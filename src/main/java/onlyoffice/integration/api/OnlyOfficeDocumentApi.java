@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.util.ParamUtil;
 
 import onlyoffice.integration.OnlyOfficeHasher;
+import onlyoffice.integration.OnlyOfficeJWT;
 
 @Component(
     immediate = true,
@@ -103,8 +104,10 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 		    		error = "Empty body";
 		    	} else {
 					JSONObject jsonObj = new JSONObject(body);
-			
-					// jwt? jsonObj = jwt.validate;
+
+					if (_jwt.isEnabled()) {
+						jsonObj = _jwt.validate(jsonObj, request);
+					}
 					
 					result = processData(file, jsonObj, request);
 		    	}
@@ -217,6 +220,9 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 			OnlyOfficeDocumentApi.class);
+
+	@Reference
+	private OnlyOfficeJWT _jwt;
 
 	@Reference
 	private OnlyOfficeHasher _hasher;

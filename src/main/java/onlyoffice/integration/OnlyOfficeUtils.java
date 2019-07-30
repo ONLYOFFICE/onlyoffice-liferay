@@ -73,7 +73,11 @@ public class OnlyOfficeUtils {
             
             userObject.put("firstname", user.getFirstName());
             userObject.put("lastname", user.getLastName());
-            userObject.put("name", user.getFullName());            
+            userObject.put("name", user.getFullName());
+
+			if (_jwt.isEnabled()) {
+				responseJson.put("token", _jwt.createToken(responseJson));
+			}
         } catch (Exception e) {
         	_log.error(e.getMessage(), e);
         }
@@ -91,6 +95,9 @@ public class OnlyOfficeUtils {
         if (".pps.ppsx.ppsm.ppt.pptx.pptm.pot.potx.potm.odp.fodp.otp".indexOf(ext) != -1) return "presentation";
         return null;
     }
+
+	@Reference
+	private OnlyOfficeJWT _jwt;
 
 	@Reference
 	private OnlyOfficeHasher _hasher;
