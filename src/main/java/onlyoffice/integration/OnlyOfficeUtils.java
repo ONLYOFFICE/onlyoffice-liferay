@@ -33,7 +33,7 @@ public class OnlyOfficeUtils {
 	
 	public boolean isViewable(String ext) {
 		if (".odt.doc.ods.xls.odp.ppt".indexOf(ext) != -1) return true;
-		return false;
+		return isEditable(ext);
 	}
 	
 	public String getDocumentConfig(FileVersion file, RenderRequest req) {
@@ -78,7 +78,7 @@ public class OnlyOfficeUtils {
         	_log.error(e.getMessage(), e);
         }
         
-        return responseJson.toString();
+        return responseJson.toString().replace("'", "\\'");
 	}
 
 	private String getBaseUrl(PortletRequest req) {

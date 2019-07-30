@@ -20,9 +20,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
+import com.liferay.portal.kernel.servlet.taglib.ui.ToolbarItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
+import com.liferay.portal.kernel.servlet.taglib.ui.URLToolbarItem;
+import com.liferay.portal.kernel.servlet.taglib.ui.URLUIItem;
 import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsException;
@@ -50,31 +54,45 @@ extends BaseDLViewFileVersionDisplayContext {
 		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 		_utils = utils;
+
+		String ext = fileVersion.getExtension();
+		_canEdit = _utils.isEditable(ext);
+		_canView = _utils.isViewable(ext);
 	}
 	
 	public Menu getMenu() throws PortalException {
 		Menu menu = super.getMenu();
-	
-		String ext = fileVersion.getExtension();
-		boolean edit = _utils.isEditable(ext);
-		boolean view = _utils.isViewable(ext);
 		
-		if (showAction() && (edit || view)) {
+		if (showAction() && _canView) {
 			URLMenuItem item = new URLMenuItem();
-			
-			item.setLabel(edit ? LanguageUtil.get(request, _res, "onlyoffice-context-action-edit")
-					: LanguageUtil.get(request, _res, "onlyoffice-context-action-view"));
-			item.setTarget("_blank");
-			item.setURL(getDocUrl());
-	
+			InitUrlItem(item);
 			List<MenuItem> list = menu.getMenuItems();
-	
 			list.add(item);
 		}
 	
 		return menu;
 	}
 	
+	@Override
+	public List<ToolbarItem> getToolbarItems() throws PortalException {
+		List<ToolbarItem> toolbarItems = super.getToolbarItems();
+
+		if (_canView) {
+			URLToolbarItem item = new URLToolbarItem();
+			InitUrlItem(item);
+			toolbarItems.add(item);
+		}
+
+		return toolbarItems;
+	}
+
+	private void InitUrlItem(URLUIItem item) {
+		item.setLabel(_canEdit ? LanguageUtil.get(request, _res, "onlyoffice-context-action-edit")
+				: LanguageUtil.get(request, _res, "onlyoffice-context-action-view"));
+		item.setTarget("_blank");
+		item.setURL(getDocUrl());
+	}
+
 	private String getDocUrl() {
 		PortletURL portletURL = PortletURLFactoryUtil.create(
 			request, "onlyoffice_integration_ui_EditActionPortlet",
@@ -97,7 +115,7 @@ extends BaseDLViewFileVersionDisplayContext {
 		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
 	
 		String portletName = portletDisplay.getPortletName();
-	
+
 		if (portletName.equals(PortletKeys.DOCUMENT_LIBRARY_ADMIN)) {
 			return true;
 		}
@@ -118,4 +136,6 @@ extends BaseDLViewFileVersionDisplayContext {
 	
 	private ThemeDisplay _themeDisplay;
 	private OnlyOfficeUtils _utils;
+	boolean _canEdit;
+	boolean _canView;
 }
