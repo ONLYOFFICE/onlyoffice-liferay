@@ -22,8 +22,15 @@ import onlyoffice.integration.config.OnlyOfficeConfigManager;
 )
 public class OnlyOfficeUtils {
 	public String getDocServerUrl() {
-		String url = _config.getDocUrl();
-		return url.endsWith("/") ? url : url + "/";
+		return fixUrl(_config.getDocUrl());
+	}
+
+	public String getDocServerInnnerUrl() {
+		return fixUrl(_config.getDocInnerUrlOrDefault(_config.getDocUrl()));
+	}
+
+	public String getLiferayUrl(PortletRequest req) {
+		return fixUrl(_config.getLiferayUrlOrDefault(PortalUtil.getPortalURL(req)));
 	}
 	
 	public boolean isEditable(String ext) {
@@ -48,7 +55,7 @@ public class OnlyOfficeUtils {
         	User user = PortalUtil.getUser(req);
         	Long fileVersionId = file.getFileVersionId();
     		boolean edit = isEditable(ext);
-        	String url = getBaseUrl(req) + "/o/onlyoffice/doc?key=" + _hasher.getHash(fileVersionId);
+    		String url = getLiferayUrl(req) + "o/onlyoffice/doc?key=" + _hasher.getHash(fileVersionId);
     		
             responseJson.put("type", "desktop");
             responseJson.put("width", "100%");
@@ -85,8 +92,8 @@ public class OnlyOfficeUtils {
         return responseJson.toString().replace("'", "\\'");
 	}
 
-	private String getBaseUrl(PortletRequest req) {
-		return PortalUtil.getPortalURL(req);
+	private String fixUrl(String url) {
+		return url.endsWith("/") ? url : url + "/";
 	}
 
 	private String getDocType(String ext) {

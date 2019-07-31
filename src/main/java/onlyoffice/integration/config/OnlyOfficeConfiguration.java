@@ -22,6 +22,18 @@ public @interface OnlyOfficeConfiguration {
     )
     public String docServUrl() default "http://127.0.0.1/";
 
+	@AttributeDefinition(
+        required = false,
+        name = "onlyoffice-config-docserv-inner-url-name", description = "onlyoffice-config-docserv-inner-url-desc"
+    )
+    public String docServInnerUrl() default "";
+
+	@AttributeDefinition(
+        required = false,
+        name = "onlyoffice-config-liferay-url-name", description = "onlyoffice-config-liferay-url-desc"
+    )
+    public String liferayUrl() default "";
+
     @AttributeDefinition(
 		required = false,
 		name = "onlyoffice-config-secret-name", description = "onlyoffice-config-secret-desc"
