@@ -2,7 +2,6 @@ package onlyoffice.integration.api;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Scanner;
@@ -31,6 +30,7 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StreamUtil;
 
 import onlyoffice.integration.OnlyOfficeHasher;
 import onlyoffice.integration.OnlyOfficeJWT;
@@ -66,13 +66,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 	        response.setHeader("Content-Length", Long.toString(file.getSize()));
 	        response.setContentType(file.getMimeType());
 
-	        InputStream is = file.getContentStream(false);
-	        OutputStream os = response.getOutputStream();
-	     
-	        byte[] buffer = new byte[10240];
-	        for (int length = 0; (length = is.read(buffer)) > 0;) {
-	            os.write(buffer, 0, length);
-	        }
+	        StreamUtil.transfer(file.getContentStream(false), response.getOutputStream());
 		} catch (PortalException e) {
 			_log.error(e.getMessage(), e);
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());

@@ -39,7 +39,7 @@ public class OnlyOfficeUtils {
 	}
 	
 	public boolean isViewable(String ext) {
-		if (".odt.doc.ods.xls.odp.ppt".indexOf(ext) != -1) return true;
+		if (".odt.doc.ods.xls.odp.ppt.txt.pdf".indexOf(ext) != -1) return true;
 		return isEditable(ext);
 	}
 	
@@ -55,7 +55,7 @@ public class OnlyOfficeUtils {
         	User user = PortalUtil.getUser(req);
         	Long fileVersionId = file.getFileVersionId();
     		boolean edit = isEditable(ext);
-    		String url = getLiferayUrl(req) + "o/onlyoffice/doc?key=" + _hasher.getHash(fileVersionId);
+    		String url = getFileUrl(req, fileVersionId);
     		
             responseJson.put("type", "desktop");
             responseJson.put("width", "100%");
@@ -90,6 +90,10 @@ public class OnlyOfficeUtils {
         }
         
         return responseJson.toString().replace("'", "\\'");
+	}
+
+	public String getFileUrl(PortletRequest req, Long id) {
+		return getLiferayUrl(req) + "o/onlyoffice/doc?key=" + _hasher.getHash(id);
 	}
 
 	private String fixUrl(String url) {
