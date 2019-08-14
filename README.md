@@ -10,7 +10,7 @@ This plugin enables users to edit office documents from [Liferay](https://www.li
 
 ## Installing ONLYOFFICE Document Server
 
-You will need an instance of ONLYOFFICE Document Server that is resolvable and connectable both from Liferay and any end clients. If that is not the case, use the official ONLYOFFICE Document Server documetnations page: [Document Server for Linux](http://helpcenter.onlyoffice.com/server/linux/document/linux-installation.aspx). ONLYOFFICE Document Server must also be able to POST to Liferay directly.
+You will need an instance of ONLYOFFICE Document Server that is resolvable and connectable both from Liferay and any end clients. If that is not the case, use the official ONLYOFFICE Document Server documetnation page: [Document Server for Linux](http://helpcenter.onlyoffice.com/server/linux/document/linux-installation.aspx). ONLYOFFICE Document Server must also be able to POST to Liferay directly.
 
 The easiest way to start an instance of ONLYOFFICE Document Server is to use [Docker](https://github.com/onlyoffice/Docker-DocumentServer).
 
@@ -32,7 +32,7 @@ In order to configure plugin you must navigate to *System Settings* `(Control Pa
 
 ## How it works
 
-The ONLYOFFICE integration follows the API documented here https://api.onlyoffice.com/editors/basic:
+The ONLYOFFICE integration follows the API documented here https://api.onlyoffice.com/editors/basic.
 
 
 ## ONLYOFFICE Document Server editions 
