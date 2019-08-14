@@ -1,7 +1,12 @@
 # Liferay ONLYOFFICE integration plugin
 
-This plugin enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Document Server. Currently the following document formats can be opened and edited with this plugin: DOCX, XLSX, PPTX.
+This plugin enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Document Server.
 
+## Features
+* Currently the following document formats can be opened and edited with this plugin: DOCX, XLSX, PPTX.
+* The following formats are available for view only: ODT, ODS, ODP, DOC, XLS, PPT.
+* The plugin will create a new *ONLYOFFICE Edit/View*  menu option within the *Documents and Media* section for Office documents.
+* This allows multiple users to collaborate in real time and to save back those changes to Liferay.
 
 ## Installing ONLYOFFICE Document Server
 
@@ -12,14 +17,17 @@ The easiest way to start an instance of ONLYOFFICE Document Server is to use [Do
 
 ## Compiling Liferay ONLYOFFICE integration plugin
 
-
-## Installing ONLYOFFICE Document Server
+Simply run `gradle build`. Output .jar will be placed inside `build/libs` directory.
 
 
 ## Installing Liferay ONLYOFFICE integration plugin
 
+Either install it from Liferay Marketplace or if you're building the plugin by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install the plugin automatically.
+
 
 ## Configuring Liferay CONLYOFFICE integration plugin
+
+In order to configure plugin you must navigate to *System Settings* `(Control Panel -> Configuration -> System Settings)`. In *Platform* section click on *Connectors* category and select ONLYOFFICE.
 
 
 ## How it works
