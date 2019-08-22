@@ -32,7 +32,21 @@ In order to configure plugin you must navigate to *System Settings* `(Control Pa
 
 ## How it works
 
-The ONLYOFFICE integration follows the API documented here https://api.onlyoffice.com/editors/basic.
+The ONLYOFFICE integration follows the API documented [here](https://api.onlyoffice.com/editors/basic):
+
+* User navigates to a *Documents and Media* section within Liferay and selects the `Edit in ONLYOFFICE` action.
+* Liferay prepares a JSON object for the Document Server with the following properties:
+  * **docUrl**: the URL that ONLYOFFICE Document Server uses to download the document,
+  * **callbackUrl**: the URL that ONLYOFFICE Document Server informs about status of the document editing;
+  * **key**: the fileVersionId to instruct ONLYOFFICE Document Server whether to download the document again or not;
+  * **docTitle**: the document Title (name).
+* The client browser makes a request for the javascript library from ONLYOFFICE Document Server and sends ONLYOFFICE Document Server the docEditor configuration with the above properties.
+* Then ONLYOFFICE Document Server downloads the document from Liferay and the user begins editing.
+* ONLYOFFICE Document Server sends a POST request to the `callback` URL to inform Liferay that a user is editing the document.
+* Liferay locks the document, but still allows other users with write access the ability to collaborate in real time with ONLYOFFICE Document Server by leaving the Action present.
+* When all users and client browsers are done with editing, they close the editing window.
+* After 10 seconds of inactivity, ONLYOFFICE Document Server sends a POST to the `callback` URL letting Liferay know that the clients have finished editing the document and closed it.
+* Liferay downloads the new version of the document, replacing the old one.
 
 
 ## ONLYOFFICE Document Server editions 
