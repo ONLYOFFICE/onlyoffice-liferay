@@ -175,7 +175,9 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                 break;
             case 2:
                 _log.info("Document updated, changing content");
-                _dlFile.unlockFileEntry(fileId);
+                if (file.isSupportsLocking()) {
+                    _dlFile.unlockFileEntry(fileId);
+                }
                 if (!updateFile(file, userId, body.getString("url"), request))
                 {
                     result = false;
@@ -183,11 +185,15 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                 break;
             case 3:
                 _log.error("ONLYOFFICE has reported that saving the document has failed");
-                _dlFile.unlockFileEntry(fileId);
+                if (file.isSupportsLocking()) {
+                    _dlFile.unlockFileEntry(fileId);
+                }
                 break;
             case 4:
                 _log.info("No document updates");
-                _dlFile.unlockFileEntry(fileId);
+                if (file.isSupportsLocking()) {
+                    _dlFile.unlockFileEntry(fileId);
+                }
                 break;
         }
 
