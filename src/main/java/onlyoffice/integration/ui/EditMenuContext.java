@@ -40,101 +40,99 @@ import onlyoffice.integration.OnlyOfficeUtils;
 
 public class EditMenuContext
 extends BaseDLViewFileVersionDisplayContext {
-	
-	public EditMenuContext(
-		UUID uuid, DLViewFileVersionDisplayContext parentDLDisplayContext,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, FileVersion fileVersion, OnlyOfficeUtils utils) {
-	
-		super(
-			uuid, parentDLDisplayContext, httpServletRequest,
-			httpServletResponse, fileVersion);
-	
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-		_utils = utils;
 
-		String ext = fileVersion.getExtension();
-		_canEdit = _utils.isEditable(ext);
-		_canView = _utils.isViewable(ext);
-	}
-	
-	public Menu getMenu() throws PortalException {
-		Menu menu = super.getMenu();
-		
-		if (showAction() && _canView) {
-			URLMenuItem item = new URLMenuItem();
-			InitUrlItem(item);
-			List<MenuItem> list = menu.getMenuItems();
-			list.add(item);
-		}
-	
-		return menu;
-	}
-	
-	@Override
-	public List<ToolbarItem> getToolbarItems() throws PortalException {
-		List<ToolbarItem> toolbarItems = super.getToolbarItems();
+    public EditMenuContext(
+        UUID uuid, DLViewFileVersionDisplayContext parentDLDisplayContext,
+        HttpServletRequest httpServletRequest,
+        HttpServletResponse httpServletResponse, FileVersion fileVersion, OnlyOfficeUtils utils) {
 
-		if (_canView) {
-			URLToolbarItem item = new URLToolbarItem();
-			InitUrlItem(item);
-			toolbarItems.add(item);
-		}
+        super(
+            uuid, parentDLDisplayContext, httpServletRequest,
+            httpServletResponse, fileVersion);
 
-		return toolbarItems;
-	}
+        _themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+        _utils = utils;
 
-	private void InitUrlItem(URLUIItem item) {
-		item.setLabel(_canEdit ? LanguageUtil.get(request, _res, "onlyoffice-context-action-edit")
-				: LanguageUtil.get(request, _res, "onlyoffice-context-action-view"));
-		item.setTarget("_blank");
-		item.setURL(getDocUrl());
-	}
+        String ext = fileVersion.getExtension();
+        _canEdit = _utils.isEditable(ext);
+        _canView = _utils.isViewable(ext);
+    }
 
-	private String getDocUrl() {
-		PortletURL portletURL = PortletURLFactoryUtil.create(
-			request, "onlyoffice_integration_ui_EditActionPortlet",
-			_themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+    public Menu getMenu() throws PortalException {
+        Menu menu = super.getMenu();
+        
+        if (showAction() && _canView) {
+            URLMenuItem item = new URLMenuItem();
+            InitUrlItem(item);
+            List<MenuItem> list = menu.getMenuItems();
+            list.add(item);
+        }
 
-		MutableRenderParameters params = portletURL.getRenderParameters();
-		params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
+        return menu;
+    }
 
-		try {
-			portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
-		}
-		catch (WindowStateException wse) {
-			_log.error(wse.getMessage(), wse);
-		}
-	
-		return portletURL.toString();
-	}
-	
-	private boolean showAction() throws SettingsException {
-		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
-	
-		String portletName = portletDisplay.getPortletName();
+    @Override
+    public List<ToolbarItem> getToolbarItems() throws PortalException {
+        List<ToolbarItem> toolbarItems = super.getToolbarItems();
 
-		if (portletName.equals(PortletKeys.DOCUMENT_LIBRARY_ADMIN)) {
-			return true;
-		}
-	
-		Settings settings = SettingsFactoryUtil.getSettings(
-			new PortletInstanceSettingsLocator(
-				_themeDisplay.getLayout(), portletDisplay.getId()));
-	
-		TypedSettings typedSettings = new TypedSettings(settings);
-	
-		return typedSettings.getBooleanValue("showActions");
-	}
-	
-	private static final Log _log = LogFactoryUtil.getLog(
-		EditMenuContext.class);
-	
-	private static final ResourceBundle _res = ResourceBundle.getBundle("content/Language");
-	
-	private ThemeDisplay _themeDisplay;
-	private OnlyOfficeUtils _utils;
-	boolean _canEdit;
-	boolean _canView;
+        if (_canView) {
+            URLToolbarItem item = new URLToolbarItem();
+            InitUrlItem(item);
+            toolbarItems.add(item);
+        }
+
+        return toolbarItems;
+    }
+
+    private void InitUrlItem(URLUIItem item) {
+        item.setLabel(_canEdit ? LanguageUtil.get(request, _res, "onlyoffice-context-action-edit")
+                : LanguageUtil.get(request, _res, "onlyoffice-context-action-view"));
+        item.setTarget("_blank");
+        item.setURL(getDocUrl());
+    }
+
+    private String getDocUrl() {
+        PortletURL portletURL = PortletURLFactoryUtil.create(
+            request, "onlyoffice_integration_ui_EditActionPortlet",
+            _themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+
+        MutableRenderParameters params = portletURL.getRenderParameters();
+        params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
+
+        try {
+            portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
+        }
+        catch (WindowStateException wse) {
+            _log.error(wse.getMessage(), wse);
+        }
+
+        return portletURL.toString();
+    }
+
+    private boolean showAction() throws SettingsException {
+        PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
+
+        String portletName = portletDisplay.getPortletName();
+
+        if (portletName.equals(PortletKeys.DOCUMENT_LIBRARY_ADMIN)) {
+            return true;
+        }
+
+        Settings settings = SettingsFactoryUtil.getSettings(
+            new PortletInstanceSettingsLocator(
+                _themeDisplay.getLayout(), portletDisplay.getId()));
+
+        TypedSettings typedSettings = new TypedSettings(settings);
+
+        return typedSettings.getBooleanValue("showActions");
+    }
+
+    private static final Log _log = LogFactoryUtil.getLog(EditMenuContext.class);
+
+    private static final ResourceBundle _res = ResourceBundle.getBundle("content/Language");
+
+    private ThemeDisplay _themeDisplay;
+    private OnlyOfficeUtils _utils;
+    boolean _canEdit;
+    boolean _canView;
 }

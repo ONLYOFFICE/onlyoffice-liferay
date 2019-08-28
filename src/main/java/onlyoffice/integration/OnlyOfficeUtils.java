@@ -21,35 +21,35 @@ import onlyoffice.integration.config.OnlyOfficeConfigManager;
     service = OnlyOfficeUtils.class
 )
 public class OnlyOfficeUtils {
-	public String getDocServerUrl() {
-		String url = _config.getDocUrl();
-		return url.endsWith("/") ? url : url + "/";
-	}
-	
-	public boolean isEditable(String ext) {
-		if (".docx.xlsx.pptx".indexOf(ext) != -1) return true;
-		return false;
-	}
-	
-	public boolean isViewable(String ext) {
-		if (".odt.doc.ods.xls.odp.ppt".indexOf(ext) != -1) return true;
-		return isEditable(ext);
-	}
-	
-	public String getDocumentConfig(FileVersion file, RenderRequest req) {
-		JSONObject responseJson = new JSONObject();
+    public String getDocServerUrl() {
+        String url = _config.getDocUrl();
+        return url.endsWith("/") ? url : url + "/";
+    }
+
+    public boolean isEditable(String ext) {
+        if (".docx.xlsx.pptx".indexOf(ext) != -1) return true;
+        return false;
+    }
+
+    public boolean isViewable(String ext) {
+        if (".odt.doc.ods.xls.odp.ppt".indexOf(ext) != -1) return true;
+        return isEditable(ext);
+    }
+
+    public String getDocumentConfig(FileVersion file, RenderRequest req) {
+        JSONObject responseJson = new JSONObject();
         JSONObject documentObject = new JSONObject();
         JSONObject editorConfigObject = new JSONObject();
         JSONObject userObject = new JSONObject();
         JSONObject permObject = new JSONObject();
         
         try {
-        	String ext = file.getExtension();
-        	User user = PortalUtil.getUser(req);
-        	Long fileVersionId = file.getFileVersionId();
-    		boolean edit = isEditable(ext);
-        	String url = getBaseUrl(req) + "/o/onlyoffice/doc?key=" + _hasher.getHash(fileVersionId);
-    		
+            String ext = file.getExtension();
+            User user = PortalUtil.getUser(req);
+            Long fileVersionId = file.getFileVersionId();
+            boolean edit = isEditable(ext);
+            String url = getBaseUrl(req) + "/o/onlyoffice/doc?key=" + _hasher.getHash(fileVersionId);
+            
             responseJson.put("type", "desktop");
             responseJson.put("width", "100%");
             responseJson.put("height", "100%");
@@ -65,9 +65,9 @@ public class OnlyOfficeUtils {
             responseJson.put("editorConfig", editorConfigObject);
             editorConfigObject.put("lang", LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag());
             editorConfigObject.put("mode", edit ? "edit" : "view");
-			if (edit) {
-				editorConfigObject.put("callbackUrl", url);
-			}
+            if (edit) {
+                editorConfigObject.put("callbackUrl", url);
+            }
             editorConfigObject.put("user", userObject);
             userObject.put("id", user.getUserId());
             
@@ -75,36 +75,35 @@ public class OnlyOfficeUtils {
             userObject.put("lastname", user.getLastName());
             userObject.put("name", user.getFullName());
 
-			if (_jwt.isEnabled()) {
-				responseJson.put("token", _jwt.createToken(responseJson));
-			}
+            if (_jwt.isEnabled()) {
+                responseJson.put("token", _jwt.createToken(responseJson));
+            }
         } catch (Exception e) {
-        	_log.error(e.getMessage(), e);
+            _log.error(e.getMessage(), e);
         }
         
         return responseJson.toString().replace("'", "\\'");
-	}
+    }
 
-	private String getBaseUrl(PortletRequest req) {
-		return PortalUtil.getPortalURL(req);
-	}
+    private String getBaseUrl(PortletRequest req) {
+        return PortalUtil.getPortalURL(req);
+    }
 
-	private String getDocType(String ext) {
+    private String getDocType(String ext) {
         if (".doc.docx.docm.dot.dotx.dotm.odt.fodt.ott.rtf.txt.html.htm.mht.pdf.djvu.fb2.epub.xps".indexOf(ext) != -1) return "text";
         if (".xls.xlsx.xlsm.xlt.xltx.xltm.ods.fods.ots.csv".indexOf(ext) != -1) return "spreadsheet";
         if (".pps.ppsx.ppsm.ppt.pptx.pptm.pot.potx.potm.odp.fodp.otp".indexOf(ext) != -1) return "presentation";
         return null;
     }
 
-	@Reference
-	private OnlyOfficeJWT _jwt;
+    @Reference
+    private OnlyOfficeJWT _jwt;
 
-	@Reference
-	private OnlyOfficeHasher _hasher;
-	
-	@Reference
-	private OnlyOfficeConfigManager _config;
-	
-	private static final Log _log = LogFactoryUtil.getLog(
-			OnlyOfficeUtils.class);
+    @Reference
+    private OnlyOfficeHasher _hasher;
+
+    @Reference
+    private OnlyOfficeConfigManager _config;
+
+    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeUtils.class);
 }

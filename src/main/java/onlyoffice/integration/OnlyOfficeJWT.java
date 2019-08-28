@@ -21,34 +21,34 @@ import onlyoffice.integration.config.OnlyOfficeConfigManager;
 )
 public class OnlyOfficeJWT {
 
-	public Boolean isEnabled() {
-		String jwts = _config.getSecret();
+    public Boolean isEnabled() {
+        String jwts = _config.getSecret();
         return jwts != null && !jwts.isEmpty();
     }
 
     public String createToken(JSONObject payload) {
-    	if (!isEnabled()) return "";
+        if (!isEnabled()) return "";
 
-    	try {
-	        JSONObject header = new JSONObject();
-	        header.put("alg", "HS256");
-	        header.put("typ", "JWT");
+        try {
+            JSONObject header = new JSONObject();
+            header.put("alg", "HS256");
+            header.put("typ", "JWT");
 
-	        Encoder enc = Base64.getUrlEncoder();
+            Encoder enc = Base64.getUrlEncoder();
 
-	        String encHeader = enc.encodeToString(header.toString().getBytes("UTF-8")).replace("=", "");
-	        String encPayload = enc.encodeToString(payload.toString().getBytes("UTF-8")).replace("=", "");
-	        String hash = calculateHash(encHeader, encPayload);
+            String encHeader = enc.encodeToString(header.toString().getBytes("UTF-8")).replace("=", "");
+            String encPayload = enc.encodeToString(payload.toString().getBytes("UTF-8")).replace("=", "");
+            String hash = calculateHash(encHeader, encPayload);
 
-	        return encHeader + "." + encPayload + "." + hash;
-    	} catch(Exception ex) {
-        	_log.error("Couldn't createToken: " + ex.getMessage(), ex);
+            return encHeader + "." + encPayload + "." + hash;
+        } catch(Exception ex) {
+            _log.error("Couldn't createToken: " + ex.getMessage(), ex);
             return "";
         }
     }
 
     public JSONObject validate(JSONObject obj, HttpServletRequest req) throws Exception {
-    	String token = obj.optString("token");
+        String token = obj.optString("token");
         Boolean inBody = true;
 
         if (token == null || token == "") {
@@ -58,19 +58,19 @@ public class OnlyOfficeJWT {
         }
 
         if (token == null || token == "") {
-        	throw new SecurityException("Expected JWT");
+            throw new SecurityException("Expected JWT");
         }
 
         if (!verify(token)) {
-        	throw new SecurityException("Wrong JWT hash");
+            throw new SecurityException("Wrong JWT hash");
         }
 
         JSONObject bodyFromToken = new JSONObject(new String(Base64.getUrlDecoder().decode(token.split("\\.")[1]), "UTF-8"));
 
         if (inBody) {
-        	return bodyFromToken;
+            return bodyFromToken;
         } else {
-        	return bodyFromToken.getJSONObject("payload");
+            return bodyFromToken.getJSONObject("payload");
         }
     }
 
@@ -84,7 +84,7 @@ public class OnlyOfficeJWT {
             String hash = calculateHash(jwt[0], jwt[1]);
             if (!hash.equals(jwt[2])) return false;
         } catch(Exception ex) {
-        	_log.error("Couldn't calculate hash: " + ex.getMessage(), ex);
+            _log.error("Couldn't calculate hash: " + ex.getMessage(), ex);
             return false;
         }
 
@@ -107,9 +107,8 @@ public class OnlyOfficeJWT {
         return sha256;
     }
 
-	@Reference
-	private OnlyOfficeConfigManager _config;
+    @Reference
+    private OnlyOfficeConfigManager _config;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-			OnlyOfficeJWT.class);
+    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeJWT.class);
 }

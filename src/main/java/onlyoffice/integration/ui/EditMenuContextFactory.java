@@ -18,44 +18,44 @@ import onlyoffice.integration.OnlyOfficeUtils;
 
 @Component(immediate = true, service = DLDisplayContextFactory.class)
 public class EditMenuContextFactory
-	implements DLDisplayContextFactory {
+    implements DLDisplayContextFactory {
 
-	public DLEditFileEntryDisplayContext getDLEditFileEntryDisplayContext(
-		DLEditFileEntryDisplayContext parentDLEditFileEntryDisplayContext,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse,
-		DLFileEntryType dlFileEntryType) {
+    public DLEditFileEntryDisplayContext getDLEditFileEntryDisplayContext(
+        DLEditFileEntryDisplayContext parentDLEditFileEntryDisplayContext,
+        HttpServletRequest httpServletRequest,
+        HttpServletResponse httpServletResponse,
+        DLFileEntryType dlFileEntryType) {
 
-		return parentDLEditFileEntryDisplayContext;
-	}
+        return parentDLEditFileEntryDisplayContext;
+    }
 
-	public DLEditFileEntryDisplayContext getDLEditFileEntryDisplayContext(
-		DLEditFileEntryDisplayContext parentDLEditFileEntryDisplayContext,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, FileEntry fileEntry) {
+    public DLEditFileEntryDisplayContext getDLEditFileEntryDisplayContext(
+        DLEditFileEntryDisplayContext parentDLEditFileEntryDisplayContext,
+        HttpServletRequest httpServletRequest,
+        HttpServletResponse httpServletResponse, FileEntry fileEntry) {
 
-		return parentDLEditFileEntryDisplayContext;
-	}
+        return parentDLEditFileEntryDisplayContext;
+    }
 
-	public DLViewFileVersionDisplayContext getDLViewFileVersionDisplayContext(
-		DLViewFileVersionDisplayContext parentDLViewFileVersionDisplayContext,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, FileShortcut fileShortcut) {
+    public DLViewFileVersionDisplayContext getDLViewFileVersionDisplayContext(
+        DLViewFileVersionDisplayContext parentDLViewFileVersionDisplayContext,
+        HttpServletRequest httpServletRequest,
+        HttpServletResponse httpServletResponse, FileShortcut fileShortcut) {
 
-		return parentDLViewFileVersionDisplayContext;
-	}
+        return parentDLViewFileVersionDisplayContext;
+    }
 
-	public DLViewFileVersionDisplayContext getDLViewFileVersionDisplayContext(
-		DLViewFileVersionDisplayContext parentDLViewFileVersionDisplayContext,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, FileVersion fileVersion) {
+    public DLViewFileVersionDisplayContext getDLViewFileVersionDisplayContext(
+        DLViewFileVersionDisplayContext parentDLViewFileVersionDisplayContext,
+        HttpServletRequest httpServletRequest,
+        HttpServletResponse httpServletResponse, FileVersion fileVersion) {
 
-		return new EditMenuContext(
-			parentDLViewFileVersionDisplayContext.getUuid(),
-			parentDLViewFileVersionDisplayContext, httpServletRequest,
-			httpServletResponse, fileVersion, _utils);
-	}
-	
-	@Reference
-	private OnlyOfficeUtils _utils;
+        return new EditMenuContext(
+            parentDLViewFileVersionDisplayContext.getUuid(),
+            parentDLViewFileVersionDisplayContext, httpServletRequest,
+            httpServletResponse, fileVersion, _utils);
+    }
+
+    @Reference
+    private OnlyOfficeUtils _utils;
 }

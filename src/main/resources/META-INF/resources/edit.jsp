@@ -14,11 +14,11 @@
 <portlet:defineObjects />
 
 <%
-	BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeUtils.class).getBundleContext();
+    BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeUtils.class).getBundleContext();
 
-	Long fileVersionId = ParamUtil.getLong(renderRequest, "fileId");
-	FileVersion file = DLAppLocalServiceUtil.getFileVersion(fileVersionId);
-	OnlyOfficeUtils utils = bc.getService(bc.getServiceReference(OnlyOfficeUtils.class));
+    Long fileVersionId = ParamUtil.getLong(renderRequest, "fileId");
+    FileVersion file = DLAppLocalServiceUtil.getFileVersion(fileVersionId);
+    OnlyOfficeUtils utils = bc.getService(bc.getServiceReference(OnlyOfficeUtils.class));
 %>
 
 <html>
