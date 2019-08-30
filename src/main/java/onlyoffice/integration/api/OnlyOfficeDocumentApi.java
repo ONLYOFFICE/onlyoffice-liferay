@@ -84,7 +84,6 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {
 
-        boolean result = false;
         String error = null;
 
         String key = ParamUtil.getString(request, "key");
@@ -108,7 +107,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                         jsonObj = _jwt.validate(jsonObj, request);
                     }
 
-                    result = processData(file, jsonObj, request);
+                    processData(file, jsonObj, request);
                 }
             } catch (Exception ex) {
                 _log.error("Unable to process ONLYOFFICE response: " + ex.getMessage(), ex);
@@ -118,9 +117,12 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
         try {
             JSONObject respBody = new JSONObject();
-            respBody.put("error", result ? 0 : 1);
             if (error != null) {
+                response.setStatus(500);
+                respBody.put("error", 1);
                 respBody.put("message", error);
+            } else {
+                respBody.put("error", 0);
             }
 
             response.getWriter().write(respBody.toString(2));
@@ -144,10 +146,9 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         return "";
     }
     
-    private boolean processData(FileEntry file, JSONObject body, HttpServletRequest request)
-        throws JSONException, PortalException {
+    private void processData(FileEntry file, JSONObject body, HttpServletRequest request)
+        throws JSONException, PortalException, Exception {
 
-        boolean result = true;
         Long fileId = file.getFileEntryId();
         Long userId = (long) -1;
         
@@ -178,10 +179,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                 if (file.isSupportsLocking()) {
                     _dlFile.unlockFileEntry(fileId);
                 }
-                if (!updateFile(file, userId, body.getString("url"), request))
-                {
-                    result = false;
-                }
+                updateFile(file, userId, body.getString("url"), request);
                 break;
             case 3:
                 _log.error("ONLYOFFICE has reported that saving the document has failed");
@@ -196,11 +194,9 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                 }
                 break;
         }
-
-        return result;
     }
 
-    private boolean updateFile(FileEntry file, Long userId, String url, HttpServletRequest request) {
+    private void updateFile(FileEntry file, Long userId, String url, HttpServletRequest request) throws Exception {
         _log.info("Trying to download file from URL: " + url);
 
         try {
@@ -215,11 +211,10 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             _log.info("Document saved.");
 
         } catch (Exception e) {
-            _log.error("Couldn't download or save file: " + e.getMessage(), e);
-            return false;
+            String msg = "Couldn't download or save file: " + e.getMessage();
+            _log.error(msg, e);
+            throw new Exception(msg);
         }
-
-        return true;
     }
 
     private static final long serialVersionUID = 1L;
