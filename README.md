@@ -36,10 +36,10 @@ The ONLYOFFICE integration follows the API documented [here](https://api.onlyoff
 
 * User navigates to a *Documents and Media* section within Liferay and selects the `Edit in ONLYOFFICE` action.
 * Liferay prepares a JSON object for the Document Server with the following properties:
-  * **docUrl**: the URL that ONLYOFFICE Document Server uses to download the document,
+  * **url**: the URL that ONLYOFFICE Document Server uses to download the document,
   * **callbackUrl**: the URL that ONLYOFFICE Document Server informs about status of the document editing;
   * **key**: the fileVersionId to instruct ONLYOFFICE Document Server whether to download the document again or not;
-  * **docTitle**: the document Title (name).
+  * **title**: the document Title (name).
 * The client browser makes a request for the javascript library from ONLYOFFICE Document Server and sends ONLYOFFICE Document Server the docEditor configuration with the above properties.
 * Then ONLYOFFICE Document Server downloads the document from Liferay and the user begins editing.
 * ONLYOFFICE Document Server sends a POST request to the `callback` URL to inform Liferay that a user is editing the document.
