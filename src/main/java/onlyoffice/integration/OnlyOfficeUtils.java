@@ -22,8 +22,15 @@ import onlyoffice.integration.config.OnlyOfficeConfigManager;
 )
 public class OnlyOfficeUtils {
     public String getDocServerUrl() {
-        String url = _config.getDocUrl();
-        return url.endsWith("/") ? url : url + "/";
+        return fixUrl(_config.getDocUrl());
+    }
+
+    public String getDocServerInnnerUrl() {
+        return fixUrl(_config.getDocInnerUrlOrDefault(_config.getDocUrl()));
+    }
+
+    public String getLiferayUrl(PortletRequest req) {
+        return fixUrl(_config.getLiferayUrlOrDefault(PortalUtil.getPortalURL(req)));
     }
 
     public boolean isEditable(String ext) {
@@ -32,7 +39,7 @@ public class OnlyOfficeUtils {
     }
 
     public boolean isViewable(String ext) {
-        if (".odt.doc.ods.xls.odp.ppt".indexOf(ext) != -1) return true;
+        if (".odt.doc.ods.xls.odp.ppt.txt.pdf".indexOf(ext) != -1) return true;
         return isEditable(ext);
     }
 
@@ -42,14 +49,14 @@ public class OnlyOfficeUtils {
         JSONObject editorConfigObject = new JSONObject();
         JSONObject userObject = new JSONObject();
         JSONObject permObject = new JSONObject();
-        
+
         try {
             String ext = file.getExtension();
             User user = PortalUtil.getUser(req);
             Long fileVersionId = file.getFileVersionId();
             boolean edit = isEditable(ext);
-            String url = getBaseUrl(req) + "/o/onlyoffice/doc?key=" + _hasher.getHash(fileVersionId);
-            
+            String url = getFileUrl(req, fileVersionId);
+
             responseJson.put("type", "desktop");
             responseJson.put("width", "100%");
             responseJson.put("height", "100%");
@@ -70,7 +77,7 @@ public class OnlyOfficeUtils {
             }
             editorConfigObject.put("user", userObject);
             userObject.put("id", user.getUserId());
-            
+
             userObject.put("firstname", user.getFirstName());
             userObject.put("lastname", user.getLastName());
             userObject.put("name", user.getFullName());
@@ -81,12 +88,16 @@ public class OnlyOfficeUtils {
         } catch (Exception e) {
             _log.error(e.getMessage(), e);
         }
-        
+
         return responseJson.toString().replace("'", "\\'");
     }
 
-    private String getBaseUrl(PortletRequest req) {
-        return PortalUtil.getPortalURL(req);
+    public String getFileUrl(PortletRequest req, Long id) {
+        return getLiferayUrl(req) + "o/onlyoffice/doc?key=" + _hasher.getHash(id);
+    }
+
+    private String fixUrl(String url) {
+        return url.endsWith("/") ? url : url + "/";
     }
 
     private String getDocType(String ext) {
@@ -105,5 +116,6 @@ public class OnlyOfficeUtils {
     @Reference
     private OnlyOfficeConfigManager _config;
 
-    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeUtils.class);
+    private static final Log _log = LogFactoryUtil.getLog(
+            OnlyOfficeUtils.class);
 }

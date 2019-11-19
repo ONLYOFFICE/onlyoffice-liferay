@@ -14,6 +14,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 
+import onlyoffice.integration.OnlyOfficeConvertUtils;
 import onlyoffice.integration.OnlyOfficeUtils;
 
 @Component(immediate = true, service = DLDisplayContextFactory.class)
@@ -53,8 +54,11 @@ public class EditMenuContextFactory
         return new EditMenuContext(
             parentDLViewFileVersionDisplayContext.getUuid(),
             parentDLViewFileVersionDisplayContext, httpServletRequest,
-            httpServletResponse, fileVersion, _utils);
+            httpServletResponse, fileVersion, _utils, _convertUtils);
     }
+
+    @Reference
+    private OnlyOfficeConvertUtils _convertUtils;
 
     @Reference
     private OnlyOfficeUtils _utils;

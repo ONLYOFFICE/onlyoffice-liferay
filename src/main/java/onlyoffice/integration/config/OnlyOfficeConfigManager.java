@@ -19,6 +19,16 @@ public class OnlyOfficeConfigManager {
         return configuration.docServUrl();
     }
 
+    public String getDocInnerUrlOrDefault(String def) {
+        String url = configuration.docServUrl();
+        return url == null || url.isEmpty() ? def : url;
+    }
+
+    public String getLiferayUrlOrDefault(String def) {
+        String url = configuration.liferayUrl();
+        return url == null || url.isEmpty() ? def : url;
+    }
+
     public String getSecret() {
         return configuration.secret();
     }

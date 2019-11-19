@@ -20,6 +20,9 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptMenuItem;
+import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptToolbarItem;
+import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptUIItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.ToolbarItem;
@@ -36,6 +39,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import onlyoffice.integration.OnlyOfficeConvertUtils;
 import onlyoffice.integration.OnlyOfficeUtils;
 
 public class EditMenuContext
@@ -44,28 +48,36 @@ extends BaseDLViewFileVersionDisplayContext {
     public EditMenuContext(
         UUID uuid, DLViewFileVersionDisplayContext parentDLDisplayContext,
         HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse, FileVersion fileVersion, OnlyOfficeUtils utils) {
+        HttpServletResponse httpServletResponse, FileVersion fileVersion, OnlyOfficeUtils utils,  OnlyOfficeConvertUtils convertUtils) {
 
         super(
             uuid, parentDLDisplayContext, httpServletRequest,
             httpServletResponse, fileVersion);
 
-        _themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-        _utils = utils;
+        _themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+            WebKeys.THEME_DISPLAY);
 
         String ext = fileVersion.getExtension();
-        _canEdit = _utils.isEditable(ext);
-        _canView = _utils.isViewable(ext);
+        _canEdit = utils.isEditable(ext);
+        _canView = utils.isViewable(ext);
+        _canConvert = convertUtils.isConvertable(ext);
     }
 
     public Menu getMenu() throws PortalException {
         Menu menu = super.getMenu();
-        
-        if (showAction() && _canView) {
-            URLMenuItem item = new URLMenuItem();
-            InitUrlItem(item);
-            List<MenuItem> list = menu.getMenuItems();
-            list.add(item);
+        List<MenuItem> list = menu.getMenuItems();
+
+        if (showAction()) {
+            if (_canView) {
+                URLMenuItem item = new URLMenuItem();
+                InitViewItem(item);
+                list.add(item);
+            }
+            if (_canConvert) {
+                JavaScriptMenuItem item = new JavaScriptMenuItem();
+                InitConvertItem(item);
+                list.add(item);
+            }
         }
 
         return menu;
@@ -77,18 +89,37 @@ extends BaseDLViewFileVersionDisplayContext {
 
         if (_canView) {
             URLToolbarItem item = new URLToolbarItem();
-            InitUrlItem(item);
+            InitViewItem(item);
             toolbarItems.add(item);
         }
-
+        if (_canConvert) {
+            JavaScriptToolbarItem item = new JavaScriptToolbarItem();
+            InitConvertItem(item);
+            toolbarItems.add(item);
+        }
         return toolbarItems;
     }
 
-    private void InitUrlItem(URLUIItem item) {
+    private void InitViewItem(URLUIItem item) {
         item.setLabel(_canEdit ? LanguageUtil.get(request, _res, "onlyoffice-context-action-edit")
                 : LanguageUtil.get(request, _res, "onlyoffice-context-action-view"));
         item.setTarget("_blank");
         item.setURL(getDocUrl());
+    }
+
+    private void InitConvertItem(JavaScriptUIItem item) {
+        String lang = LanguageUtil.get(request, _res, "onlyoffice-context-action-convert");
+        item.setLabel(lang);
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Liferay.Util.openWindow({");
+        sb.append("dialog: {cache:false,width:500,height:200,modal:true},");
+        sb.append("title: '" + lang + "',id: ");
+        sb.append("'onlyofficeConvertPopup',uri:'");
+        sb.append(getConvertUrl() + "'});");
+
+        item.setOnClick(sb.toString());
     }
 
     private String getDocUrl() {
@@ -101,6 +132,24 @@ extends BaseDLViewFileVersionDisplayContext {
 
         try {
             portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
+        }
+        catch (WindowStateException wse) {
+            _log.error(wse.getMessage(), wse);
+        }
+
+        return portletURL.toString();
+    }
+
+    private String getConvertUrl() {
+        PortletURL portletURL = PortletURLFactoryUtil.create(
+            request, "onlyoffice_integration_ui_ConvertActionPortlet",
+            _themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+
+        MutableRenderParameters params = portletURL.getRenderParameters();
+        params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
+
+        try {
+            portletURL.setWindowState(LiferayWindowState.POP_UP);
         }
         catch (WindowStateException wse) {
             _log.error(wse.getMessage(), wse);
@@ -127,12 +176,13 @@ extends BaseDLViewFileVersionDisplayContext {
         return typedSettings.getBooleanValue("showActions");
     }
 
-    private static final Log _log = LogFactoryUtil.getLog(EditMenuContext.class);
+    private static final Log _log = LogFactoryUtil.getLog(
+        EditMenuContext.class);
 
     private static final ResourceBundle _res = ResourceBundle.getBundle("content/Language");
 
     private ThemeDisplay _themeDisplay;
-    private OnlyOfficeUtils _utils;
     boolean _canEdit;
     boolean _canView;
+    boolean _canConvert;
 }
