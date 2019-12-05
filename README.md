@@ -22,7 +22,7 @@ Simply run `gradle build`. Output .jar will be placed inside `build/libs` direct
 
 ## Installing Liferay ONLYOFFICE integration plugin
 
-Either install it from Liferay Marketplace or if you're building the plugin by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install the plugin automatically.
+Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace/-/mp/application/171169174) or if you're building the plugin by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install the plugin automatically.
 
 
 ## Configuring Liferay CONLYOFFICE integration plugin
