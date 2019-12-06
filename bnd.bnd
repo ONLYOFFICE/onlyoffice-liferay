@@ -1,0 +1,7 @@
+Bundle-Name: onlyoffice-integration-web
+Bundle-SymbolicName: onlyoffice.integration.web
+Bundle-Version: 1.0.0
+Import-Package: !org.apache.log,*
+-metatype: *
+-includeresource:\
+	lib/httpclient.jar=httpclient-*.jar,\
