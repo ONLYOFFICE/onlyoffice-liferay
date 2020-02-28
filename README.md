@@ -1,34 +1,43 @@
 # Liferay ONLYOFFICE integration plugin
 
-This plugin enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Document Server.
+This plugin enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Document Server - [Community or Integration Edition](#onlyoffice-document-server-editions).
 
 ## Features
-* Currently the following document formats can be opened and edited with this plugin: DOCX, XLSX, PPTX.
-* The following formats are available for view only: ODT, ODS, ODP, DOC, XLS, PPT.
-* The plugin will create a new *ONLYOFFICE Edit/View*  menu option within the *Documents and Media* section for Office documents.
-* This allows multiple users to collaborate in real time and to save back those changes to Liferay.
+
+The plugin allows to:
+
+* Create and edit text documents, spreadsheets, and presentations.
+* Share documents with other users.
+* Co-edit documents in real-time: use two co-editing modes (Fast and Strict), Track Changes, comments, and built-in chat.
+
+Supported formats: 
+
+* For opening and editing: DOCX, XLSX, PPTX.
+* For viewing only: ODT, ODS, ODP, DOC, XLS, PPT, PDF.
 
 ## Installing ONLYOFFICE Document Server
 
-You will need an instance of ONLYOFFICE Document Server that is resolvable and connectable both from Liferay and any end clients. If that is not the case, use the official ONLYOFFICE Document Server documetnation page: [Document Server for Linux](http://helpcenter.onlyoffice.com/server/linux/document/linux-installation.aspx). ONLYOFFICE Document Server must also be able to POST to Liferay directly.
+You will need an instance of ONLYOFFICE Document Server that is resolvable and connectable both from Liferay and any end clients. ONLYOFFICE Document Server must also be able to POST to Liferay directly.
 
-The easiest way to start an instance of ONLYOFFICE Document Server is to use [Docker](https://github.com/onlyoffice/Docker-DocumentServer).
+You can install free Community version of ONLYOFFICE Document Server or scalable enterprise-level Integration Edition.
 
+To install free Community version, use [Docker](https://github.com/onlyoffice/Docker-DocumentServer) (recommended) or follow [these instructions](https://helpcenter.onlyoffice.com/server/linux/document/linux-installation.aspx) for Debian, Ubuntu, or derivatives.  
 
-## Compiling Liferay ONLYOFFICE integration plugin
+To install Integration Edition, follow instructions [here](https://helpcenter.onlyoffice.com/server/integration-edition/index.aspx).
 
-Simply run `gradle build`. Output .jar will be placed inside `build/libs` directory.
-
+Community Edition vs Integration Edition comparison can be found [here](#onlyoffice-document-server-editions).
 
 ## Installing Liferay ONLYOFFICE integration plugin
 
 Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace/-/mp/application/171169174) or if you're building the plugin by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install the plugin automatically.
 
-
 ## Configuring Liferay CONLYOFFICE integration plugin
 
 In order to configure plugin you must navigate to *System Settings* `(Control Panel -> Configuration -> System Settings)`. In *Platform* section click on *Connectors* category and select ONLYOFFICE.
 
+## Compiling Liferay ONLYOFFICE integration plugin
+
+Simply run `gradle build`. Output .jar will be placed inside `build/libs` directory.
 
 ## How it works
 
@@ -47,7 +56,6 @@ The ONLYOFFICE integration follows the API documented [here](https://api.onlyoff
 * When all users and client browsers are done with editing, they close the editing window.
 * After 10 seconds of inactivity, ONLYOFFICE Document Server sends a POST to the `callback` URL letting Liferay know that the clients have finished editing the document and closed it.
 * Liferay downloads the new version of the document, replacing the old one.
-
 
 ## ONLYOFFICE Document Server editions 
 
@@ -111,3 +119,4 @@ The table below will help you make the right choice.
 | | [Get it now](https://www.onlyoffice.com/download.aspx?utm_source=github&utm_medium=cpc&utm_campaign=GitHubLiferay)  | [Start Free Trial](https://www.onlyoffice.com/connectors-request.aspx?utm_source=github&utm_medium=cpc&utm_campaign=GitHubLiferay)  |
 
 *Changing style and deleting (Full support coming soon)
+
