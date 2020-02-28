@@ -1,10 +1,21 @@
-# Liferay ONLYOFFICE integration plugin
+# Liferay ONLYOFFICE integration app
 
-This plugin enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Document Server - [Community or Integration Edition](#onlyoffice-document-server-editions).
+* [Overview](#overview)
+* [Features](#features)
+* [Installing ONLYOFFICE Document Server](#installing-onlyoffice-document-server)
+* [Installing Liferay ONLYOFFICE integration app](#installing-liferay-onlyoffice-integration-app)
+* [Configuring Liferay ONLYOFFICE integration app](#configuring-liferay-onlyoffice-integration-app)
+* [Compiling Liferay ONLYOFFICE integration app](#compiling-liferay-onlyoffice-integration-app)
+* [How it works](#how-it-works)
+* [ONLYOFFICE Document Server editions](#onlyoffice-document-server-editions)
+
+## Overview
+
+This app enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Document Server - [Community or Integration Edition](#onlyoffice-document-server-editions).
 
 ## Features
 
-The plugin allows to:
+The app allows to:
 
 * Create and edit text documents, spreadsheets, and presentations.
 * Share documents with other users.
@@ -27,15 +38,15 @@ To install Integration Edition, follow instructions [here](https://helpcenter.on
 
 Community Edition vs Integration Edition comparison can be found [here](#onlyoffice-document-server-editions).
 
-## Installing Liferay ONLYOFFICE integration plugin
+## Installing Liferay ONLYOFFICE integration app
 
-Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace/-/mp/application/171169174) or if you're building the plugin by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install the plugin automatically.
+Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace/-/mp/application/171169174) or if you're building the app by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install the app automatically.
 
-## Configuring Liferay CONLYOFFICE integration plugin
+## Configuring Liferay CONLYOFFICE integration app
 
-In order to configure plugin you must navigate to *System Settings* `(Control Panel -> Configuration -> System Settings)`. In *Platform* section click on *Connectors* category and select ONLYOFFICE.
+In order to configure the app you must navigate to *System Settings* `(Control Panel -> Configuration -> System Settings)`. In *Platform* section click on *Connectors* category and select ONLYOFFICE.
 
-## Compiling Liferay ONLYOFFICE integration plugin
+## Compiling Liferay ONLYOFFICE integration app
 
 Simply run `gradle build`. Output .jar will be placed inside `build/libs` directory.
 
