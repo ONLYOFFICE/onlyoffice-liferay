@@ -42,7 +42,7 @@ Community Edition vs Integration Edition comparison can be found [here](#onlyoff
 
 Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace/-/mp/application/171169174) or if you're building the app by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install the app automatically.
 
-## Configuring Liferay CONLYOFFICE integration app
+## Configuring Liferay ONLYOFFICE integration app
 
 In order to configure the app you must navigate to *System Settings* `(Control Panel -> Configuration -> System Settings)`. In *Platform* section click on *Connectors* category and select ONLYOFFICE.
 
