@@ -1,16 +1,5 @@
 # Liferay ONLYOFFICE integration app
 
-* [Overview](#overview)
-* [Features](#features)
-* [Installing ONLYOFFICE Document Server](#installing-onlyoffice-document-server)
-* [Installing Liferay ONLYOFFICE integration app](#installing-liferay-onlyoffice-integration-app)
-* [Configuring Liferay ONLYOFFICE integration app](#configuring-liferay-onlyoffice-integration-app)
-* [Compiling Liferay ONLYOFFICE integration app](#compiling-liferay-onlyoffice-integration-app)
-* [How it works](#how-it-works)
-* [ONLYOFFICE Document Server editions](#onlyoffice-document-server-editions)
-
-## Overview
-
 This app enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Document Server - [Community or Integration Edition](#onlyoffice-document-server-editions).
 
 ## Features
@@ -97,6 +86,7 @@ The table below will help you make the right choice.
 | Tabbed interface                       | + | + |
 | White Label                            | - | - |
 | Integrated test example (node.js)     | - | + |
+| Mobile web editors                    | - | + |
 | **Plugins & Macros** | **Community Edition** | **Integration Edition** |
 | Plugins                           | + | + |
 | Macros                            | + | + |
@@ -110,11 +100,13 @@ The table below will help you make the right choice.
 | **Document Editor features** | **Community Edition** | **Integration Edition** |
 | Font and paragraph formatting   | + | + |
 | Object insertion                | + | + |
-| Content control                 | + | + |
+| Adding Content control          | - | + | 
+| Editing Content control         | + | + | 
 | Layout tools                    | + | + |
 | Table of contents               | + | + |
 | Navigation panel                | + | + |
 | Mail Merge                      | + | + |
+| Comparing Documents             | - | + |
 | **Spreadsheet Editor features** | **Community Edition** | **Integration Edition** |
 | Font and paragraph formatting   | + | + |
 | Object insertion                | + | + |
