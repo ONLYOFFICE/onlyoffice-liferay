@@ -76,7 +76,7 @@ public class OnlyOfficeUtils {
                 editorConfigObject.put("callbackUrl", url);
             }
             editorConfigObject.put("user", userObject);
-            userObject.put("id", user.getUserId());
+            userObject.put("id", Long.toString(user.getUserId()));
 
             userObject.put("firstname", user.getFirstName());
             userObject.put("lastname", user.getLastName());
