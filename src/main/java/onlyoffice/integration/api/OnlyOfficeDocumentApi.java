@@ -160,7 +160,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                 break;
             case 1:
                 if (file.isSupportsLocking()) {
-                    if (file.hasLock()) {
+                    if (_dlFile.hasFileEntryLock(userId, fileId)) {
                         _log.info("Document already locked, another user has entered/exited");
                     } else {
                         _log.info("Document opened for editing");
