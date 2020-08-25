@@ -13,6 +13,7 @@ import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 
 import onlyoffice.integration.OnlyOfficeConvertUtils;
 import onlyoffice.integration.OnlyOfficeUtils;
@@ -54,7 +55,7 @@ public class EditMenuContextFactory
         return new EditMenuContext(
             parentDLViewFileVersionDisplayContext.getUuid(),
             parentDLViewFileVersionDisplayContext, httpServletRequest,
-            httpServletResponse, fileVersion, _utils, _convertUtils);
+            httpServletResponse, fileVersion, _utils, _convertUtils, _permissionFactory);
     }
 
     @Reference
@@ -62,4 +63,7 @@ public class EditMenuContextFactory
 
     @Reference
     private OnlyOfficeUtils _utils;
+
+    @Reference
+    private PermissionCheckerFactory _permissionFactory;
 }
