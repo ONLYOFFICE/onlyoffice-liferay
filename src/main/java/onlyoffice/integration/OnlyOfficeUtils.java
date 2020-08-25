@@ -1,19 +1,27 @@
 package onlyoffice.integration;
 
-import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
+import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.util.Arrays;
+import java.util.List;
 
 import onlyoffice.integration.config.OnlyOfficeConfigManager;
 
@@ -29,18 +37,18 @@ public class OnlyOfficeUtils {
         return fixUrl(_config.getDocInnerUrlOrDefault(_config.getDocUrl()));
     }
 
-    public String getLiferayUrl(PortletRequest req) {
+    public String getLiferayUrl(HttpServletRequest req) {
         return fixUrl(_config.getLiferayUrlOrDefault(PortalUtil.getPortalURL(req)));
     }
 
+    private List<String> editableExtensions = Arrays.asList("docx", "xlsx", "pptx");
     public boolean isEditable(String ext) {
-        if (".docx.xlsx.pptx".indexOf(ext) != -1) return true;
-        return false;
+        return editableExtensions.contains(trimDot(ext));
     }
 
+    private List<String> viewableExtensions = Arrays.asList("odt", "doc", "ods", "xls", "odp", "ppt", "csv", "rtf", "txt", "pdf");
     public boolean isViewable(String ext) {
-        if (".odt.doc.ods.xls.odp.ppt.txt.pdf".indexOf(ext) != -1) return true;
-        return isEditable(ext);
+        return viewableExtensions.contains(trimDot(ext)) || isEditable(ext);
     }
 
     public String getDocumentConfig(FileVersion file, RenderRequest req) {
@@ -54,8 +62,16 @@ public class OnlyOfficeUtils {
             String ext = file.getExtension();
             User user = PortalUtil.getUser(req);
             Long fileVersionId = file.getFileVersionId();
-            boolean edit = isEditable(ext);
-            String url = getFileUrl(req, fileVersionId);
+
+            PermissionChecker checker = _permissionFactory.create(PortalUtil.getUser(req));
+            FileEntry fe = file.getFileEntry();
+            boolean editPerm = fe.containsPermission(checker, ActionKeys.UPDATE);
+            if (!fe.containsPermission(checker, ActionKeys.VIEW)) {
+                throw new Exception("User don't have read rights");
+            }
+
+            boolean edit = isEditable(ext) && editPerm;
+            String url = getFileUrl(PortalUtil.getHttpServletRequest(req), fileVersionId);
 
             responseJson.put("type", "desktop");
             responseJson.put("width", "100%");
@@ -65,7 +81,7 @@ public class OnlyOfficeUtils {
             documentObject.put("title", file.getFileName());
             documentObject.put("url", url);
             documentObject.put("fileType", ext);
-            documentObject.put("key", Long.toString(fileVersionId));
+            documentObject.put("key", file.getUuid() + "_" + file.getVersion().hashCode());
             documentObject.put("permissions", permObject);
             permObject.put("edit", edit);
 
@@ -92,8 +108,15 @@ public class OnlyOfficeUtils {
         return responseJson.toString().replace("'", "\\'");
     }
 
-    public String getFileUrl(PortletRequest req, Long id) {
-        return getLiferayUrl(req) + "o/onlyoffice/doc?key=" + _hasher.getHash(id);
+    public String getFileUrl(HttpServletRequest request, Long id) {
+        return getLiferayUrl(request) + "o/onlyoffice/doc?key=" + _hasher.getHash(id);
+    }
+
+    private String trimDot(String ext) {
+        if (ext.startsWith(".")) {
+            return ext.substring(1);
+        }
+        return ext;
     }
 
     private String fixUrl(String url) {
@@ -115,6 +138,12 @@ public class OnlyOfficeUtils {
 
     @Reference
     private OnlyOfficeConfigManager _config;
+
+    @Reference
+    private DLFileEntryLocalService _dlFile;
+
+    @Reference
+    private PermissionCheckerFactory _permissionFactory;
 
     private static final Log _log = LogFactoryUtil.getLog(
             OnlyOfficeUtils.class);

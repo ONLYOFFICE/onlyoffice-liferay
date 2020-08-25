@@ -19,7 +19,12 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptMenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptToolbarItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptUIItem;
@@ -36,6 +41,7 @@ import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.settings.TypedSettings;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -48,7 +54,8 @@ extends BaseDLViewFileVersionDisplayContext {
     public EditMenuContext(
         UUID uuid, DLViewFileVersionDisplayContext parentDLDisplayContext,
         HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse, FileVersion fileVersion, OnlyOfficeUtils utils,  OnlyOfficeConvertUtils convertUtils) {
+        HttpServletResponse httpServletResponse, FileVersion fileVersion, OnlyOfficeUtils utils,  OnlyOfficeConvertUtils convertUtils,
+        PermissionCheckerFactory permissionFactory) {
 
         super(
             uuid, parentDLDisplayContext, httpServletRequest,
@@ -57,10 +64,24 @@ extends BaseDLViewFileVersionDisplayContext {
         _themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
             WebKeys.THEME_DISPLAY);
 
+        boolean editPerm = false;
+        boolean viewPerm = false;
+        boolean convPerm = false;
+
+        try {
+            PermissionChecker checker = permissionFactory.create(PortalUtil.getUser(httpServletRequest));
+            FileEntry fe = fileVersion.getFileEntry();
+            Folder folder = fe.getFolder();
+
+            editPerm = fe.containsPermission(checker, ActionKeys.UPDATE);
+            viewPerm = fe.containsPermission(checker, ActionKeys.VIEW);
+            convPerm = folder.containsPermission(checker, ActionKeys.ADD_DOCUMENT) && viewPerm;
+        } catch (PortalException e) { }
+
         String ext = fileVersion.getExtension();
-        _canEdit = utils.isEditable(ext);
-        _canView = utils.isViewable(ext);
-        _canConvert = convertUtils.isConvertable(ext);
+        _canEdit = utils.isEditable(ext) && editPerm;
+        _canView = utils.isViewable(ext) && viewPerm;
+        _canConvert = convertUtils.isConvertable(ext) && convPerm;
     }
 
     public Menu getMenu() throws PortalException {
