@@ -40,13 +40,9 @@
 	String doneText = LanguageUtil.get(request, "onlyoffice-convert-done");
 	String errorText = LanguageUtil.get(request, "onlyoffice-convert-error");
 
-	PortletURL portletURL = PortletURLFactoryUtil.create(
-			request, "onlyoffice_integration_api_OnlyOfficeDocumentConvert", PortletRequest.RESOURCE_PHASE);
-	
-	MutableRenderParameters params = portletURL.getRenderParameters();
-	params.setValue("key", Long.toString(new Date().getTime()));
-	params.setValue("fileId", Long.toString(fileVersionId));
-	params.setValue("fileName", newFileName);
+	String apiurl = convertUtils.getConvertUrl(request) + "?key=" + Long.toString(new Date().getTime())
+		+ "&fileId=" + Long.toString(fileVersionId)
+		+ "&fileName=" + newFileName;
 	
 %>
 
@@ -67,7 +63,7 @@
 		}
 		
 		function _callAjax() {
-		    var url = '<%= portletURL.toString() %>';
+		    var url = '<%= apiurl %>';
 		    jQuery.ajax({
 			    type : "POST",
 			    url : url,

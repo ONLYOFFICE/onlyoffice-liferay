@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.portlet.PortletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.HttpException;
 import org.apache.http.HttpStatus;
@@ -43,10 +43,15 @@ public class OnlyOfficeConvertUtils {
     public static final Map<String, String> convertableDict = new HashMap<String, String>() {{
         put("odt", "docx");
         put("doc", "docx");
+        put("rtf", "docx");
+        put("txt", "docx");
+
         put("odp", "pptx");
         put("ppt", "pptx");
+
         put("ods", "xlsx");
         put("xls", "xlsx");
+        put("csv", "xlsx");
     }};
 
     @SuppressWarnings("serial")
@@ -60,9 +65,12 @@ public class OnlyOfficeConvertUtils {
         put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         put("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation");
         put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        put("rtf", "application/rtf");
+        put("txt", "text/plain");
+        put("csv", "text/csv");
     }};
 
-    public JSONObject convert(PortletRequest req, FileVersion file, String key) throws SecurityException, Exception {
+    public JSONObject convert(HttpServletRequest req, FileVersion file, String key) throws SecurityException, Exception {
         try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
             Long fileVersionId = file.getFileVersionId();
             String ext = file.getExtension();
@@ -116,6 +124,10 @@ public class OnlyOfficeConvertUtils {
                 }
             }
         }
+    }
+
+    public String getConvertUrl(HttpServletRequest request) {
+        return _utils.getLiferayUrl(request) + "o/onlyoffice/convert";
     }
 
     private String trimDot(String input) {

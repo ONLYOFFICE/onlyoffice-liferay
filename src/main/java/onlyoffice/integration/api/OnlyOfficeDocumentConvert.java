@@ -6,10 +6,11 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javax.portlet.Portlet;
-import javax.portlet.PortletException;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
@@ -20,8 +21,11 @@ import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -32,17 +36,27 @@ import onlyoffice.integration.OnlyOfficeConvertUtils;
 @Component(
     immediate = true,
     property = {
-        "com.liferay.portlet.display-category=category.hidden",
-        "com.liferay.portlet.instanceable=true",
-        "javax.portlet.security-role-ref=power-user,user",
-        "javax.portlet.version=3.0"
+        "osgi.http.whiteboard.context.path=/",
+        "osgi.http.whiteboard.servlet.pattern=/onlyoffice/convert/*"
     },
-    service = Portlet.class
+    service = Servlet.class
 )
-public class OnlyOfficeDocumentConvert extends MVCPortlet {
+public class OnlyOfficeDocumentConvert extends HttpServlet {
 
     @Override
-    public void serveResource(ResourceRequest request, ResourceResponse response) throws PortletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        User user;
+
+        try {
+            user = PortalUtil.getUser(request);
+            if (user == null) {
+                throw new Exception("user is null");
+            }
+        } catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
         Long versionId = ParamUtil.getLong(request , "fileId");
         String key = ParamUtil.getString(request , "key");
         String fn = ParamUtil.getString(request , "fileName");
@@ -52,6 +66,12 @@ public class OnlyOfficeDocumentConvert extends MVCPortlet {
 
         try {
             FileVersion file = DLAppLocalServiceUtil.getFileVersion(versionId);
+
+            PermissionChecker checker = _permissionFactory.create(user);
+            FileEntry fe = file.getFileEntry();
+            if (!fe.containsPermission(checker, ActionKeys.VIEW) || !fe.getFolder().containsPermission(checker, ActionKeys.ADD_DOCUMENT)) {
+                throw new Exception("User don't have rights");
+            }
 
             JSONObject json = _convert.convert(request, file, key);
 
@@ -67,7 +87,7 @@ public class OnlyOfficeDocumentConvert extends MVCPortlet {
     }
 
 
-    private void savefile(ResourceRequest request, FileVersion file, String url, String filename) throws Exception {
+    private void savefile(HttpServletRequest request, FileVersion file, String url, String filename) throws Exception {
         User user = PortalUtil.getUser(request);
 
         _log.info("Trying to download file from URL: " + url);
@@ -83,11 +103,16 @@ public class OnlyOfficeDocumentConvert extends MVCPortlet {
         _log.info("Document saved.");
     }
 
+    private static final long serialVersionUID = 1L;
+
     @Reference
     private DLAppLocalService _dlApp;
 
     @Reference
     OnlyOfficeConvertUtils _convert;
+
+    @Reference
+    private PermissionCheckerFactory _permissionFactory;
 
     private static final Log _log = LogFactoryUtil.getLog(
             OnlyOfficeDocumentConvert.class);
