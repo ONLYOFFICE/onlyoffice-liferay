@@ -145,7 +145,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
         Long fileId = file.getFileEntryId();
         Long userId = (long) -1;
-        
+
         if (body.has("users")) {
             JSONArray users = body.getJSONArray("users");
             userId = users.getLong(0);
@@ -160,10 +160,10 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                 break;
             case 1:
                 if (file.isSupportsLocking()) {
-                    if (_dlFile.hasFileEntryLock(userId, fileId)) {
+                    if (file.getLock() != null) {
                         _log.info("Document already locked, another user has entered/exited");
                     } else {
-                        _log.info("Document opened for editing");
+                        _log.info("Document opened for editing, locking document");
                         _dlFile.lockFileEntry(userId, fileId);
                     }
                 }
@@ -171,18 +171,19 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             case 2:
                 _log.info("Document updated, changing content");
                 if (file.isSupportsLocking()) {
+                    _log.info("Unlocking document");
                     _dlFile.unlockFileEntry(fileId);
                 }
                 updateFile(file, userId, body.getString("url"), request);
                 break;
             case 3:
-                _log.error("ONLYOFFICE has reported that saving the document has failed");
+                _log.error("ONLYOFFICE has reported that saving the document has failed, unlocking document");
                 if (file.isSupportsLocking()) {
                     _dlFile.unlockFileEntry(fileId);
                 }
                 break;
             case 4:
-                _log.info("No document updates");
+                _log.info("No document updates, unlocking document");
                 if (file.isSupportsLocking()) {
                     _dlFile.unlockFileEntry(fileId);
                 }
