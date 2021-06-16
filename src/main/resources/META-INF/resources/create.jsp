@@ -101,7 +101,7 @@ String pptx = LanguageUtil.get(resourceBundle, "onlyoffice-context-type-pptx");
 				},
 				on: {
 					failure: function(event, id, obj) {
-						<portlet:namespace />showErrorMessage( "Please enter a file with a valid file name.");
+						<portlet:namespace />showErrorMessage("<%= LanguageUtil.get(resourceBundle, "onlyoffice-context-create-exceptionUndefined") %>");
 					},
 					success: function(event, id, obj) {
 						var response = this.get("responseData");
@@ -111,7 +111,13 @@ String pptx = LanguageUtil.get(resourceBundle, "onlyoffice-context-type-pptx");
 							window.open(response.editUrl);
 							document.location.href = "<%= redirect %>";
 						} else {
-							<portlet:namespace />showErrorMessage( "Please enter a file with a valid file name.");
+							if (exception.indexOf("FileNameException") != -1) {
+								<portlet:namespace />showErrorMessage("<%= LanguageUtil.get(resourceBundle, "onlyoffice-context-create-exceptionFileName") %>");
+							} else if (exception.indexOf("MustHavePermission") != -1) {
+								<portlet:namespace />showErrorMessage("<%= LanguageUtil.get(resourceBundle, "onlyoffice-context-create-exceptionPermission") %>");
+							} else {
+								<portlet:namespace />showErrorMessage("<%= LanguageUtil.get(resourceBundle, "onlyoffice-context-create-exceptionUndefined") %>");
+							}
 						}
 
 					}

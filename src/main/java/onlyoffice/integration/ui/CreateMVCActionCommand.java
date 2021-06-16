@@ -94,7 +94,7 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 
 			jsonObject.put("editUrl", portletURL.toString());
 		} catch (Exception e) {
-			jsonObject.putException(e);
+			jsonObject.put("exception", e.getClass());
 			_log.error(e.getMessage(), e);
 		}
 		JSONPortletResponseUtil.writeJSON(actionRequest, actionResponse, jsonObject);
