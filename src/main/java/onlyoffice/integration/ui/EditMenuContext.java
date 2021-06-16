@@ -166,8 +166,11 @@ extends BaseDLViewFileVersionDisplayContext {
             request, "onlyoffice_integration_ui_EditActionPortlet",
             _themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 
-        MutableRenderParameters params = portletURL.getRenderParameters();
-        params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
+//      MutableRenderParameters added in portlet version 3.0
+//      MutableRenderParameters params = portletURL.getRenderParameters();
+//      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
+
+        portletURL.setParameter("fileId", String.valueOf(Long.toString(fileVersion.getFileVersionId())));
 
         try {
             portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
@@ -184,8 +187,11 @@ extends BaseDLViewFileVersionDisplayContext {
             request, "onlyoffice_integration_ui_ConvertActionPortlet",
             _themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 
-        MutableRenderParameters params = portletURL.getRenderParameters();
-        params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
+//      MutableRenderParameters added in portlet version 3.0
+//      MutableRenderParameters params = portletURL.getRenderParameters();
+//      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
+
+        portletURL.setParameter("fileId", String.valueOf(Long.toString(fileVersion.getFileVersionId())));
 
         try {
             portletURL.setWindowState(LiferayWindowState.POP_UP);
