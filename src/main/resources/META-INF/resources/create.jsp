@@ -63,13 +63,13 @@ String pptx = LanguageUtil.get(resourceBundle, "onlyoffice-context-type-pptx");
 </liferay-portlet:actionURL>
 
 <div class="container-fluid-1280">
-	<aui:form action="<%= createFileEntryURL %>" cssClass="lfr-dynamic-form" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "createFile();" %>' >
+	<aui:form action="<%= createFileEntryURL %>" cssClass="lfr-dynamic-form" method="post" id="fmCreate" name="fmCreate" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "createFile();" %>' >
 		<aui:input name="folderId" type="hidden" value="<%= folderId %>" />
 		<div class="lfr-form-content">
 			<div class="hide" id="<portlet:namespace />error-messages"></div>
 			<aui:fieldset-group markupView="lexicon">
 				<aui:fieldset>
-					<aui:select label="<%= labelFormat %>" id="options" name="type">
+					<aui:select label="<%= labelFormat %>" id="type" name="type">
 						<aui:option value="docx"><%= docx %></aui:option>
 						<aui:option value="xlsx"><%= xlsx %></aui:option>
 						<aui:option value="pptx"><%= pptx %></aui:option>
@@ -89,42 +89,45 @@ String pptx = LanguageUtil.get(resourceBundle, "onlyoffice-context-type-pptx");
 
 <script>
 	function <portlet:namespace />createFile() {
-		var form = AUI().one(document.<portlet:namespace />fm);
-		var uri = form.getAttribute('action');
 
-		AUI().io.request(
-			uri,
-			{
-				dataType: "json",
-				form: {
-					id: form
-				},
-				on: {
-					failure: function(event, id, obj) {
+		var url = AUI().one("#<portlet:namespace/>fmCreate").get("action");
+
+		var folderId = "<%= folderId %>";
+		var type = AUI().one("#<portlet:namespace/>type").get("value");
+		var title = AUI().one("#<portlet:namespace/>title").get("value");
+		var description = AUI().one("#<portlet:namespace/>description").get("value");
+
+		$.ajax({
+			url: url,
+			dataType: "json",
+			type: "post",
+			data: Liferay.Util.ns('<portlet:namespace />', {
+				folderId: folderId,
+				type: type,
+				title: title,
+				description: description
+			}),
+			error: function () {
+				<portlet:namespace />showErrorMessage("<%= LanguageUtil.get(resourceBundle, "onlyoffice-context-create-exceptionUndefined") %>");
+			},
+			complete: function (data) {
+				var responseText = data.responseText;
+				var response = $.parseJSON(responseText);
+				var exception = response.exception;
+				if (!exception) {
+					window.open(response.editUrl);
+					document.location.href = "<%= redirect %>";
+				} else {
+					if (exception.indexOf("FileNameException") != -1) {
+						<portlet:namespace />showErrorMessage("<%= LanguageUtil.get(resourceBundle, "onlyoffice-context-create-exceptionFileName") %>");
+					} else if (exception.indexOf("MustHavePermission") != -1) {
+						<portlet:namespace />showErrorMessage("<%= LanguageUtil.get(resourceBundle, "onlyoffice-context-create-exceptionPermission") %>");
+					} else {
 						<portlet:namespace />showErrorMessage("<%= LanguageUtil.get(resourceBundle, "onlyoffice-context-create-exceptionUndefined") %>");
-					},
-					success: function(event, id, obj) {
-						var response = this.get("responseData");
-						var exception = response.exception;
-						
-						if (!exception) {
-							window.open(response.editUrl);
-							document.location.href = "<%= redirect %>";
-						} else {
-							if (exception.indexOf("FileNameException") != -1) {
-								<portlet:namespace />showErrorMessage("<%= LanguageUtil.get(resourceBundle, "onlyoffice-context-create-exceptionFileName") %>");
-							} else if (exception.indexOf("MustHavePermission") != -1) {
-								<portlet:namespace />showErrorMessage("<%= LanguageUtil.get(resourceBundle, "onlyoffice-context-create-exceptionPermission") %>");
-							} else {
-								<portlet:namespace />showErrorMessage("<%= LanguageUtil.get(resourceBundle, "onlyoffice-context-create-exceptionUndefined") %>");
-							}
-						}
-
 					}
 				}
 			}
-		);
-
+		});
 	}
 
 	function <portlet:namespace />showErrorMessage (message) {
