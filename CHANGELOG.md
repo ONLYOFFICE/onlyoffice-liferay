@@ -1,5 +1,8 @@
 # Change Log
 
+## Added
+ - Ability to create documents
+
 ## 1.1.0
 ## Fixed
  - Fixed an issue with collaborative editing
