@@ -30,6 +30,7 @@
 <%@ page import="com.liferay.document.library.kernel.exception.FileNameException" %>
 <%@ page import="com.liferay.portal.kernel.security.auth.PrincipalException" %>
 <%@ page import="com.liferay.portal.kernel.portlet.LiferayWindowState"%>
+<%@ page import="com.liferay.portal.kernel.util.ResourceBundleUtil" %>
 
 <%@ page import="java.util.ResourceBundle" %>
 
@@ -42,12 +43,8 @@ String redirect = ParamUtil.getString(request, "redirect");
 long folderId = ParamUtil.getLong(request, "folderId");
 long fileEntryId = ParamUtil.getLong(request, "fileEntryId");
 
-ResourceBundle resourceBundle = ResourceBundle.getBundle("content/Language", themeDisplay.getLocale());
+ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(locale, getClass());
 String headerTitle = LanguageUtil.get(resourceBundle, "onlyoffice-context-create-name");
-String labelFormat = LanguageUtil.get(resourceBundle, "onlyoffice-context-create-format");
-String docx = LanguageUtil.get(resourceBundle, "onlyoffice-context-create-type-docx");
-String xlsx = LanguageUtil.get(resourceBundle, "onlyoffice-context-create-type-xlsx");
-String pptx = LanguageUtil.get(resourceBundle, "onlyoffice-context-create-type-pptx");
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
@@ -75,10 +72,10 @@ renderResponse.setTitle(headerTitle);
 			<div class="hide" id="<portlet:namespace />error-messages"></div>
 			<aui:fieldset-group markupView="lexicon">
 				<aui:fieldset>
-					<aui:select label="<%= labelFormat %>" id="type" name="type">
-						<aui:option value="docx"><%= docx %></aui:option>
-						<aui:option value="xlsx"><%= xlsx %></aui:option>
-						<aui:option value="pptx"><%= pptx %></aui:option>
+					<aui:select label="onlyoffice-context-create-format" id="type" name="type">
+						<aui:option label="onlyoffice-context-create-type-docx" value="docx" />
+						<aui:option label="onlyoffice-context-create-type-xlsx" value="xlsx" />
+						<aui:option label="onlyoffice-context-create-type-pptx" value="pptx" />
 					</aui:select>
 					<aui:input name="title" type="text"  required="true" showRequiredLabel="true" />
 					<aui:input name="description" type="textarea" />
