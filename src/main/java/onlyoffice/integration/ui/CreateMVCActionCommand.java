@@ -19,19 +19,16 @@
 package onlyoffice.integration.ui;
 
 import com.liferay.document.library.constants.DLPortletKeys;
+import com.liferay.document.library.kernel.exception.FileNameException;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.util.DLUtil;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
-import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -39,13 +36,12 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 
 import java.io.File;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -67,9 +63,12 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 		String type = ParamUtil.getString(actionRequest, "type");
 		String title = ParamUtil.getString(actionRequest, "title");	
 		String description = ParamUtil.getString(actionRequest, "description");
+		String redirect = ParamUtil.getString(actionRequest, "redirectUrl");
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 		try {
+			actionResponse.setRenderParameter("folderId", String.valueOf(folderId));
+			actionResponse.setRenderParameter("redirect", redirect);
+
 			ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 			Long repositoryId = themeDisplay.getScopeGroupId();
 
@@ -82,22 +81,19 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(DLFileEntry.class.getName(), actionRequest);
 
-			FileEntry newFile = _dlAppService.addFileEntry(repositoryId, folderId,uniqueFileName, mimeType,
+			FileEntry newFile = _dlAppService.addFileEntry(repositoryId, folderId, uniqueFileName, mimeType,
 					uniqueFileName, description, (String) null, sourceFile,serviceContext);
 
-			PortletURL portletURL = PortletURLFactoryUtil.create(actionRequest,
-					"onlyoffice_integration_ui_EditActionPortlet", themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
-
-			portletURL.setParameter("fileId", String.valueOf(newFile.getFileVersion().getFileVersionId()));
-
-			portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
-
-			jsonObject.put("editUrl", portletURL.toString());
+			actionResponse.setRenderParameter("fileEntryId", String.valueOf(newFile.getFileVersion().getFileVersionId()));
 		} catch (Exception e) {
-			jsonObject.put("exception", e.getClass());
 			_log.error(e.getMessage(), e);
+			if (e instanceof FileNameException || e instanceof PrincipalException.MustHavePermission) {
+				SessionErrors.add(actionRequest, e.getClass());
+			} else {
+				SessionErrors.add(actionRequest, Exception.class);
+			}
+			return;
 		}
-		JSONPortletResponseUtil.writeJSON(actionRequest, actionResponse, jsonObject);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(CreateMVCActionCommand.class);
