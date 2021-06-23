@@ -2,6 +2,7 @@
 
 ## Added
  - Ability to create documents
+ - Desktop mode
 
 ## 1.1.0
 ## Fixed
