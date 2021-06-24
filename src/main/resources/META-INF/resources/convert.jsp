@@ -72,45 +72,48 @@
 	
 	<script type="text/javascript">
 	(function() {
-		var text = jQuery("#ooConvertText");
-		var thumb = jQuery("#ooProgressThumb");
+		var text = document.getElementById("ooConvertText");
+		var thumb = document.getElementById("ooProgressThumb");
 		var timeOut = null;
 
 		function onError(error) {
-			text.text('<%= errorText %> ' + error);
+			text.innerHTML = "<%= errorText %>" + error;
 		}
 		
 		function _callAjax() {
-		    var url = '<%= apiurl %>';
-		    jQuery.ajax({
-			    type : "POST",
-			    url : url,
-			    cache: false,
-			    success: function(data) {	
-			    	if (data.error) {
-			    		onError(data.error);
-			    		return;
-			    	}
-			    	
-			    	if (data.percent != null) {
-			    		var perc = data.percent / 100;
-			    		if (perc > 0) {
-			    			thumb.css({flex: data.percent / 100});
-			    		}
-			    		thumb.text(data.percent + "%");
-			    	}
-			    	
-			    	if (!data.endConvert) {
-			    		setTimeout(_callAjax, 1000);
-			    	} else {
-			    		text.text('<%= doneText %>');
-			    		window.top.location.reload();
-			    	}
-			    },
-			    error: onError
-		  	});
+			var url = "<%= apiurl %>";
+
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", url, false);
+			xhr.send();
+
+			if (xhr.status != 200) {
+				onError( xhr.status + " " + xhr.statusText );
+			} else {
+				var data = JSON.parse(xhr.responseText);
+
+				if (data.error) {
+					onError(data.error);
+					return;
+				}
+
+				if (data.percent != null) {
+					var perc = data.percent / 100;
+					if (perc > 0) {
+						thumb.style.flex = data.percent / 100;
+					}
+					thumb.innerHTML = data.percent + "%";
+				}
+
+				if (!data.endConvert) {
+					setTimeout(_callAjax, 1000);
+				} else {
+					text.innerHTML = "<%= doneText %>";
+					window.top.location.reload();
+				}
+			}
 		}
-	
+
 		_callAjax();
 	})();
 	</script>
