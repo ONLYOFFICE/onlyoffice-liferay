@@ -50,4 +50,6 @@ public class OnlyOfficeStatus extends HttpServlet {
 		jsonObj.put("installed", true);
 		response.getWriter().write(jsonObj.toString());
 	}
+
+	private static final long serialVersionUID = 1L;
 }
