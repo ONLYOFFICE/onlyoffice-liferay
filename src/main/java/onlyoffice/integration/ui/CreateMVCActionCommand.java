@@ -39,6 +39,8 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.Locale;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -65,6 +67,8 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 		String description = ParamUtil.getString(actionRequest, "description");
 		String redirect = ParamUtil.getString(actionRequest, "redirectUrl");
 
+		InputStream streamSourceFile = null;
+
 		try {
 			actionResponse.setRenderParameter("folderId", String.valueOf(folderId));
 			actionResponse.setRenderParameter("redirect", redirect);
@@ -72,9 +76,17 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 			ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 			Long repositoryId = themeDisplay.getScopeGroupId();
 
-			String pathToSourceFile = "app_data/new/new." + type;
+			Locale locale = themeDisplay.getLocale();
 
-			File sourceFile = FileUtil.createTempFile(this.getClass().getClassLoader().getResourceAsStream(pathToSourceFile));
+			String pathToSourceFile = "app_data/document-templates/" + locale.toLanguageTag() + "/new." + type;
+			streamSourceFile = this.getClass().getClassLoader().getResourceAsStream(pathToSourceFile);
+
+			if (streamSourceFile == null) {
+				pathToSourceFile = "app_data/document-templates/en-US/new." + type;
+				streamSourceFile = this.getClass().getClassLoader().getResourceAsStream(pathToSourceFile);
+			}
+
+			File sourceFile = FileUtil.createTempFile(streamSourceFile);
 			String mimeType = MimeTypesUtil.getContentType(sourceFile);
 
 			String uniqueFileName = DLUtil.getUniqueFileName(repositoryId, folderId, title + "." + type);
@@ -93,6 +105,8 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 				SessionErrors.add(actionRequest, Exception.class);
 			}
 			return;
+		} finally {
+			streamSourceFile.close();
 		}
 	}
 
