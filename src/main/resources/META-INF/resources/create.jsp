@@ -98,10 +98,6 @@ renderResponse.setTitle(headerTitle);
 		<portlet:param name="fileId" value="<%= String.valueOf(fileEntryId) %>" />
 	</liferay-portlet:renderURL>
 	<aui:script>
-		window.open("<%= editURL %>");
-		var redirect = "<%= redirect %>";
-		if (redirect) {
-			document.location.href = redirect;
-		}
+		document.location.href = "<%= editURL %>";
 	</aui:script>
 </c:if>
