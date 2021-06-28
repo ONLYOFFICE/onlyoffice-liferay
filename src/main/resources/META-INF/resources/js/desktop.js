@@ -1,5 +1,5 @@
 var data = {
-    displayName: Liferay.ThemeDisplay.getUserName(),
+    displayName: decodeURI(JSON.parse(`"${Liferay.ThemeDisplay.getUserName()}"`)),
     email: Liferay.ThemeDisplay.getUserEmailAddress(),
     domain: Liferay.ThemeDisplay.getPortalURL(),
     provider: "liferay",
