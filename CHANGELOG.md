@@ -2,6 +2,7 @@
 
 ## Added
  - Ability to create documents
+ - DE, ES, FR, IT, PT_BR, RU translations
 
 ## 1.1.0
 ## Fixed
