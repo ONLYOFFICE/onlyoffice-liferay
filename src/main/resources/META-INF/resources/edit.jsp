@@ -17,11 +17,15 @@
  --%>
 
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
+<%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
 
 <%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
 <%@ page import="com.liferay.document.library.kernel.service.DLAppLocalServiceUtil" %>
 <%@ page import="com.liferay.portal.kernel.repository.model.FileVersion" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
+<%@ page import="com.liferay.portal.kernel.util.ResourceBundleUtil" %>
+
+<%@ page import="java.util.ResourceBundle" %>
 
 <%@ page import="org.osgi.framework.BundleContext" %>
 <%@ page import="org.osgi.framework.FrameworkUtil" %>
@@ -33,6 +37,7 @@
 
 <%
     BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeUtils.class).getBundleContext();
+    ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(locale, getClass());
 
     Long fileVersionId = ParamUtil.getLong(renderRequest, "fileId");
     FileVersion file = DLAppLocalServiceUtil.getFileVersion(fileVersionId);
@@ -42,7 +47,7 @@
 <html>
 <head>
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-    <title><%= file.getFileName() %> - <%= LanguageUtil.get(request, "onlyoffice-edit-title") %></title>
+    <title><%= file.getFileName() %> - <%= LanguageUtil.get(resourceBundle, "onlyoffice-edit-title") %></title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css" />
     <script id="scriptApi" type="text/javascript" src="<%= utils.getDocServerUrl() %>OfficeWeb/apps/api/documents/api.js"></script>
 </head>

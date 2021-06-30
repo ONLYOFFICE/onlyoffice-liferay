@@ -19,7 +19,7 @@ package onlyoffice.integration.ui;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.portlet.toolbar.contributor.DLPortletToolbarContributorContext;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
@@ -33,7 +33,9 @@ import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -76,8 +78,7 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 					portletURL.setParameter("folderId", String.valueOf(folder.getFolderId()));
 				}
 
-				ResourceBundle resourceBundle = ResourceBundle.getBundle("content/Language", themeDisplay.getLocale());
-				String labelMenu = LanguageUtil.get(resourceBundle, "onlyoffice-context-action-create");
+				String labelMenu = _translate(portletRequest, "onlyoffice-context-action-create");
 
 				menuItems.add(this.getNewMenuItem("#create-document-onlyoffice", labelMenu, "documents-and-media", portletURL.toString()));
 			}
@@ -94,9 +95,24 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 		menuItem.setURL(url);
 		return menuItem;
 	}
+	
+	private String _translate(PortletRequest portletRequest, String key) {
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			_portal.getLocale(portletRequest),
+			EditToolbarContributorContext.class);
+
+		return _language.get(resourceBundle, key);
+	}
 
 	private static final Log _log = LogFactoryUtil.getLog(EditToolbarContributorContext.class);
 
 	@Reference(target = "(model.class.name=com.liferay.document.library.kernel.model.DLFolder)")
 	private ModelResourcePermission<DLFolder> _dlFolderModelResourcePermission;
+	
+	@Reference
+	private Language _language;
+
+	@Reference
+	private Portal _portal;
+
 }

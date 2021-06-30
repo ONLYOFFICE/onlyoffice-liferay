@@ -4,6 +4,7 @@
 - Ability to create documents
 - Desktop mode
 - goback from editor
+- DE, ES, FR, IT, PT_BR, RU translations
 
 ## 1.1.0
 ## Fixed

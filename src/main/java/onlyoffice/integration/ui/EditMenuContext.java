@@ -61,6 +61,7 @@ import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import onlyoffice.integration.OnlyOfficeConvertUtils;
@@ -81,6 +82,8 @@ extends BaseDLViewFileVersionDisplayContext {
 
         _themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
             WebKeys.THEME_DISPLAY);
+        _resourceBundle = ResourceBundleUtil.getBundle("content.Language",
+                httpServletRequest.getLocale(), getClass());
 
         boolean editPerm = false;
         boolean viewPerm = false;
@@ -140,14 +143,14 @@ extends BaseDLViewFileVersionDisplayContext {
     }
 
     private void InitViewItem(URLUIItem item) {
-        item.setLabel(_canEdit ? LanguageUtil.get(request, _res, "onlyoffice-context-action-edit")
-                : LanguageUtil.get(request, _res, "onlyoffice-context-action-view"));
+        item.setLabel(_canEdit ? LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-edit")
+                : LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-view"));
         item.setTarget("_blank");
         item.setURL(getDocUrl());
     }
 
     private void InitConvertItem(JavaScriptUIItem item) {
-        String lang = LanguageUtil.get(request, _res, "onlyoffice-context-action-convert");
+        String lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-convert");
         item.setLabel(lang);
 
         StringBuilder sb = new StringBuilder();
@@ -224,9 +227,8 @@ extends BaseDLViewFileVersionDisplayContext {
     private static final Log _log = LogFactoryUtil.getLog(
         EditMenuContext.class);
 
-    private static final ResourceBundle _res = ResourceBundle.getBundle("content/Language");
-
     private ThemeDisplay _themeDisplay;
+    private ResourceBundle _resourceBundle;
     boolean _canEdit;
     boolean _canView;
     boolean _canConvert;
