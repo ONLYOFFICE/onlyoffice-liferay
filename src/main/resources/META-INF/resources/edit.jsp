@@ -32,6 +32,7 @@
 
 <%@ page import="onlyoffice.integration.OnlyOfficeUtils" %>
 
+<liferay-theme:defineObjects />
 
 <portlet:defineObjects />
 
