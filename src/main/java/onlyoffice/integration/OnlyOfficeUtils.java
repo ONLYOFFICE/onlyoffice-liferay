@@ -18,6 +18,8 @@
 
 package onlyoffice.integration;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,16 +27,20 @@ import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import com.liferay.document.library.constants.DLPortletKeys;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 
@@ -69,10 +75,31 @@ public class OnlyOfficeUtils {
         return viewableExtensions.contains(trimDot(ext)) || isEditable(ext);
     }
 
+    private String getGoBackUrl(RenderRequest request, FileEntry fileEntry) {
+        Group group = GroupLocalServiceUtil.fetchGroup(fileEntry.getGroupId());
+
+        PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+            request, group, DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
+            0, 0, PortletRequest.RENDER_PHASE);
+
+        long folderId = fileEntry.getFolderId();
+
+        if (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+            portletURL.setParameter("mvcRenderCommandName", "/document_library/view");
+        } else {
+            portletURL.setParameter("mvcRenderCommandName", "/document_library/view_folder");
+            portletURL.setParameter("folderId", String.valueOf(folderId));
+        }
+
+        return portletURL.toString();
+    }
+
     public String getDocumentConfig(FileVersion file, RenderRequest req) {
         JSONObject responseJson = new JSONObject();
         JSONObject documentObject = new JSONObject();
         JSONObject editorConfigObject = new JSONObject();
+        JSONObject customizationObject = new JSONObject();
+        JSONObject goBackObject = new JSONObject();
         JSONObject userObject = new JSONObject();
         JSONObject permObject = new JSONObject();
 
@@ -106,6 +133,10 @@ public class OnlyOfficeUtils {
             responseJson.put("editorConfig", editorConfigObject);
             editorConfigObject.put("lang", LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag());
             editorConfigObject.put("mode", edit ? "edit" : "view");
+            editorConfigObject.put("customization", customizationObject);
+            customizationObject.put("goback", goBackObject);
+            goBackObject.put("url", getGoBackUrl(req, fe));
+
             if (edit) {
                 editorConfigObject.put("callbackUrl", url);
             }
