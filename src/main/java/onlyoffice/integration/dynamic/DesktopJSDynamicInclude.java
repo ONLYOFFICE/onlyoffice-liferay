@@ -65,7 +65,7 @@ public class DesktopJSDynamicInclude extends BaseDynamicInclude {
 	@Override
 	public void register(DynamicIncludeRegistry dynamicIncludeRegistry) {
 		dynamicIncludeRegistry.register(
-			"com.liferay.document.library.web#/document_library/view.jsp#pre"
+			"/html/common/themes/top_head.jsp#post"
 		);
 	}
 
