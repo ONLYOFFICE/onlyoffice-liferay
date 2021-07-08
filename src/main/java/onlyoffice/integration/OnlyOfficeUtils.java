@@ -58,7 +58,7 @@ public class OnlyOfficeUtils {
     }
 
     public String getDocServerInnnerUrl() {
-        return fixUrl(_config.getDocInnerUrlOrDefault(_config.getDocUrl()));
+        return fixUrl(_config.getDocInnerUrl());
     }
 
     public String getLiferayUrl(HttpServletRequest req) {

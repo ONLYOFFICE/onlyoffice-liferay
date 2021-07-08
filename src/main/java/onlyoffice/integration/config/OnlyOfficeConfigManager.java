@@ -37,9 +37,9 @@ public class OnlyOfficeConfigManager {
         return configuration.docServUrl();
     }
 
-    public String getDocInnerUrlOrDefault(String def) {
-        String url = configuration.docServUrl();
-        return url == null || url.isEmpty() ? def : url;
+    public String getDocInnerUrl() {
+        String url = configuration.docServInnerUrl();
+        return url == null || url.isEmpty() ? getDocUrl() : url;
     }
 
     public String getLiferayUrlOrDefault(String def) {
