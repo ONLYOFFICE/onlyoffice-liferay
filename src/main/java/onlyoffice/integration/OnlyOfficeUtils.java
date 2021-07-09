@@ -65,6 +65,15 @@ public class OnlyOfficeUtils {
         return fixUrl(_config.getLiferayUrlOrDefault(PortalUtil.getPortalURL(req)));
     }
 
+    public String replaceDocServerURLToInternal(String url) {
+        String innerDocEditorUrl = getDocServerInnnerUrl();
+        String publicDocEditorUrl = getDocServerUrl();
+        if (!publicDocEditorUrl.equals(innerDocEditorUrl)) {
+            url = url.replace(publicDocEditorUrl, innerDocEditorUrl);
+        }
+        return url;
+    }
+
     private List<String> editableExtensions = Arrays.asList("docx", "xlsx", "pptx");
     public boolean isEditable(String ext) {
         return editableExtensions.contains(trimDot(ext));
