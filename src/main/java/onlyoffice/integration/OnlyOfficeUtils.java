@@ -58,11 +58,20 @@ public class OnlyOfficeUtils {
     }
 
     public String getDocServerInnnerUrl() {
-        return fixUrl(_config.getDocInnerUrlOrDefault(_config.getDocUrl()));
+        return fixUrl(_config.getDocInnerUrl());
     }
 
     public String getLiferayUrl(HttpServletRequest req) {
         return fixUrl(_config.getLiferayUrlOrDefault(PortalUtil.getPortalURL(req)));
+    }
+
+    public String replaceDocServerURLToInternal(String url) {
+        String innerDocEditorUrl = getDocServerInnnerUrl();
+        String publicDocEditorUrl = getDocServerUrl();
+        if (!publicDocEditorUrl.equals(innerDocEditorUrl)) {
+            url = url.replace(publicDocEditorUrl, innerDocEditorUrl);
+        }
+        return url;
     }
 
     private List<String> editableExtensions = Arrays.asList("docx", "xlsx", "pptx");

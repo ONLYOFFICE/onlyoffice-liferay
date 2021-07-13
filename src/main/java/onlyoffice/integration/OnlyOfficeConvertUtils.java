@@ -102,7 +102,7 @@ public class OnlyOfficeConvertUtils {
             body.put("url", _utils.getFileUrl(req, fileVersionId));
 
             StringEntity requestEntity = new StringEntity(body.toString(), ContentType.APPLICATION_JSON);
-            HttpPost request = new HttpPost(_utils.getDocServerUrl() + "ConvertService.ashx");
+            HttpPost request = new HttpPost(_utils.getDocServerInnnerUrl() + "ConvertService.ashx");
             request.setEntity(requestEntity);
             request.setHeader("Accept", "application/json");
 

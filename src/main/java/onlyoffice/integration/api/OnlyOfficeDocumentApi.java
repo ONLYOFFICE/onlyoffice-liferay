@@ -52,6 +52,7 @@ import com.liferay.portal.kernel.util.StreamUtil;
 
 import onlyoffice.integration.OnlyOfficeHasher;
 import onlyoffice.integration.OnlyOfficeJWT;
+import onlyoffice.integration.OnlyOfficeUtils;
 
 @Component(
     immediate = true,
@@ -192,7 +193,9 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                     _log.info("Unlocking document");
                     _dlFile.unlockFileEntry(fileId);
                 }
-                updateFile(file, userId, body.getString("url"), request);
+
+                String download = _utils.replaceDocServerURLToInternal(body.getString("url"));
+                updateFile(file, userId, download, request);
                 break;
             case 3:
                 _log.error("ONLYOFFICE has reported that saving the document has failed, unlocking document");
@@ -245,4 +248,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
     @Reference
     private DLFileEntryLocalService _dlFile;
+
+    @Reference
+    private OnlyOfficeUtils _utils;
 }
