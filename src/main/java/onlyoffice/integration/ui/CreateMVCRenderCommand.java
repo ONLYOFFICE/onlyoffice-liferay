@@ -20,7 +20,7 @@ package onlyoffice.integration.ui;
 
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderConstants;
+import com.liferay.portal.kernel.portlet.bridges.mvc.constants.MVCRenderConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
