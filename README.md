@@ -1,10 +1,10 @@
-# Liferay ONLYOFFICE integration app
+# Liferay ONLYOFFICE Connector
 
-This app enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Docs packaged as Document Server - [Community or Enterprise Edition](#onlyoffice-docs-editions).
+This connector enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Docs packaged as Document Server - [Community or Enterprise Edition](#onlyoffice-docs-editions).
 
 ## Features
 
-The app allows to:
+The connector allows to:
 
 * Create and edit text documents, spreadsheets, and presentations.
 * Share documents with other users.
@@ -27,15 +27,15 @@ To install Enterprise Edition, follow instructions [here](https://helpcenter.onl
 
 Community Edition vs Enterprise Edition comparison can be found [here](#onlyoffice-docs-editions).
 
-## Installing Liferay ONLYOFFICE integration app
+## Installing Liferay ONLYOFFICE connector
 
-Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace/-/mp/application/171169174) or if you're building the app by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install the app automatically.
+Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace/-/mp/application/171169174) or if you're building the connector by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install it automatically.
 
-## Configuring Liferay ONLYOFFICE integration app
+## Configuring Liferay ONLYOFFICE сonnector
 
-In order to configure the app you must navigate to *System Settings* `(Control Panel -> Configuration -> System Settings)`. In *Platform* section click on *Connectors* category and select ONLYOFFICE.
+In order to configure it you must navigate to *System Settings* `(Control Panel -> Configuration -> System Settings)`. In *Platform* section click on *Connectors* category and select ONLYOFFICE.
 
-## Compiling Liferay ONLYOFFICE integration app
+## Compiling Liferay ONLYOFFICE connector
 
 Simply run `gradle build`. Output .jar will be placed inside `build/libs` directory.
 
@@ -113,6 +113,7 @@ The table below will help you make the right choice.
 | Pivot tables                    | + | + |
 | Data validation                 | + | + |
 | Conditional formatting  for viewing | +** | +** |
+| Sheet views                     | - | + |
 | **Presentation Editor features** | **Community Edition** | **Enterprise Edition** |
 | Font and paragraph formatting   | + | + |
 | Object insertion                | + | + |
