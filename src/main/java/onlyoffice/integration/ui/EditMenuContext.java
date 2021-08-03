@@ -156,7 +156,7 @@ extends BaseDLViewFileVersionDisplayContext {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Liferay.Util.openWindow({");
-        sb.append("dialog: {cache:false,width:500,height:200,modal:true},");
+        sb.append("dialog: {cache:false,width:500,height:200,modal:true,resizable: false},");
         sb.append("title: '" + lang + "',id: ");
         sb.append("'onlyofficeConvertPopup',uri:'");
         sb.append(getConvertUrl() + "'});");
