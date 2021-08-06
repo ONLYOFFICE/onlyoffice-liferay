@@ -1,0 +1,50 @@
+Liferay ONLYOFFICE Connector uses code from the following 3rd party projects:
+
+
+avalon-framework-api - Avalon Framework API (https://www.apache.org/licenses/LICENSE-2.0)
+License:               Apache 2.0
+License File:          avalon-framework-api.license
+
+biz.aQute.bndlib     - bndlib: A Swiss Army Knife for OSGi (https://www.apache.org/licenses/LICENSE-2.0)
+License:               Apache 2.0
+License File:          biz.aQute.bndlib.license
+
+com.liferay.document.library.api - Liferay Document Library API (https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+License:               LGPL 2.1
+License File:          com.liferay.document.library.api.license
+
+com.liferay.dynamic.data.mapping.api - Liferay Dynamic Data Mapping API (https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+License:               LGPL 2.1
+License File:          com.liferay.dynamic.data.mapping.api.license
+
+com.liferay.portal.configuration.metatype - Liferay Portal Configuration Metatype (https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+License:               LGPL 2.1
+License File:          com.liferay.portal.configuration.metatype.license
+
+com.liferay.portal.kernel - Contains interfaces for the portal services. Interfaces are only loaded by the global class loader and are shared by all plugins. (https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+License:               LGPL 2.1
+License File:          com.liferay.portal.kernel.license
+
+httpclient           - Apache HttpComponents Client (https://www.apache.org/licenses/LICENSE-2.0)
+License:               Apache 2.0
+License File:          httpclient.license
+
+javax.servlet-api    - Java Servlet API (https://opensource.org/licenses/CDDL-1.0 https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+License:               CDDL, GPL 2.0
+License File:          javax.servlet-api.license
+
+JSON                 - JSON is a light-weight, language independent, data interchange format. See http://www.JSON.org/ The files in this package implement JSON encoders/decoders in Java. It also includes the capability to convert between JSON and XML, HTTP headers, Cookies, and CDL. This is a reference implementation. (http://json.org/license.html)
+License:               JSON
+License File:          JSON.license
+
+org.osgi.service.component.annotations - OSGi Companion Code for org.osgi.service.component.annotations Version 1.4.0 (https://www.apache.org/licenses/LICENSE-2.0)
+License:               Apache 2.0
+License File:          org.osgi.service.component.annotations.license
+
+osgi.core            - OSGi Core Release 7, Interfaces and Classes for use in compiling bundles (https://www.apache.org/licenses/LICENSE-2.0)
+License:               Apache 2.0
+License File:          osgi.core.license
+
+portlet-api          - The Java Portlet API version 3.0 developed by the Java Community Process JSR-362 Expert Group. (https://www.apache.org/licenses/LICENSE-2.0)
+License:               Apache 2.0
+License File:          portlet-api.license

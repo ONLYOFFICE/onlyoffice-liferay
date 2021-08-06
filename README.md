@@ -1,10 +1,10 @@
-# Liferay ONLYOFFICE integration app
+# Liferay ONLYOFFICE Connector
 
-This app enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Docs packaged as Document Server - [Community or Enterprise Edition](#onlyoffice-docs-editions).
+This connector enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Docs packaged as Document Server - [Community or Enterprise Edition](#onlyoffice-docs-editions).
 
 ## Features
 
-The app allows to:
+The connector allows to:
 
 * Create and edit text documents, spreadsheets, and presentations.
 * Share documents with other users.
@@ -27,15 +27,15 @@ To install Enterprise Edition, follow instructions [here](https://helpcenter.onl
 
 Community Edition vs Enterprise Edition comparison can be found [here](#onlyoffice-docs-editions).
 
-## Installing Liferay ONLYOFFICE integration app
+## Installing Liferay ONLYOFFICE connector
 
-Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace/-/mp/application/171169174) or if you're building the app by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install the app automatically.
+Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace/-/mp/application/171169174) or if you're building the connector by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install it automatically.
 
-## Configuring Liferay ONLYOFFICE integration app
+## Configuring Liferay ONLYOFFICE connector
 
-In order to configure the app you must navigate to *System Settings* `(Control Panel -> Configuration -> System Settings)`. In *Platform* section click on *Connectors* category and select ONLYOFFICE.
+In order to configure it you must navigate to *System Settings* `(Control Panel -> Configuration -> System Settings)`. In *Platform* section click on *Connectors* category and select ONLYOFFICE.
 
-## Compiling Liferay ONLYOFFICE integration app
+## Compiling Liferay ONLYOFFICE connector
 
 Simply run `gradle build`. Output .jar will be placed inside `build/libs` directory.
 
@@ -69,12 +69,12 @@ The table below will help you make the right choice.
 | Pricing and licensing | Community Edition | Enterprise Edition |
 | ------------- | ------------- | ------------- |
 | | [Get it now](https://www.onlyoffice.com/download.aspx?utm_source=github&utm_medium=cpc&utm_campaign=GitHubLiferay)  | [Start Free Trial](https://www.onlyoffice.com/enterprise-edition-free.aspx?utm_source=github&utm_medium=cpc&utm_campaign=GitHubLiferay)  |
-| Cost  | FREE  | [Go to the pricing page](https://www.onlyoffice.com/enterprise-edition.aspx?utm_source=github&utm_medium=cpc&utm_campaign=GitHubLiferay)  |
+| Cost  | FREE  | [Go to the pricing page](https://www.onlyoffice.com/docs-enterprise-prices.aspx?utm_source=github&utm_medium=cpc&utm_campaign=GitHubLiferay)  |
 | Simultaneous connections | up to 20 maximum  | As in chosen pricing plan |
 | Number of users | up to 20 recommended | As in chosen pricing plan |
 | License | GNU AGPL v.3 | Proprietary |
 | **Support** | **Community Edition** | **Enterprise Edition** | 
-| Documentation | [Help Center](https://helpcenter.onlyoffice.com/server/docker/opensource/index.aspx) | [Help Center](https://helpcenter.onlyoffice.com/server/integration-edition/index.aspx) |
+| Documentation | [Help Center](https://helpcenter.onlyoffice.com/installation/docs-community-index.aspx) | [Help Center](https://helpcenter.onlyoffice.com/installation/docs-enterprise-index.aspx) |
 | Standard support | [GitHub](https://github.com/ONLYOFFICE/DocumentServer/issues) or paid | One year support included |
 | Premium support | [Buy Now](https://www.onlyoffice.com/support.aspx?utm_source=github&utm_medium=cpc&utm_campaign=GitHubLiferay) | [Buy Now](https://www.onlyoffice.com/support.aspx?utm_source=github&utm_medium=cpc&utm_campaign=GitHubLiferay) |
 | **Services** | **Community Edition** | **Enterprise Edition** | 
@@ -82,6 +82,8 @@ The table below will help you make the right choice.
 | Document Builder Service          | + | + | 
 | **Interface** | **Community Edition** | **Enterprise Edition** |
 | Tabbed interface                       | + | + |
+| Dark theme                             | + | + |
+| 150% scaling                           | + | + |
 | White Label                            | - | - |
 | Integrated test example (node.js)     | - | + |
 | **Plugins & Macros** | **Community Edition** | **Enterprise Edition** |
@@ -109,11 +111,13 @@ The table below will help you make the right choice.
 | Functions, formulas, equations  | + | + |
 | Table templates                 | + | + |
 | Pivot tables                    | + | + |
+| Data validation                 | + | + |
 | Conditional formatting  for viewing | +** | +** |
+| Sheet views                     | - | + |
 | **Presentation Editor features** | **Community Edition** | **Enterprise Edition** |
 | Font and paragraph formatting   | + | + |
 | Object insertion                | + | + |
-| Animations                      | + | + |
+| Transitions                     | + | + |
 | Presenter mode                  | + | + |
 | Notes                           | + | + |
 | | [Get it now](https://www.onlyoffice.com/download.aspx?utm_source=github&utm_medium=cpc&utm_campaign=GitHubLiferay)  | [Start Free Trial](https://www.onlyoffice.com/enterprise-edition-free.aspx?utm_source=github&utm_medium=cpc&utm_campaign=GitHubLiferay)  |

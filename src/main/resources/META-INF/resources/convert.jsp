@@ -1,3 +1,21 @@
+<%--
+ *
+ * (c) Copyright Ascensio System SIA 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ --%>
+
 <%@page import="java.util.Date"%>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
@@ -54,45 +72,48 @@
 	
 	<script type="text/javascript">
 	(function() {
-		var text = jQuery("#ooConvertText");
-		var thumb = jQuery("#ooProgressThumb");
+		var text = document.getElementById("ooConvertText");
+		var thumb = document.getElementById("ooProgressThumb");
 		var timeOut = null;
 
 		function onError(error) {
-			text.text('<%= errorText %> ' + error);
+			text.innerHTML = "<%= errorText %>" + error;
 		}
 		
 		function _callAjax() {
-		    var url = '<%= apiurl %>';
-		    jQuery.ajax({
-			    type : "POST",
-			    url : url,
-			    cache: false,
-			    success: function(data) {	
-			    	if (data.error) {
-			    		onError(data.error);
-			    		return;
-			    	}
-			    	
-			    	if (data.percent != null) {
-			    		var perc = data.percent / 100;
-			    		if (perc > 0) {
-			    			thumb.css({flex: data.percent / 100});
-			    		}
-			    		thumb.text(data.percent + "%");
-			    	}
-			    	
-			    	if (!data.endConvert) {
-			    		setTimeout(_callAjax, 1000);
-			    	} else {
-			    		text.text('<%= doneText %>');
-			    		window.top.location.reload();
-			    	}
-			    },
-			    error: onError
-		  	});
+			var url = "<%= apiurl %>";
+
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", url, false);
+			xhr.send();
+
+			if (xhr.status != 200) {
+				onError( xhr.status + " " + xhr.statusText );
+			} else {
+				var data = JSON.parse(xhr.responseText);
+
+				if (data.error) {
+					onError(data.error);
+					return;
+				}
+
+				if (data.percent != null) {
+					var perc = data.percent / 100;
+					if (perc > 0) {
+						thumb.style.flex = data.percent / 100;
+					}
+					thumb.innerHTML = data.percent + "%";
+				}
+
+				if (!data.endConvert) {
+					setTimeout(_callAjax, 1000);
+				} else {
+					text.innerHTML = "<%= doneText %>";
+					window.top.location.reload();
+				}
+			}
 		}
-	
+
 		_callAjax();
 	})();
 	</script>

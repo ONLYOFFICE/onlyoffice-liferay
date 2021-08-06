@@ -1,3 +1,21 @@
+/**
+ *
+ * (c) Copyright Ascensio System SIA 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package onlyoffice.integration.ui;
 
 import java.util.List;
@@ -43,6 +61,7 @@ import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import onlyoffice.integration.OnlyOfficeConvertUtils;
@@ -63,6 +82,8 @@ extends BaseDLViewFileVersionDisplayContext {
 
         _themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
             WebKeys.THEME_DISPLAY);
+        _resourceBundle = ResourceBundleUtil.getBundle("content.Language",
+                httpServletRequest.getLocale(), getClass());
 
         boolean editPerm = false;
         boolean viewPerm = false;
@@ -122,20 +143,20 @@ extends BaseDLViewFileVersionDisplayContext {
     }
 
     private void InitViewItem(URLUIItem item) {
-        item.setLabel(_canEdit ? LanguageUtil.get(request, _res, "onlyoffice-context-action-edit")
-                : LanguageUtil.get(request, _res, "onlyoffice-context-action-view"));
+        item.setLabel(_canEdit ? LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-edit")
+                : LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-view"));
         item.setTarget("_blank");
         item.setURL(getDocUrl());
     }
 
     private void InitConvertItem(JavaScriptUIItem item) {
-        String lang = LanguageUtil.get(request, _res, "onlyoffice-context-action-convert");
+        String lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-convert");
         item.setLabel(lang);
 
         StringBuilder sb = new StringBuilder();
 
         sb.append("Liferay.Util.openWindow({");
-        sb.append("dialog: {cache:false,width:500,height:200,modal:true},");
+        sb.append("dialog: {cache:false,width:500,height:200,modal:true,resizable: false},");
         sb.append("title: '" + lang + "',id: ");
         sb.append("'onlyofficeConvertPopup',uri:'");
         sb.append(getConvertUrl() + "'});");
@@ -148,8 +169,11 @@ extends BaseDLViewFileVersionDisplayContext {
             request, "onlyoffice_integration_ui_EditActionPortlet",
             _themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 
-        MutableRenderParameters params = portletURL.getRenderParameters();
-        params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
+//      MutableRenderParameters added in portlet version 3.0
+//      MutableRenderParameters params = portletURL.getRenderParameters();
+//      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
+
+        portletURL.setParameter("fileId", String.valueOf(Long.toString(fileVersion.getFileVersionId())));
 
         try {
             portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
@@ -166,8 +190,11 @@ extends BaseDLViewFileVersionDisplayContext {
             request, "onlyoffice_integration_ui_ConvertActionPortlet",
             _themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 
-        MutableRenderParameters params = portletURL.getRenderParameters();
-        params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
+//      MutableRenderParameters added in portlet version 3.0
+//      MutableRenderParameters params = portletURL.getRenderParameters();
+//      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
+
+        portletURL.setParameter("fileId", String.valueOf(Long.toString(fileVersion.getFileVersionId())));
 
         try {
             portletURL.setWindowState(LiferayWindowState.POP_UP);
@@ -200,9 +227,8 @@ extends BaseDLViewFileVersionDisplayContext {
     private static final Log _log = LogFactoryUtil.getLog(
         EditMenuContext.class);
 
-    private static final ResourceBundle _res = ResourceBundle.getBundle("content/Language");
-
     private ThemeDisplay _themeDisplay;
+    private ResourceBundle _resourceBundle;
     boolean _canEdit;
     boolean _canView;
     boolean _canConvert;
