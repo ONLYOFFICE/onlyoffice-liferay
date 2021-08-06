@@ -7,6 +7,9 @@
 - goback from editor
 - DE, ES, FR, IT, PT_BR, RU translations
 
+## Changed
+- apache license
+
 ## 1.1.0
 ## Fixed
 - Fixed an issue with collaborative editing
