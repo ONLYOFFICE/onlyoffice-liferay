@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -36,7 +37,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
@@ -103,7 +103,7 @@ public class OnlyOfficeUtils {
         return portletURL.toString();
     }
 
-    public String getDocumentConfig(FileVersion file, RenderRequest req) {
+    public String getDocumentConfig(Long fileEntryId, RenderRequest req) {
         JSONObject responseJson = new JSONObject();
         JSONObject documentObject = new JSONObject();
         JSONObject editorConfigObject = new JSONObject();
@@ -113,29 +113,30 @@ public class OnlyOfficeUtils {
         JSONObject permObject = new JSONObject();
 
         try {
-            String ext = file.getExtension();
+            FileEntry fileEntry = _DLAppService.getFileEntry(fileEntryId);
+
+            String ext = fileEntry.getExtension();
             User user = PortalUtil.getUser(req);
-            Long fileVersionId = file.getFileVersionId();
 
             PermissionChecker checker = _permissionFactory.create(PortalUtil.getUser(req));
-            FileEntry fe = file.getFileEntry();
-            boolean editPerm = fe.containsPermission(checker, ActionKeys.UPDATE);
-            if (!fe.containsPermission(checker, ActionKeys.VIEW)) {
+
+            boolean editPerm = fileEntry.containsPermission(checker, ActionKeys.UPDATE);
+            if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)) {
                 throw new Exception("User don't have read rights");
             }
 
             boolean edit = isEditable(ext) && editPerm;
-            String url = getFileUrl(PortalUtil.getHttpServletRequest(req), fileVersionId);
+            String url = getFileUrl(PortalUtil.getHttpServletRequest(req), fileEntryId);
 
             responseJson.put("type", "desktop");
             responseJson.put("width", "100%");
             responseJson.put("height", "100%");
             responseJson.put("documentType", getDocType(ext));
             responseJson.put("document", documentObject);
-            documentObject.put("title", file.getFileName());
+            documentObject.put("title", fileEntry.getFileName());
             documentObject.put("url", url);
             documentObject.put("fileType", ext);
-            documentObject.put("key", file.getUuid() + "_" + file.getVersion().hashCode());
+            documentObject.put("key", fileEntry.getUuid() + "_" + fileEntry.getVersion().hashCode());
             documentObject.put("permissions", permObject);
             permObject.put("edit", edit);
 
@@ -144,7 +145,7 @@ public class OnlyOfficeUtils {
             editorConfigObject.put("mode", edit ? "edit" : "view");
             editorConfigObject.put("customization", customizationObject);
             customizationObject.put("goback", goBackObject);
-            goBackObject.put("url", getGoBackUrl(req, fe));
+            goBackObject.put("url", getGoBackUrl(req, fileEntry));
 
             if (edit) {
                 editorConfigObject.put("callbackUrl", url);
@@ -202,6 +203,9 @@ public class OnlyOfficeUtils {
 
     @Reference
     private PermissionCheckerFactory _permissionFactory;
+
+    @Reference
+    private DLAppService _DLAppService;
 
     private static final Log _log = LogFactoryUtil.getLog(
             OnlyOfficeUtils.class);

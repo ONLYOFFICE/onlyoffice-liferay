@@ -173,7 +173,7 @@ extends BaseDLViewFileVersionDisplayContext {
 //      MutableRenderParameters params = portletURL.getRenderParameters();
 //      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
 
-        portletURL.setParameter("fileId", String.valueOf(Long.toString(fileVersion.getFileVersionId())));
+        portletURL.setParameter("fileId", Long.toString(fileVersion.getFileEntryId()));
 
         try {
             portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);

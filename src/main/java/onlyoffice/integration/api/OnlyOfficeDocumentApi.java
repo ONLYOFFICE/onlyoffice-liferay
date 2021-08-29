@@ -47,7 +47,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
@@ -78,22 +77,17 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         throws IOException, ServletException {
 
         String key = ParamUtil.getString(request, "key");
-        Long fileVersionId = _hasher.validate(key);
+        Long fileEntryId = _hasher.validate(key);
 
-        if (fileVersionId <= 0) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN);
-            return;
-        }
-
-        FileVersion file;
+        FileEntry fileEntry;
         try {
-            file = DLAppLocalServiceUtil.getFileVersion(fileVersionId);
+            fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
 
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getFileName() + "\"");
-            response.setHeader("Content-Length", Long.toString(file.getSize()));
-            response.setContentType(file.getMimeType());
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileEntry.getFileName() + "\"");
+            response.setHeader("Content-Length", Long.toString(fileEntry.getSize()));
+            response.setContentType(fileEntry.getMimeType());
 
-            StreamUtil.transfer(file.getContentStream(false), response.getOutputStream());
+            StreamUtil.transfer(fileEntry.getContentStream(), response.getOutputStream());
         } catch (PortalException e) {
             _log.error(e.getMessage(), e);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
@@ -108,32 +102,27 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         String error = null;
 
         String key = ParamUtil.getString(request, "key");
-        Long fileVersionId = _hasher.validate(key);
+        Long fileEntryId = _hasher.validate(key);
 
-        if (fileVersionId <= 0) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            error = "Wrong fileVersionId";
-        } else {
-            try {
-                FileEntry file = _dlApp.getFileVersion(fileVersionId).getFileEntry();
+        try {
+            FileEntry fileEntry = _dlApp.getFileEntry(fileEntryId);
 
-                String body = getBody(request.getInputStream());
-                if (body.isEmpty()) {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    error = "Empty body";
-                } else {
-                    JSONObject jsonObj = new JSONObject(body);
+            String body = getBody(request.getInputStream());
+            if (body.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                error = "Empty body";
+            } else {
+                JSONObject jsonObj = new JSONObject(body);
 
-                    if (_jwt.isEnabled()) {
-                        jsonObj = _jwt.validate(jsonObj, request);
-                    }
-
-                    processData(file, jsonObj, request);
+                if (_jwt.isEnabled()) {
+                    jsonObj = _jwt.validate(jsonObj, request);
                 }
-            } catch (Exception ex) {
-                _log.error("Unable to process ONLYOFFICE response: " + ex.getMessage(), ex);
-                error = ex.getMessage();
+
+                processData(fileEntry, jsonObj, request);
             }
+        } catch (Exception ex) {
+            _log.error("Unable to process ONLYOFFICE response: " + ex.getMessage(), ex);
+            error = ex.getMessage();
         }
 
         try {
@@ -167,11 +156,10 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         return "";
     }
     
-    private void processData(FileEntry file, JSONObject body, HttpServletRequest request)
+    private void processData(FileEntry fileEntry, JSONObject body, HttpServletRequest request)
         throws JSONException, PortalException, Exception {
         ServiceContext serviceContext = ServiceContextFactory.getInstance(OnlyOfficeDocumentApi.class.getName(), request);
 
-        Long fileId = file.getFileEntryId();
         Long userId = (long) -1;
 
         if (body.has("users")) {
@@ -183,16 +171,16 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             case 0:
                 _log.error("ONLYOFFICE has reported that no doc with the specified key can be found");
 
-                if (file.isCheckedOut()) {
-                    setUserThreadLocal(file.getLock().getUserId());
-                    _dlAppService.cancelCheckOut(fileId);
+                if (fileEntry.isCheckedOut()) {
+                    setUserThreadLocal(fileEntry.getLock().getUserId());
+                    _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
                 }
 
                 break;
             case 1:
-                if (!file.isCheckedOut()) {
+                if (!fileEntry.isCheckedOut()) {
                     setUserThreadLocal(userId);
-                    _dlAppService.checkOutFileEntry(fileId, serviceContext);
+                    _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
 
                     _log.info("Document opened for editing, locking document");
                 } else {
@@ -205,18 +193,18 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
                 String download = _utils.replaceDocServerURLToInternal(body.getString("url"));
 
-                Lock lockFile = file.getLock();
+                Lock lockFile = fileEntry.getLock();
                 if (userId.longValue() != lockFile.getUserId()) {
                     setUserThreadLocal(lockFile.getUserId());
-                    _dlAppService.cancelCheckOut(fileId);
+                    _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
 
                     setUserThreadLocal(userId);
-                    _dlAppService.checkOutFileEntry(fileId, serviceContext);
+                    _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
                 } else {
                     setUserThreadLocal(userId);
                 }
 
-                updateFile(file, userId, download, serviceContext);
+                updateFile(fileEntry, userId, download, serviceContext);
 
                 _log.info("Document saved.");
 
@@ -224,36 +212,36 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             case 3:
                 _log.error("ONLYOFFICE has reported that saving the document has failed, unlocking document");
                 
-                if (file.isCheckedOut()) {
-                    setUserThreadLocal(file.getLock().getUserId());
-                    _dlAppService.cancelCheckOut(fileId);
+                if (fileEntry.isCheckedOut()) {
+                    setUserThreadLocal(fileEntry.getLock().getUserId());
+                    _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
                 }
 
                 break;
             case 4:
                 _log.info("No document updates, unlocking document");
 
-                if (file.isCheckedOut()) {
-                    setUserThreadLocal(file.getLock().getUserId());
-                    _dlAppService.cancelCheckOut(fileId);
+                if (fileEntry.isCheckedOut()) {
+                    setUserThreadLocal(fileEntry.getLock().getUserId());
+                    _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
                 }
 
                 break;
         }
     }
 
-    private void updateFile(FileEntry file, Long userId, String url, ServiceContext serviceContext) throws Exception {
+    private void updateFile(FileEntry fileEntry, Long userId, String url, ServiceContext serviceContext) throws Exception {
         _log.info("Trying to download file from URL: " + url);
 
         try {
             URLConnection con = new URL(url).openConnection();
             InputStream in = con.getInputStream();
 
-            _dlApp.updateFileEntry(userId, file.getFileEntryId(), file.getFileName(), file.getMimeType(),
-                    file.getTitle(), file.getDescription(), "ONLYOFFICE Edit",
+            _dlApp.updateFileEntry(userId, fileEntry.getFileEntryId(), fileEntry.getFileName(), fileEntry.getMimeType(),
+                    fileEntry.getTitle(), fileEntry.getDescription(), "ONLYOFFICE Edit",
                     DLVersionNumberIncrease.MINOR, in, con.getContentLength(), serviceContext);
 
-            _dlAppService.checkInFileEntry(file.getFileEntryId(), DLVersionNumberIncrease.MINOR, "ONLYOFFICE Edit", serviceContext);
+            _dlAppService.checkInFileEntry(fileEntry.getFileEntryId(), DLVersionNumberIncrease.MINOR, "ONLYOFFICE Edit", serviceContext);
         } catch (Exception e) {
             String msg = "Couldn't download or save file: " + e.getMessage();
             _log.error(msg, e);
