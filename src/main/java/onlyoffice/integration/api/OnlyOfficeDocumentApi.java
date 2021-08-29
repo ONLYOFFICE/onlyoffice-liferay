@@ -39,14 +39,22 @@ import org.osgi.service.component.annotations.Reference;
 import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
+import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 
@@ -161,6 +169,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
     
     private void processData(FileEntry file, JSONObject body, HttpServletRequest request)
         throws JSONException, PortalException, Exception {
+        ServiceContext serviceContext = ServiceContextFactory.getInstance(OnlyOfficeDocumentApi.class.getName(), request);
 
         Long fileId = file.getFileEntryId();
         Long userId = (long) -1;
@@ -173,64 +182,93 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         switch(body.getInt("status")) {
             case 0:
                 _log.error("ONLYOFFICE has reported that no doc with the specified key can be found");
-                    if (file.isSupportsLocking()) {
-                        _dlFile.unlockFileEntry(fileId);
-                    }
+
+                if (file.isCheckedOut()) {
+                    setUserThreadLocal(file.getLock().getUserId());
+                    _dlAppService.cancelCheckOut(fileId);
+                }
+
                 break;
             case 1:
-                if (file.isSupportsLocking()) {
-                    if (file.getLock() != null) {
-                        _log.info("Document already locked, another user has entered/exited");
-                    } else {
-                        _log.info("Document opened for editing, locking document");
-                        _dlFile.lockFileEntry(userId, fileId);
-                    }
+                if (!file.isCheckedOut()) {
+                    setUserThreadLocal(userId);
+                    _dlAppService.checkOutFileEntry(fileId, serviceContext);
+
+                    _log.info("Document opened for editing, locking document");
+                } else {
+                    _log.info("Document already locked, another user has entered/exited");
                 }
+
                 break;
             case 2:
                 _log.info("Document updated, changing content");
-                if (file.isSupportsLocking()) {
-                    _log.info("Unlocking document");
-                    _dlFile.unlockFileEntry(fileId);
-                }
 
                 String download = _utils.replaceDocServerURLToInternal(body.getString("url"));
-                updateFile(file, userId, download, request);
+
+                Lock lockFile = file.getLock();
+                if (userId.longValue() != lockFile.getUserId()) {
+                    setUserThreadLocal(lockFile.getUserId());
+                    _dlAppService.cancelCheckOut(fileId);
+
+                    setUserThreadLocal(userId);
+                    _dlAppService.checkOutFileEntry(fileId, serviceContext);
+                } else {
+                    setUserThreadLocal(userId);
+                }
+
+                updateFile(file, userId, download, serviceContext);
+
+                _log.info("Document saved.");
+
                 break;
             case 3:
                 _log.error("ONLYOFFICE has reported that saving the document has failed, unlocking document");
-                if (file.isSupportsLocking()) {
-                    _dlFile.unlockFileEntry(fileId);
+                
+                if (file.isCheckedOut()) {
+                    setUserThreadLocal(file.getLock().getUserId());
+                    _dlAppService.cancelCheckOut(fileId);
                 }
+
                 break;
             case 4:
                 _log.info("No document updates, unlocking document");
-                if (file.isSupportsLocking()) {
-                    _dlFile.unlockFileEntry(fileId);
+
+                if (file.isCheckedOut()) {
+                    setUserThreadLocal(file.getLock().getUserId());
+                    _dlAppService.cancelCheckOut(fileId);
                 }
+
                 break;
         }
     }
 
-    private void updateFile(FileEntry file, Long userId, String url, HttpServletRequest request) throws Exception {
+    private void updateFile(FileEntry file, Long userId, String url, ServiceContext serviceContext) throws Exception {
         _log.info("Trying to download file from URL: " + url);
 
         try {
             URLConnection con = new URL(url).openConnection();
             InputStream in = con.getInputStream();
-            ServiceContext serviceContext = ServiceContextFactory.getInstance(OnlyOfficeDocumentApi.class.getName(), request);
 
-            _dlApp.updateFileEntry(userId, file.getFileEntryId(), file.getFileName(), file.getMimeType(), 
-                    file.getTitle(), file.getDescription(), "ONLYOFFICE Edit", 
+            _dlApp.updateFileEntry(userId, file.getFileEntryId(), file.getFileName(), file.getMimeType(),
+                    file.getTitle(), file.getDescription(), "ONLYOFFICE Edit",
                     DLVersionNumberIncrease.MINOR, in, con.getContentLength(), serviceContext);
 
-            _log.info("Document saved.");
-
+            _dlAppService.checkInFileEntry(file.getFileEntryId(), DLVersionNumberIncrease.MINOR, "ONLYOFFICE Edit", serviceContext);
         } catch (Exception e) {
             String msg = "Couldn't download or save file: " + e.getMessage();
             _log.error(msg, e);
             throw new Exception(msg);
         }
+    }
+
+    private void setUserThreadLocal (Long userId) throws PortalException {
+        User user = UserLocalServiceUtil.getUser(userId);
+
+        PermissionChecker permissionChecker;
+        permissionChecker = PermissionCheckerFactoryUtil.create(user);
+
+        PrincipalThreadLocal.setName(userId);
+        PermissionThreadLocal.setPermissionChecker(permissionChecker);
     }
 
     private static final long serialVersionUID = 1L;
@@ -248,6 +286,9 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
     @Reference
     private DLFileEntryLocalService _dlFile;
+
+    @Reference
+    private DLAppService _dlAppService;
 
     @Reference
     private OnlyOfficeUtils _utils;
