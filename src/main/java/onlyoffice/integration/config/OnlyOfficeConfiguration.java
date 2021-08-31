@@ -58,4 +58,9 @@ public @interface OnlyOfficeConfiguration {
     )
     public String secret() default "";
 
+    @AttributeDefinition(
+        required = false,
+        name = "onlyoffice-config-force-save-name", description = "onlyoffice-config-force-save-desc"
+    )
+    public boolean forceSave() default false;
 }

@@ -51,6 +51,10 @@ public class OnlyOfficeConfigManager {
         return configuration.secret();
     }
 
+    public boolean forceSaveEnabled() {
+        return configuration.forceSave();
+    }
+
     @Activate
     @Modified
     protected void readConfig(OnlyOfficeConfiguration config) {
