@@ -60,6 +60,7 @@ import com.liferay.portal.kernel.util.StreamUtil;
 import onlyoffice.integration.OnlyOfficeHasher;
 import onlyoffice.integration.OnlyOfficeJWT;
 import onlyoffice.integration.OnlyOfficeUtils;
+import onlyoffice.integration.config.OnlyOfficeConfigManager;
 
 @Component(
     immediate = true,
@@ -167,6 +168,9 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             userId = users.getLong(0);
         }
 
+        String download = null;
+        Lock lockFile = fileEntry.getLock();
+
         switch(body.getInt("status")) {
             case 0:
                 _log.error("ONLYOFFICE has reported that no doc with the specified key can be found");
@@ -175,25 +179,38 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                     setUserThreadLocal(fileEntry.getLock().getUserId());
                     _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
                 }
+                _utils.setCollaborativeEditingKey(fileEntry, null);
 
                 break;
             case 1:
-                if (!fileEntry.isCheckedOut()) {
-                    setUserThreadLocal(userId);
-                    _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
+                if (body.has("actions")) {
+                    JSONArray actions = body.getJSONArray("actions");
+                    if (actions.length() > 0) {
+                        JSONObject action = (JSONObject) actions.get(0);
+                        if (action.getLong("type") == 1) {
+                            if (!fileEntry.isCheckedOut()) {
+                                setUserThreadLocal(userId);
+                                _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
 
-                    _log.info("Document opened for editing, locking document");
-                } else {
-                    _log.info("Document already locked, another user has entered/exited");
+                                if (_utils.getCollaborativeEditingKey(fileEntry) == null) {
+                                    String key = body.getString("key");
+                                    _utils.setCollaborativeEditingKey(fileEntry, key);
+                                }
+
+                                _log.info("Document opened for editing, locking document");
+                            } else {
+                                _log.info("Document already locked, another user has entered");
+                            }
+                        }
+                    }
                 }
 
                 break;
             case 2:
                 _log.info("Document updated, changing content");
 
-                String download = _utils.replaceDocServerURLToInternal(body.getString("url"));
+                download = _utils.replaceDocServerURLToInternal(body.getString("url"));
 
-                Lock lockFile = fileEntry.getLock();
                 if (userId.longValue() != lockFile.getUserId()) {
                     setUserThreadLocal(lockFile.getUserId());
                     _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
@@ -204,7 +221,8 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                     setUserThreadLocal(userId);
                 }
 
-                updateFile(fileEntry, userId, download, serviceContext);
+                updateFile(fileEntry, userId, download, DLVersionNumberIncrease.MAJOR, serviceContext);
+                _utils.setCollaborativeEditingKey(fileEntry, null);
 
                 _log.info("Document saved.");
 
@@ -216,6 +234,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                     setUserThreadLocal(fileEntry.getLock().getUserId());
                     _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
                 }
+                _utils.setCollaborativeEditingKey(fileEntry, null);
 
                 break;
             case 4:
@@ -225,12 +244,45 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                     setUserThreadLocal(fileEntry.getLock().getUserId());
                     _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
                 }
+                _utils.setCollaborativeEditingKey(fileEntry, null);
+
+                break;
+
+            case 6:
+                if (_config.forceSaveEnabled()) {
+                    download = _utils.replaceDocServerURLToInternal(body.getString("url"));
+
+                    if (userId.longValue() != lockFile.getUserId()) {
+                        setUserThreadLocal(lockFile.getUserId());
+                        _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
+
+                        setUserThreadLocal(userId);
+                        _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
+                    } else {
+                        setUserThreadLocal(userId);
+                    }
+
+                    updateFile(fileEntry, userId, download, DLVersionNumberIncrease.MINOR, serviceContext);
+
+                    String key = _utils.getCollaborativeEditingKey(fileEntry);
+                    _utils.setCollaborativeEditingKey(fileEntry, null);
+
+                    fileEntry = _dlApp.getFileEntry(fileEntry.getFileEntryId());
+                    _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
+
+                    _utils.setCollaborativeEditingKey(fileEntry, key);
+
+                    _log.info("Document saved (forcesave).");
+                } else {
+                    _log.info("Forcesave is disabled, ignoring forcesave request");
+                }
 
                 break;
         }
     }
 
-    private void updateFile(FileEntry fileEntry, Long userId, String url, ServiceContext serviceContext) throws Exception {
+    private void updateFile(FileEntry fileEntry, Long userId, String url, DLVersionNumberIncrease dlVersionNumberIncrease,
+            ServiceContext serviceContext) throws Exception {
         _log.info("Trying to download file from URL: " + url);
 
         try {
@@ -238,10 +290,10 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             InputStream in = con.getInputStream();
 
             _dlApp.updateFileEntry(userId, fileEntry.getFileEntryId(), fileEntry.getFileName(), fileEntry.getMimeType(),
-                    fileEntry.getTitle(), fileEntry.getDescription(), "ONLYOFFICE Edit",
-                    DLVersionNumberIncrease.MINOR, in, con.getContentLength(), serviceContext);
+                    fileEntry.getTitle(), fileEntry.getDescription(), "ONLYOFFICE Edit",dlVersionNumberIncrease, in,
+                    con.getContentLength(), serviceContext);
 
-            _dlAppService.checkInFileEntry(fileEntry.getFileEntryId(), DLVersionNumberIncrease.MINOR, "ONLYOFFICE Edit", serviceContext);
+            _dlAppService.checkInFileEntry(fileEntry.getFileEntryId(), dlVersionNumberIncrease, "ONLYOFFICE Edit", serviceContext);
         } catch (Exception e) {
             String msg = "Couldn't download or save file: " + e.getMessage();
             _log.error(msg, e);
@@ -280,4 +332,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
     @Reference
     private OnlyOfficeUtils _utils;
+
+    @Reference
+    private OnlyOfficeConfigManager _config;
 }

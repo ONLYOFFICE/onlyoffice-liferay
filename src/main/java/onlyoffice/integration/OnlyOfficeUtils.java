@@ -31,6 +31,12 @@ import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.expando.kernel.model.ExpandoColumnConstants;
+import com.liferay.expando.kernel.model.ExpandoTableConstants;
+import com.liferay.expando.kernel.service.ExpandoValueLocalServiceUtil;
+import com.liferay.expando.kernel.model.ExpandoValue;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -136,7 +142,7 @@ public class OnlyOfficeUtils {
             documentObject.put("title", fileEntry.getFileName());
             documentObject.put("url", url);
             documentObject.put("fileType", ext);
-            documentObject.put("key", fileEntry.getUuid() + "_" + fileEntry.getVersion().hashCode());
+            documentObject.put("key", getDocKey(fileEntry));
             documentObject.put("permissions", permObject);
             permObject.put("edit", edit);
 
@@ -145,6 +151,7 @@ public class OnlyOfficeUtils {
             editorConfigObject.put("mode", edit ? "edit" : "view");
             editorConfigObject.put("customization", customizationObject);
             customizationObject.put("goback", goBackObject);
+            customizationObject.put("forcesave", _config.forceSaveEnabled());
             goBackObject.put("url", getGoBackUrl(req, fileEntry));
 
             if (edit) {
@@ -186,6 +193,46 @@ public class OnlyOfficeUtils {
         if (".doc.docx.docm.dot.dotx.dotm.odt.fodt.ott.rtf.txt.html.htm.mht.pdf.djvu.fb2.epub.xps".indexOf(ext) != -1) return "text";
         if (".xls.xlsx.xlsm.xlt.xltx.xltm.ods.fods.ots.csv".indexOf(ext) != -1) return "spreadsheet";
         if (".pps.ppsx.ppsm.ppt.pptx.pptm.pot.potx.potm.odp.fodp.otp".indexOf(ext) != -1) return "presentation";
+        return null;
+    }
+
+    private String getDocKey(FileEntry fileEntry) throws PortalException {
+        String key = getCollaborativeEditingKey(fileEntry);
+        if (key != null) {
+            return key;
+        } else {
+            return fileEntry.getUuid() + "_" + fileEntry.getVersion().hashCode();
+        }
+    }
+
+    public void setCollaborativeEditingKey(FileEntry fileEntry, String key) throws PortalException {
+        ExpandoBridge expandoBridge = fileEntry.getExpandoBridge();
+
+        if (!expandoBridge.hasAttribute("onlyoffice-collaborative-editor-key")) {
+            expandoBridge.addAttribute("onlyoffice-collaborative-editor-key", ExpandoColumnConstants.STRING, false);
+        }
+
+        if (key == null || key.isEmpty()) {
+            ExpandoValueLocalServiceUtil.deleteValue(expandoBridge.getCompanyId(), expandoBridge.getClassName(),
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "onlyoffice-collaborative-editor-key", expandoBridge.getClassPK());
+        } else {
+            ExpandoValueLocalServiceUtil.addValue(expandoBridge.getCompanyId(), expandoBridge.getClassName(),
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "onlyoffice-collaborative-editor-key", expandoBridge.getClassPK(), key);
+        }
+    }
+
+    public String getCollaborativeEditingKey(FileEntry fileEntry) throws PortalException {
+        ExpandoBridge expandoBridge = fileEntry.getExpandoBridge();
+
+        if (expandoBridge.hasAttribute("onlyoffice-collaborative-editor-key")) {
+            ExpandoValue value = ExpandoValueLocalServiceUtil.getValue(expandoBridge.getCompanyId(), expandoBridge.getClassName(),
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "onlyoffice-collaborative-editor-key", expandoBridge.getClassPK());
+
+            if (value != null && !value.getString().isEmpty()) {
+                return value.getString();
+            }
+        }
+
         return null;
     }
 
