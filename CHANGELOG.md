@@ -1,5 +1,9 @@
 # Change Log
 
+
+## Changed
+- checkin/checkout instead of lock/unlock
+
 ## 2.0.0
 ## Added
 - Ability to create documents
