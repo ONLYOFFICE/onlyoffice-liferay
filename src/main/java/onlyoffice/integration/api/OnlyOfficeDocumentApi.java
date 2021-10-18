@@ -207,6 +207,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
                 break;
             case 2:
+            case 3:
                 _log.info("Document updated, changing content");
 
                 download = _utils.replaceDocServerURLToInternal(body.getString("url"));
@@ -227,16 +228,6 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                 _log.info("Document saved.");
 
                 break;
-            case 3:
-                _log.error("ONLYOFFICE has reported that saving the document has failed, unlocking document");
-                
-                if (fileEntry.isCheckedOut()) {
-                    setUserThreadLocal(fileEntry.getLock().getUserId());
-                    _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
-                }
-                _utils.setCollaborativeEditingKey(fileEntry, null);
-
-                break;
             case 4:
                 _log.info("No document updates, unlocking document");
 
@@ -249,6 +240,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                 break;
 
             case 6:
+            case 7:
                 if (_config.forceSaveEnabled()) {
                     download = _utils.replaceDocServerURLToInternal(body.getString("url"));
 
