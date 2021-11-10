@@ -55,6 +55,10 @@ public class OnlyOfficeConfigManager {
         return configuration.forceSave();
     }
 
+    public boolean webPreview() {
+        return configuration.webPreview();
+    }
+
     @Activate
     @Modified
     protected void readConfig(OnlyOfficeConfiguration config) {
