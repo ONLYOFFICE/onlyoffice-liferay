@@ -101,6 +101,7 @@ extends BaseDLViewFileVersionDisplayContext {
 
         String ext = fileVersion.getExtension();
         _canEdit = utils.isEditable(ext) && editPerm;
+        _canFillForm = utils.isFillForm(ext) && editPerm;
         _canView = utils.isViewable(ext) && viewPerm;
         _canConvert = convertUtils.isConvertable(ext) && convPerm;
     }
@@ -143,8 +144,15 @@ extends BaseDLViewFileVersionDisplayContext {
     }
 
     private void InitViewItem(URLUIItem item) {
-        item.setLabel(_canEdit ? LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-edit")
-                : LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-view"));
+        String labelKey = "onlyoffice-context-action-view";
+
+        if (_canEdit) {
+            labelKey = "onlyoffice-context-action-edit";
+        } else if (_canFillForm)  {
+            labelKey = "onlyoffice-context-action-fillForm";
+        }
+
+        item.setLabel(LanguageUtil.get(request, _resourceBundle, labelKey));
         item.setTarget("_blank");
         item.setURL(getDocUrl());
     }
@@ -230,6 +238,7 @@ extends BaseDLViewFileVersionDisplayContext {
     private ThemeDisplay _themeDisplay;
     private ResourceBundle _resourceBundle;
     boolean _canEdit;
+    boolean _canFillForm;
     boolean _canView;
     boolean _canConvert;
 }
