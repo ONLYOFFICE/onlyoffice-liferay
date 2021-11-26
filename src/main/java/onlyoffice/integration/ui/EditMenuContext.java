@@ -104,6 +104,7 @@ extends BaseDLViewFileVersionDisplayContext {
         _canFillForm = utils.isFillForm(ext) && editPerm;
         _canView = utils.isViewable(ext) && viewPerm;
         _canConvert = convertUtils.isConvertable(ext) && convPerm;
+        _isMasterForm = ext.equals("docxf");
     }
 
     public Menu getMenu() throws PortalException {
@@ -158,7 +159,12 @@ extends BaseDLViewFileVersionDisplayContext {
     }
 
     private void InitConvertItem(JavaScriptUIItem item) {
-        String lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-convert");
+        String lang = null;
+        if (_isMasterForm) {
+            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-create-from");
+        } else {
+            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-convert");
+        }
         item.setLabel(lang);
 
         StringBuilder sb = new StringBuilder();
@@ -241,4 +247,5 @@ extends BaseDLViewFileVersionDisplayContext {
     boolean _canFillForm;
     boolean _canView;
     boolean _canConvert;
+    boolean _isMasterForm;
 }
