@@ -65,6 +65,10 @@ public class OnlyOfficeUtils {
         return fixUrl(_config.getLiferayUrlOrDefault(PortalUtil.getPortalURL(req)));
     }
 
+    public String getSaveAsUrl(HttpServletRequest req) {
+        return getLiferayUrl(req) + "o/onlyoffice/api?type=save-as";
+    }
+
     public String replaceDocServerURLToInternal(String url) {
         String innerDocEditorUrl = getDocServerInnnerUrl();
         String publicDocEditorUrl = getDocServerUrl();

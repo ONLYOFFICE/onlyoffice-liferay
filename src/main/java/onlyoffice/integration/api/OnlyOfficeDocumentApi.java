@@ -52,6 +52,7 @@ import com.liferay.portal.kernel.util.StreamUtil;
 
 import onlyoffice.integration.OnlyOfficeHasher;
 import onlyoffice.integration.OnlyOfficeJWT;
+import onlyoffice.integration.OnlyOfficeParsingUtils;
 import onlyoffice.integration.OnlyOfficeUtils;
 
 @Component(
@@ -109,7 +110,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             try {
                 FileEntry file = _dlApp.getFileVersion(fileVersionId).getFileEntry();
 
-                String body = getBody(request.getInputStream());
+                String body = _parsingUtils.getBody(request.getInputStream());
                 if (body.isEmpty()) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     error = "Empty body";
@@ -142,21 +143,6 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
-    }
-    
-    private String getBody(InputStream is) {
-        try {
-            Scanner s = new Scanner(is);
-            s.useDelimiter("\\A");
-            String result = s.hasNext() ? s.next() : "";
-            s.close();
-            is.close();
-
-            return result;
-        } catch (IOException e) {
-            _log.error(e.getMessage(), e);
-        }
-        return "";
     }
     
     private void processData(FileEntry file, JSONObject body, HttpServletRequest request)
@@ -251,4 +237,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
     @Reference
     private OnlyOfficeUtils _utils;
+
+    @Reference
+    private OnlyOfficeParsingUtils _parsingUtils;
 }
