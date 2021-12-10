@@ -92,7 +92,18 @@
             config.events.onRequestSaveAs = onRequestSaveAs;
         <% } %>
 
-        var docEditor = new DocsAPI.DocEditor("placeholder", config);
+        var connectEditor = function () {
+            if ((config.document.fileType === "docxf" || config.document.fileType === "oform")
+                && DocsAPI.DocEditor.version().split(".")[0] < 7) {
+                alert("<%= LanguageUtil.get(request, "onlyoffice-editor-froms-error-version")%>");
+                window.location.href = config.editorConfig.customization.goback.url;
+                return;
+            }
+
+            var docEditor = new DocsAPI.DocEditor("placeholder", config);
+        }
+
+        connectEditor();
     </script>
 </body>
 </html>
