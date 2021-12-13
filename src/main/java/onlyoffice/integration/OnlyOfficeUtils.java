@@ -65,6 +65,10 @@ public class OnlyOfficeUtils {
         return fixUrl(_config.getLiferayUrlOrDefault(PortalUtil.getPortalURL(req)));
     }
 
+    public String getSaveAsUrl(HttpServletRequest req) {
+        return getLiferayUrl(req) + "o/onlyoffice/api?type=save-as";
+    }
+
     public String replaceDocServerURLToInternal(String url) {
         String innerDocEditorUrl = getDocServerInnnerUrl();
         String publicDocEditorUrl = getDocServerUrl();
@@ -74,14 +78,19 @@ public class OnlyOfficeUtils {
         return url;
     }
 
-    private List<String> editableExtensions = Arrays.asList("docx", "xlsx", "pptx");
+    private List<String> editableExtensions = Arrays.asList("docx", "xlsx", "pptx", "docxf");
     public boolean isEditable(String ext) {
         return editableExtensions.contains(trimDot(ext));
     }
 
+    private List<String> fillFormExtensions = Arrays.asList("oform");
+    public boolean isFillForm(String ext) {
+        return fillFormExtensions.contains(trimDot(ext));
+    }
+
     private List<String> viewableExtensions = Arrays.asList("odt", "doc", "ods", "xls", "odp", "ppt", "csv", "rtf", "txt", "pdf");
     public boolean isViewable(String ext) {
-        return viewableExtensions.contains(trimDot(ext)) || isEditable(ext);
+        return viewableExtensions.contains(trimDot(ext)) || isEditable(ext) || isFillForm(ext);
     }
 
     private String getGoBackUrl(RenderRequest request, FileEntry fileEntry) {
@@ -124,7 +133,7 @@ public class OnlyOfficeUtils {
                 throw new Exception("User don't have read rights");
             }
 
-            boolean edit = isEditable(ext) && editPerm;
+            boolean edit = (isEditable(ext) || isFillForm(ext)) && editPerm;
             String url = getFileUrl(PortalUtil.getHttpServletRequest(req), fileVersionId);
 
             responseJson.put("type", "desktop");
@@ -182,7 +191,7 @@ public class OnlyOfficeUtils {
     }
 
     private String getDocType(String ext) {
-        if (".doc.docx.docm.dot.dotx.dotm.odt.fodt.ott.rtf.txt.html.htm.mht.pdf.djvu.fb2.epub.xps".indexOf(ext) != -1) return "text";
+        if (".doc.docx.docm.dot.dotx.dotm.odt.fodt.ott.rtf.txt.html.htm.mht.pdf.djvu.fb2.epub.xps.docxf.oform".indexOf(ext) != -1) return "text";
         if (".xls.xlsx.xlsm.xlt.xltx.xltm.ods.fods.ots.csv".indexOf(ext) != -1) return "spreadsheet";
         if (".pps.ppsx.ppsm.ppt.pptx.pptm.pot.potx.potm.odp.fodp.otp".indexOf(ext) != -1) return "presentation";
         return null;
