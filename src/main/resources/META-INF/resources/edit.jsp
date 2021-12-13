@@ -24,6 +24,9 @@
 <%@ page import="com.liferay.portal.kernel.repository.model.FileVersion" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.ResourceBundleUtil" %>
+<%@ page import="com.liferay.portal.kernel.servlet.HttpHeaders" %>
+<%@ page import="com.liferay.portal.kernel.util.PortalUtil" %>
+<%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %>
 
 <%@ page import="java.util.ResourceBundle" %>
 
@@ -51,6 +54,31 @@
     <title><%= file.getFileName() %> - <%= LanguageUtil.get(resourceBundle, "onlyoffice-edit-title") %></title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css" />
     <script id="scriptApi" type="text/javascript" src="<%= utils.getDocServerUrl() %>OfficeWeb/apps/api/documents/api.js"></script>
+
+    <% if (request.getHeader(HttpHeaders.USER_AGENT).contains("AscDesktopEditor")) { %>
+        <script type="text/javascript">
+            var Liferay = Liferay || {};
+            Liferay.ThemeDisplay = Liferay.ThemeDisplay || {
+                getUserId: function () {
+                    return "<%= themeDisplay.getUserId() %>";
+                },
+                getUserName: function () {
+                    return "<%= themeDisplay.getUser().getFullName() %>";
+                },
+                getUserEmailAddress: function () {
+                    return "<%= themeDisplay.getUser().getEmailAddress() %>";
+                },
+                getPortalURL: function () {
+                    return "<%= themeDisplay.getPortalURL() %>";
+                },
+                isSignedIn: function () {
+                    return <%= themeDisplay.isSignedIn() %>;
+                }
+            };
+        </script>
+
+        <script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, application.getContextPath() + "/js/desktop.js")) %>" type="text/javascript"></script>
+    <% } %>
 </head>
 
 <body>
