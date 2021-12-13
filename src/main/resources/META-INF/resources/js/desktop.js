@@ -6,4 +6,6 @@ var data = {
     userId: Liferay.ThemeDisplay.getUserId()
 };
 
-window.AscDesktopEditor.execCommand("portal:login", JSON.stringify(data));
+if (Liferay.ThemeDisplay.isSignedIn()) {
+    window.AscDesktopEditor.execCommand("portal:login", JSON.stringify(data));
+}
