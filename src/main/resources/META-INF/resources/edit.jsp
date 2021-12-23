@@ -100,10 +100,10 @@
                 return;
             }
 
-            var docEditor = new DocsAPI.DocEditor("placeholder", config);
+            return new DocsAPI.DocEditor("placeholder", config);
         }
 
-        connectEditor();
+        var docEditor = connectEditor();
     </script>
 </body>
 </html>
