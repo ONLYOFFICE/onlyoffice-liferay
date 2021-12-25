@@ -70,6 +70,7 @@ public class OnlyOfficeConvertUtils {
         put("ods", "xlsx");
         put("xls", "xlsx");
         put("csv", "xlsx");
+        put("docxf", "oform");
     }};
 
     @SuppressWarnings("serial")
@@ -86,6 +87,8 @@ public class OnlyOfficeConvertUtils {
         put("rtf", "application/rtf");
         put("txt", "text/plain");
         put("csv", "text/csv");
+        put("docxf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        put("oform", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
     }};
 
     public JSONObject convert(HttpServletRequest req, FileVersion file, String key) throws SecurityException, Exception {

@@ -34,6 +34,7 @@
 <%@ page import="org.osgi.framework.FrameworkUtil" %>
 
 <%@ page import="onlyoffice.integration.OnlyOfficeUtils" %>
+<%@ page import="onlyoffice.integration.permission.OnlyOfficePermissionUtils" %>
 
 <liferay-theme:defineObjects />
 
@@ -86,8 +87,51 @@
         <div id="placeholder"></div>
     </div>
     <script>
-    var config = JSON.parse('<%= utils.getDocumentConfig(file, renderRequest) %>');
-    new DocsAPI.DocEditor("placeholder", config);
+        var config = JSON.parse('<%= utils.getDocumentConfig(file, renderRequest) %>');
+
+        var onRequestSaveAs = function (event) {
+            var url = event.data.url;
+            var fileType = event.data.fileType ? event.data.fileType : event.data.title.split(".").pop();
+
+            var request = new XMLHttpRequest();
+            request.open("POST", '<%= utils.getSaveAsUrl(request) %>', true);
+            request.send(JSON.stringify({
+                url: url,
+                fileType: fileType,
+                fileEntryId: "<%= file.getFileEntry().getFileEntryId() %>"
+            }));
+
+            request.onreadystatechange = function() {
+                if (request.readyState != 4) return;
+                if (request.status == 200) {
+                    var response = JSON.parse(request.response);
+                    docEditor.showMessage("<%= LanguageUtil.get(request, "onlyoffice-save-as-success")%>" + " " + response.fileName);
+                } else if (request.status == 403) {
+                    docEditor.showMessage("<%= LanguageUtil.get(request, "onlyoffice-save-as-error-forbidden")%>");
+                } else {
+                    docEditor.showMessage("<%= LanguageUtil.get(request, "onlyoffice-save-as-error-unknown")%>");
+                }
+            }
+        }
+
+        config.events = {};
+
+        <% if (OnlyOfficePermissionUtils.saveAs(file.getFileEntry(), themeDisplay.getUser())) { %>
+            config.events.onRequestSaveAs = onRequestSaveAs;
+        <% } %>
+
+        var connectEditor = function () {
+            if ((config.document.fileType === "docxf" || config.document.fileType === "oform")
+                && DocsAPI.DocEditor.version().split(".")[0] < 7) {
+                alert("<%= LanguageUtil.get(request, "onlyoffice-editor-froms-error-version")%>");
+                window.location.href = config.editorConfig.customization.goback.url;
+                return;
+            }
+
+            return new DocsAPI.DocEditor("placeholder", config);
+        }
+
+        var docEditor = connectEditor();
     </script>
 </body>
 </html>

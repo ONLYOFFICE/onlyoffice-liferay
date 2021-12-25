@@ -4,6 +4,13 @@
 ## Changed
 - checkin/checkout instead of lock/unlock
 
+## 2.1.0
+## Added
+- support docxf and oform formats
+- create blank docxf from creation menu
+- create oform from docxf from document manager
+- "save as" in editor
+
 ## 2.0.0
 ## Added
 - Ability to create documents
