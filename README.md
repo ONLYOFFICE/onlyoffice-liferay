@@ -12,7 +12,7 @@ The connector allows to:
 
 Supported formats: 
 
-* For opening and editing: DOCX, XLSX, PPTX.
+* For opening and editing: DOCX, XLSX, PPTX, DOCXF, OFORM.
 * For viewing only: ODT, ODS, ODP, DOC, XLS, PPT, PDF.
 
 ## Installing ONLYOFFICE Docs
