@@ -91,8 +91,11 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
 
             JSONObject json = _convert.convert(request, fileEntry, key);
 
-            if (json.getBoolean("endConvert")) {
+            if (json.has("endConvert") && json.getBoolean("endConvert")) {
                 savefile(request, fileEntry, json.getString("fileUrl"), fn);
+            } else if (json.has("error")) {
+                writer.write("{\"error\":\"Unknown conversion error\"}");
+                return;
             }
 
             writer.write(json.toString());

@@ -59,6 +59,7 @@ import com.liferay.portal.kernel.util.StreamUtil;
 
 import onlyoffice.integration.OnlyOfficeHasher;
 import onlyoffice.integration.OnlyOfficeJWT;
+import onlyoffice.integration.OnlyOfficeParsingUtils;
 import onlyoffice.integration.OnlyOfficeUtils;
 import onlyoffice.integration.config.OnlyOfficeConfigManager;
 
@@ -108,12 +109,12 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         try {
             FileEntry fileEntry = _dlApp.getFileEntry(fileEntryId);
 
-            String body = getBody(request.getInputStream());
-            if (body.isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                error = "Empty body";
-            } else {
-                JSONObject jsonObj = new JSONObject(body);
+                String body = _parsingUtils.getBody(request.getInputStream());
+                if (body.isEmpty()) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    error = "Empty body";
+                } else {
+                    JSONObject jsonObj = new JSONObject(body);
 
                 if (_jwt.isEnabled()) {
                     jsonObj = _jwt.validate(jsonObj, request);
@@ -140,21 +141,6 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
-    }
-    
-    private String getBody(InputStream is) {
-        try {
-            Scanner s = new Scanner(is);
-            s.useDelimiter("\\A");
-            String result = s.hasNext() ? s.next() : "";
-            s.close();
-            is.close();
-
-            return result;
-        } catch (IOException e) {
-            _log.error(e.getMessage(), e);
-        }
-        return "";
     }
     
     private void processData(FileEntry fileEntry, JSONObject body, HttpServletRequest request)
@@ -324,6 +310,9 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
     @Reference
     private OnlyOfficeUtils _utils;
+
+    @Reference
+    private OnlyOfficeParsingUtils _parsingUtils;
 
     @Reference
     private OnlyOfficeConfigManager _config;

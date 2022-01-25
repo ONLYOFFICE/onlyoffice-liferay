@@ -24,6 +24,9 @@
 <%@ page import="com.liferay.portal.kernel.repository.model.FileEntry" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.ResourceBundleUtil" %>
+<%@ page import="com.liferay.portal.kernel.servlet.HttpHeaders" %>
+<%@ page import="com.liferay.portal.kernel.util.PortalUtil" %>
+<%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %>
 
 <%@ page import="java.util.ResourceBundle" %>
 
@@ -31,6 +34,7 @@
 <%@ page import="org.osgi.framework.FrameworkUtil" %>
 
 <%@ page import="onlyoffice.integration.OnlyOfficeUtils" %>
+<%@ page import="onlyoffice.integration.permission.OnlyOfficePermissionUtils" %>
 
 <liferay-theme:defineObjects />
 
@@ -51,6 +55,31 @@
     <title><%= fileEntry.getFileName() %> - <%= LanguageUtil.get(resourceBundle, "onlyoffice-edit-title") %></title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css" />
     <script id="scriptApi" type="text/javascript" src="<%= utils.getDocServerUrl() %>OfficeWeb/apps/api/documents/api.js"></script>
+
+    <% if (request.getHeader(HttpHeaders.USER_AGENT).contains("AscDesktopEditor")) { %>
+        <script type="text/javascript">
+            var Liferay = Liferay || {};
+            Liferay.ThemeDisplay = Liferay.ThemeDisplay || {
+                getUserId: function () {
+                    return "<%= themeDisplay.getUserId() %>";
+                },
+                getUserName: function () {
+                    return "<%= themeDisplay.getUser().getFullName() %>";
+                },
+                getUserEmailAddress: function () {
+                    return "<%= themeDisplay.getUser().getEmailAddress() %>";
+                },
+                getPortalURL: function () {
+                    return "<%= themeDisplay.getPortalURL() %>";
+                },
+                isSignedIn: function () {
+                    return <%= themeDisplay.isSignedIn() %>;
+                }
+            };
+        </script>
+
+        <script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, application.getContextPath() + "/js/desktop.js")) %>" type="text/javascript"></script>
+    <% } %>
 </head>
 
 <body>
@@ -59,7 +88,50 @@
     </div>
     <script>
     var config = JSON.parse('<%= utils.getDocumentConfig(fileEntryId, renderRequest) %>');
-    new DocsAPI.DocEditor("placeholder", config);
+
+        var onRequestSaveAs = function (event) {
+            var url = event.data.url;
+            var fileType = event.data.fileType ? event.data.fileType : event.data.title.split(".").pop();
+
+            var request = new XMLHttpRequest();
+            request.open("POST", '<%= utils.getSaveAsUrl(request) %>', true);
+            request.send(JSON.stringify({
+                url: url,
+                fileType: fileType,
+                fileEntryId: "<%= fileEntryId %>"
+            }));
+
+            request.onreadystatechange = function() {
+                if (request.readyState != 4) return;
+                if (request.status == 200) {
+                    var response = JSON.parse(request.response);
+                    docEditor.showMessage("<%= LanguageUtil.get(request, "onlyoffice-save-as-success")%>" + " " + response.fileName);
+                } else if (request.status == 403) {
+                    docEditor.showMessage("<%= LanguageUtil.get(request, "onlyoffice-save-as-error-forbidden")%>");
+                } else {
+                    docEditor.showMessage("<%= LanguageUtil.get(request, "onlyoffice-save-as-error-unknown")%>");
+                }
+            }
+        }
+
+        config.events = {};
+
+        <% if (OnlyOfficePermissionUtils.saveAs(fileEntry, themeDisplay.getUser())) { %>
+            config.events.onRequestSaveAs = onRequestSaveAs;
+        <% } %>
+
+        var connectEditor = function () {
+            if ((config.document.fileType === "docxf" || config.document.fileType === "oform")
+                && DocsAPI.DocEditor.version().split(".")[0] < 7) {
+                alert("<%= LanguageUtil.get(request, "onlyoffice-editor-froms-error-version")%>");
+                window.location.href = config.editorConfig.customization.goback.url;
+                return;
+            }
+
+            return new DocsAPI.DocEditor("placeholder", config);
+        }
+
+        var docEditor = connectEditor();
     </script>
 </body>
 </html>
