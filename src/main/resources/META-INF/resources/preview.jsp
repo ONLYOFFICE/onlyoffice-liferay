@@ -1,6 +1,6 @@
 <%--
  *
- * (c) Copyright Ascensio System SIA 2021
+ * (c) Copyright Ascensio System SIA 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
  * limitations under the License.
  *
  --%>
- <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
+
+<%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 <%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
-<%@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
- 
- 
+<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
+<%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
+
+
 <%@ page import="com.liferay.document.library.kernel.service.DLAppLocalServiceUtil" %>
 <%@ page import="com.liferay.portal.kernel.repository.model.FileEntry" %>
 
@@ -27,12 +29,12 @@
 <%@ page import="org.osgi.framework.FrameworkUtil" %>
 
 <%@ page import="onlyoffice.integration.OnlyOfficeUtils" %>
- 
+
 <liferay-theme:defineObjects />
 
 <portlet:defineObjects />
- 
- 
+
+
 <%
     BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeUtils.class).getBundleContext();
 
@@ -41,16 +43,37 @@
     OnlyOfficeUtils utils = bc.getService(bc.getServiceReference(OnlyOfficeUtils.class));
 %>
 
-<liferay-util:html-top>
-    <script id="scriptApi" type="text/javascript" src="<%= utils.getDocServerUrl() %>OfficeWeb/apps/api/documents/api.js"></script>
-</liferay-util:html-top>
+<div id="onlyoffice-preview">
+    <div class="preview-file-error-container" style="display: none">
+        <h3><liferay-ui:message key="onlyoffice-preview-error-no-preview-available" /></h3>
+        <p class="text-secondary">
+            <liferay-ui:message key="onlyoffice-editor-error-docs-api-undefined" />
+        </p>
+    </div>
+    <div class="preview-file" style="height: 75vh">
+        <div id="scriptApi"></div>
+        <div id="placeholder"></div>
+    </div>
+    <aui:script>
+        (function () {
+            var divScriptApi = document.getElementById("scriptApi");
+            var scriptApi = document.createElement("script");
 
+            scriptApi.setAttribute("type", "text/javascript");
+            scriptApi.setAttribute("src", "<%= utils.getDocServerUrl() %>web-apps/apps/api/documents/api.js");
 
-<div class="preview-file" style="height: 75vh">
-    <div id="placeholder"></div>
+            scriptApi.onload = scriptApi.onerror = function() {
+                if (typeof DocsAPI === "undefined") {
+                    var divOnlyofficePreview = document.getElementById("onlyoffice-preview");
+                    divOnlyofficePreview.querySelector("div.preview-file-error-container").style.display = "block";
+                    divOnlyofficePreview.querySelector("div.preview-file").style.display = "none";
+                } else {
+                    var config = JSON.parse('<%= utils.getDocumentConfig(fileEntryId, true, renderRequest) %>');
+                    docEditor = new DocsAPI.DocEditor("placeholder", config);
+                }
+            };
 
-    <script>
-        var config = JSON.parse('<%= utils.getDocumentConfig(fileEntryId, true, renderRequest) %>');
-        new DocsAPI.DocEditor("placeholder", config);
-    </script>
+            divScriptApi.append(scriptApi);
+        })();
+    </aui:script>
 </div>
