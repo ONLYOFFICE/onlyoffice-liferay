@@ -54,7 +54,7 @@
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
     <title><%= fileEntry.getFileName() %> - <%= LanguageUtil.get(resourceBundle, "onlyoffice-edit-title") %></title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css" />
-    <script id="scriptApi" type="text/javascript" src="<%= utils.getDocServerUrl() %>OfficeWeb/apps/api/documents/api.js"></script>
+    <script id="scriptApi" type="text/javascript" src="<%= utils.getDocServerUrl() %>web-apps/apps/api/documents/api.js"></script>
 
     <% if (request.getHeader(HttpHeaders.USER_AGENT).contains("AscDesktopEditor")) { %>
         <script type="text/javascript">
