@@ -1,6 +1,7 @@
 # Change Log
 
 ## Added
+- preview of the documents
 - keep intermediate versions when editing (forcesave)
 
 ## Changed
