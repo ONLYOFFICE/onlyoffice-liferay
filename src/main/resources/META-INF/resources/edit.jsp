@@ -21,7 +21,7 @@
 
 <%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
 <%@ page import="com.liferay.document.library.kernel.service.DLAppLocalServiceUtil" %>
-<%@ page import="com.liferay.portal.kernel.repository.model.FileVersion" %>
+<%@ page import="com.liferay.portal.kernel.repository.model.FileEntry" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.ResourceBundleUtil" %>
 <%@ page import="com.liferay.portal.kernel.servlet.HttpHeaders" %>
@@ -44,15 +44,15 @@
     BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeUtils.class).getBundleContext();
     ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(locale, getClass());
 
-    Long fileVersionId = ParamUtil.getLong(renderRequest, "fileId");
-    FileVersion file = DLAppLocalServiceUtil.getFileVersion(fileVersionId);
+    Long fileEntryId = ParamUtil.getLong(renderRequest, "fileId");
+    FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
     OnlyOfficeUtils utils = bc.getService(bc.getServiceReference(OnlyOfficeUtils.class));
 %>
 
 <html>
 <head>
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-    <title><%= file.getFileName() %> - <%= LanguageUtil.get(resourceBundle, "onlyoffice-edit-title") %></title>
+    <title><%= fileEntry.getFileName() %> - <%= LanguageUtil.get(resourceBundle, "onlyoffice-edit-title") %></title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css" />
     <script id="scriptApi" type="text/javascript" src="<%= utils.getDocServerUrl() %>OfficeWeb/apps/api/documents/api.js"></script>
 
@@ -87,7 +87,7 @@
         <div id="placeholder"></div>
     </div>
     <script>
-        var config = JSON.parse('<%= utils.getDocumentConfig(file, renderRequest) %>');
+    var config = JSON.parse('<%= utils.getDocumentConfig(fileEntryId, renderRequest) %>');
 
         var onRequestSaveAs = function (event) {
             var url = event.data.url;
@@ -98,7 +98,7 @@
             request.send(JSON.stringify({
                 url: url,
                 fileType: fileType,
-                fileEntryId: "<%= file.getFileEntry().getFileEntryId() %>"
+                fileEntryId: "<%= fileEntryId %>"
             }));
 
             request.onreadystatechange = function() {
@@ -116,7 +116,7 @@
 
         config.events = {};
 
-        <% if (OnlyOfficePermissionUtils.saveAs(file.getFileEntry(), themeDisplay.getUser())) { %>
+        <% if (OnlyOfficePermissionUtils.saveAs(fileEntry, themeDisplay.getUser())) { %>
             config.events.onRequestSaveAs = onRequestSaveAs;
         <% } %>
 

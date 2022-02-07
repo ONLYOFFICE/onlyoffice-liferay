@@ -1,5 +1,7 @@
 # Change Log
 
+## Added
+- keep intermediate versions when editing (forcesave)
 
 ## Changed
 - checkin/checkout instead of lock/unlock

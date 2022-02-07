@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
@@ -75,7 +74,7 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
             return;
         }
 
-        Long versionId = ParamUtil.getLong(request , "fileId");
+        Long fileEntryId = ParamUtil.getLong(request , "fileId");
         String key = ParamUtil.getString(request , "key");
         String fn = ParamUtil.getString(request , "fileName");
 
@@ -83,18 +82,17 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
         PrintWriter writer = response.getWriter();
 
         try {
-            FileVersion file = DLAppLocalServiceUtil.getFileVersion(versionId);
+            FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
 
             PermissionChecker checker = _permissionFactory.create(user);
-            FileEntry fe = file.getFileEntry();
-            if (!fe.containsPermission(checker, ActionKeys.VIEW) || !fe.getFolder().containsPermission(checker, ActionKeys.ADD_DOCUMENT)) {
+            if (!fileEntry.containsPermission(checker, ActionKeys.VIEW) || !fileEntry.getFolder().containsPermission(checker, ActionKeys.ADD_DOCUMENT)) {
                 throw new Exception("User don't have rights");
             }
 
-            JSONObject json = _convert.convert(request, file, key);
+            JSONObject json = _convert.convert(request, fileEntry, key);
 
             if (json.has("endConvert") && json.getBoolean("endConvert")) {
-                savefile(request, file, json.getString("fileUrl"), fn);
+                savefile(request, fileEntry, json.getString("fileUrl"), fn);
             } else if (json.has("error")) {
                 writer.write("{\"error\":\"Unknown conversion error\"}");
                 return;
@@ -108,7 +106,7 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
     }
 
 
-    private void savefile(HttpServletRequest request, FileVersion file, String url, String filename) throws Exception {
+    private void savefile(HttpServletRequest request, FileEntry fileEntry, String url, String filename) throws Exception {
         User user = PortalUtil.getUser(request);
 
         _log.info("Trying to download file from URL: " + url);
@@ -117,8 +115,8 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
         InputStream in = con.getInputStream();
         ServiceContext serviceContext = ServiceContextFactory.getInstance(OnlyOfficeDocumentConvert.class.getName(), request);
 
-        _dlApp.addFileEntry(user.getUserId(), file.getRepositoryId(), file.getFileEntry().getFolderId(), filename,
-                _convert.getMimeType(file.getExtension()), filename, file.getDescription(), "ONLYOFFICE Convert",
+        _dlApp.addFileEntry(user.getUserId(), fileEntry.getRepositoryId(), fileEntry.getFolderId(), filename,
+                _convert.getMimeType(fileEntry.getExtension()), filename, fileEntry.getDescription(), "ONLYOFFICE Convert",
                 in, con.getContentLength(), serviceContext);
 
         _log.info("Document saved.");
