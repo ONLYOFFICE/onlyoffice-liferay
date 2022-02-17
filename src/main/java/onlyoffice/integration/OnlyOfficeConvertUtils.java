@@ -91,7 +91,7 @@ public class OnlyOfficeConvertUtils {
         put("oform", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
     }};
 
-    public JSONObject convert(HttpServletRequest req, FileEntry fileEntry, String key) throws SecurityException, Exception {
+    public JSONObject convert(HttpServletRequest req, FileEntry fileEntry, String key, String region) throws SecurityException, Exception {
         try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
             String ext = fileEntry.getExtension();
 
@@ -102,6 +102,7 @@ public class OnlyOfficeConvertUtils {
             body.put("outputtype", convertsTo(ext));
             body.put("key", Long.toString(fileEntry.getFileEntryId()) + key);
             body.put("url", _utils.getFileUrl(req, fileEntry.getFileEntryId()));
+            body.put("region", region);
 
             StringEntity requestEntity = new StringEntity(body.toString(), ContentType.APPLICATION_JSON);
             HttpPost request = new HttpPost(_utils.getDocServerInnnerUrl() + "ConvertService.ashx");
