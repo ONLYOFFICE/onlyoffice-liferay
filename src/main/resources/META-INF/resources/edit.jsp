@@ -121,6 +121,11 @@
         <% } %>
 
         var connectEditor = function () {
+            if (typeof DocsAPI === "undefined") {
+                alert("<%= LanguageUtil.get(request, "onlyoffice-editor-docs-api-undefined")%>");
+                return;
+            }
+
             if ((config.document.fileType === "docxf" || config.document.fileType === "oform")
                 && DocsAPI.DocEditor.version().split(".")[0] < 7) {
                 alert("<%= LanguageUtil.get(request, "onlyoffice-editor-froms-error-version")%>");
