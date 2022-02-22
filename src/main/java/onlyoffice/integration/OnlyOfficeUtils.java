@@ -118,7 +118,7 @@ public class OnlyOfficeUtils {
         return portletURL.toString();
     }
 
-    public String getDocumentConfig(Long fileEntryId, RenderRequest req) {
+    public String getDocumentConfig(Long fileEntryId, Boolean preview, RenderRequest req) {
         JSONObject responseJson = new JSONObject();
         JSONObject documentObject = new JSONObject();
         JSONObject editorConfigObject = new JSONObject();
@@ -140,10 +140,10 @@ public class OnlyOfficeUtils {
                 throw new Exception("User don't have read rights");
             }
 
-            boolean edit = (isEditable(ext) || isFillForm(ext)) && editPerm;
+            boolean edit = (isEditable(ext) || isFillForm(ext)) && editPerm && !preview;
             String url = getFileUrl(PortalUtil.getHttpServletRequest(req), fileEntryId);
 
-            responseJson.put("type", "desktop");
+            responseJson.put("type", preview ? "embedded" : "desktop");
             responseJson.put("width", "100%");
             responseJson.put("height", "100%");
             responseJson.put("documentType", getDocType(ext));

@@ -63,4 +63,10 @@ public @interface OnlyOfficeConfiguration {
         name = "onlyoffice-config-force-save-name", description = "onlyoffice-config-force-save-desc"
     )
     public boolean forceSave() default false;
+
+    @AttributeDefinition(
+        required = false,
+        name = "onlyoffice-config-webpreview"
+    )
+    public boolean webPreview() default false;
 }

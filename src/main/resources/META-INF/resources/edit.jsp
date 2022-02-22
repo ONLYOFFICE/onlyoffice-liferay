@@ -87,7 +87,7 @@
         <div id="placeholder"></div>
     </div>
     <script>
-    var config = JSON.parse('<%= utils.getDocumentConfig(fileEntryId, renderRequest) %>');
+    var config = JSON.parse('<%= utils.getDocumentConfig(fileEntryId, false, renderRequest) %>');
 
         var onRequestSaveAs = function (event) {
             var url = event.data.url;
