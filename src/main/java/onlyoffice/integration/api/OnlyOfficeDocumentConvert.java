@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Locale;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -77,6 +78,7 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
         Long fileEntryId = ParamUtil.getLong(request , "fileId");
         String key = ParamUtil.getString(request , "key");
         String fn = ParamUtil.getString(request , "fileName");
+        Locale locale = user.getLocale();
 
         response.setContentType("application/json");
         PrintWriter writer = response.getWriter();
@@ -89,7 +91,7 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
                 throw new Exception("User don't have rights");
             }
 
-            JSONObject json = _convert.convert(request, fileEntry, key);
+            JSONObject json = _convert.convert(request, fileEntry, key, locale.toLanguageTag());
 
             if (json.has("endConvert") && json.getBoolean("endConvert")) {
                 savefile(request, fileEntry, json.getString("fileUrl"), fn);
