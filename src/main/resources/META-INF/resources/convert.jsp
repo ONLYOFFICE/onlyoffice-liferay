@@ -1,6 +1,6 @@
 <%--
  *
- * (c) Copyright Ascensio System SIA 2021
+ * (c) Copyright Ascensio System SIA 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 
 <%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
 <%@ page import="com.liferay.document.library.kernel.service.DLAppLocalServiceUtil" %>
-<%@ page import="com.liferay.portal.kernel.repository.model.FileVersion" %>
+<%@ page import="com.liferay.portal.kernel.repository.model.FileEntry" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.portal.kernel.portlet.PortletURLFactoryUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.WebKeys" %>
@@ -45,13 +45,13 @@
 <%
 	BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeUtils.class).getBundleContext();
 
-	Long fileVersionId = ParamUtil.getLong(renderRequest, "fileId");
-	FileVersion file = DLAppLocalServiceUtil.getFileVersion(fileVersionId);
+	Long fileEntryId = ParamUtil.getLong(renderRequest, "fileId");
+	FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
 	OnlyOfficeUtils utils = bc.getService(bc.getServiceReference(OnlyOfficeUtils.class));
 	OnlyOfficeConvertUtils convertUtils = bc.getService(bc.getServiceReference(OnlyOfficeConvertUtils.class));
 
-	String originalFileName = file.getFileName();
-	String newFileName = originalFileName.substring(0, originalFileName.lastIndexOf('.')) + "." + convertUtils.convertsTo(file.getExtension()); 
+	String originalFileName = fileEntry.getFileName();
+	String newFileName = originalFileName.substring(0, originalFileName.lastIndexOf('.')) + "." + convertUtils.convertsTo(fileEntry.getExtension()); 
 	
 	String convertText = String.format(LanguageUtil.get(request, "onlyoffice-convert-process"),
 			"<b>" + originalFileName + "</b>", "<b>" + newFileName + "</b>");
@@ -59,7 +59,7 @@
 	String errorText = LanguageUtil.get(request, "onlyoffice-convert-error");
 
 	String apiurl = convertUtils.getConvertUrl(request) + "?key=" + Long.toString(new Date().getTime())
-		+ "&fileId=" + Long.toString(fileVersionId)
+		+ "&fileId=" + Long.toString(fileEntryId)
 		+ "&fileName=" + newFileName;
 	
 %>

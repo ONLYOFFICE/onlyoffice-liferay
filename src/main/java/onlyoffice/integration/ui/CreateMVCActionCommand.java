@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2021
+ * (c) Copyright Ascensio System SIA 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 			FileEntry newFile = _dlAppService.addFileEntry(repositoryId, folderId, uniqueFileName, mimeType,
 					uniqueFileName, description, (String) null, sourceFile,serviceContext);
 
-			actionResponse.setRenderParameter("fileEntryId", String.valueOf(newFile.getFileVersion().getFileVersionId()));
+			actionResponse.setRenderParameter("fileEntryId", String.valueOf(newFile.getFileEntryId()));
 		} catch (Exception e) {
 			_log.error(e.getMessage(), e);
 			if (e instanceof FileNameException || e instanceof PrincipalException.MustHavePermission) {

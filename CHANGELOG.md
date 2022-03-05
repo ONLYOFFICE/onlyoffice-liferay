@@ -1,5 +1,12 @@
 # Change Log
 
+## Added
+- preview of the documents
+- keep intermediate versions when editing (forcesave)
+
+## Changed
+- checkin/checkout instead of lock/unlock
+
 ## 2.1.0
 ## Added
 - support docxf and oform formats

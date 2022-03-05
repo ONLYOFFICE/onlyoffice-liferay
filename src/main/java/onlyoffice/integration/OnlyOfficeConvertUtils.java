@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2021
+ * (c) Copyright Ascensio System SIA 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 
 @Component(
     service = OnlyOfficeConvertUtils.class
@@ -91,18 +91,18 @@ public class OnlyOfficeConvertUtils {
         put("oform", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
     }};
 
-    public JSONObject convert(HttpServletRequest req, FileVersion file, String key) throws SecurityException, Exception {
+    public JSONObject convert(HttpServletRequest req, FileEntry fileEntry, String key, String region) throws SecurityException, Exception {
         try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            Long fileVersionId = file.getFileVersionId();
-            String ext = file.getExtension();
+            String ext = fileEntry.getExtension();
 
             JSONObject body = new JSONObject();
             body.put("async", true);
             body.put("embeddedfonts", true);
             body.put("filetype", ext);
             body.put("outputtype", convertsTo(ext));
-            body.put("key", Long.toString(fileVersionId) + key);
-            body.put("url", _utils.getFileUrl(req, fileVersionId));
+            body.put("key", Long.toString(fileEntry.getFileEntryId()) + key);
+            body.put("url", _utils.getFileUrl(req, fileEntry.getFileEntryId()));
+            body.put("region", region);
 
             StringEntity requestEntity = new StringEntity(body.toString(), ContentType.APPLICATION_JSON);
             HttpPost request = new HttpPost(_utils.getDocServerInnnerUrl() + "ConvertService.ashx");

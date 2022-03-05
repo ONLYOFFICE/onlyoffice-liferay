@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2021
+ * (c) Copyright Ascensio System SIA 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,20 @@ import org.osgi.service.component.annotations.Reference;
 
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.expando.kernel.model.ExpandoColumnConstants;
+import com.liferay.expando.kernel.model.ExpandoTableConstants;
+import com.liferay.expando.kernel.service.ExpandoValueLocalServiceUtil;
+import com.liferay.expando.kernel.model.ExpandoValue;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
@@ -112,7 +118,7 @@ public class OnlyOfficeUtils {
         return portletURL.toString();
     }
 
-    public String getDocumentConfig(FileVersion file, RenderRequest req) {
+    public String getDocumentConfig(Long fileEntryId, Boolean preview, RenderRequest req) {
         JSONObject responseJson = new JSONObject();
         JSONObject documentObject = new JSONObject();
         JSONObject editorConfigObject = new JSONObject();
@@ -122,29 +128,30 @@ public class OnlyOfficeUtils {
         JSONObject permObject = new JSONObject();
 
         try {
-            String ext = file.getExtension();
+            FileEntry fileEntry = _DLAppService.getFileEntry(fileEntryId);
+
+            String ext = fileEntry.getExtension();
             User user = PortalUtil.getUser(req);
-            Long fileVersionId = file.getFileVersionId();
 
             PermissionChecker checker = _permissionFactory.create(PortalUtil.getUser(req));
-            FileEntry fe = file.getFileEntry();
-            boolean editPerm = fe.containsPermission(checker, ActionKeys.UPDATE);
-            if (!fe.containsPermission(checker, ActionKeys.VIEW)) {
+
+            boolean editPerm = fileEntry.containsPermission(checker, ActionKeys.UPDATE);
+            if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)) {
                 throw new Exception("User don't have read rights");
             }
 
-            boolean edit = (isEditable(ext) || isFillForm(ext)) && editPerm;
-            String url = getFileUrl(PortalUtil.getHttpServletRequest(req), fileVersionId);
+            boolean edit = (isEditable(ext) || isFillForm(ext)) && editPerm && !preview;
+            String url = getFileUrl(PortalUtil.getHttpServletRequest(req), fileEntryId);
 
-            responseJson.put("type", "desktop");
+            responseJson.put("type", preview ? "embedded" : "desktop");
             responseJson.put("width", "100%");
             responseJson.put("height", "100%");
             responseJson.put("documentType", getDocType(ext));
             responseJson.put("document", documentObject);
-            documentObject.put("title", file.getFileName());
+            documentObject.put("title", fileEntry.getFileName());
             documentObject.put("url", url);
             documentObject.put("fileType", ext);
-            documentObject.put("key", file.getUuid() + "_" + file.getVersion().hashCode());
+            documentObject.put("key", getDocKey(fileEntry));
             documentObject.put("permissions", permObject);
             permObject.put("edit", edit);
 
@@ -153,7 +160,8 @@ public class OnlyOfficeUtils {
             editorConfigObject.put("mode", edit ? "edit" : "view");
             editorConfigObject.put("customization", customizationObject);
             customizationObject.put("goback", goBackObject);
-            goBackObject.put("url", getGoBackUrl(req, fe));
+            customizationObject.put("forcesave", _config.forceSaveEnabled());
+            goBackObject.put("url", getGoBackUrl(req, fileEntry));
 
             if (edit) {
                 editorConfigObject.put("callbackUrl", url);
@@ -197,6 +205,46 @@ public class OnlyOfficeUtils {
         return null;
     }
 
+    private String getDocKey(FileEntry fileEntry) throws PortalException {
+        String key = getCollaborativeEditingKey(fileEntry);
+        if (key != null) {
+            return key;
+        } else {
+            return fileEntry.getUuid() + "_" + fileEntry.getVersion().hashCode();
+        }
+    }
+
+    public void setCollaborativeEditingKey(FileEntry fileEntry, String key) throws PortalException {
+        ExpandoBridge expandoBridge = fileEntry.getExpandoBridge();
+
+        if (!expandoBridge.hasAttribute("onlyoffice-collaborative-editor-key")) {
+            expandoBridge.addAttribute("onlyoffice-collaborative-editor-key", ExpandoColumnConstants.STRING, false);
+        }
+
+        if (key == null || key.isEmpty()) {
+            ExpandoValueLocalServiceUtil.deleteValue(expandoBridge.getCompanyId(), expandoBridge.getClassName(),
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "onlyoffice-collaborative-editor-key", expandoBridge.getClassPK());
+        } else {
+            ExpandoValueLocalServiceUtil.addValue(expandoBridge.getCompanyId(), expandoBridge.getClassName(),
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "onlyoffice-collaborative-editor-key", expandoBridge.getClassPK(), key);
+        }
+    }
+
+    public String getCollaborativeEditingKey(FileEntry fileEntry) throws PortalException {
+        ExpandoBridge expandoBridge = fileEntry.getExpandoBridge();
+
+        if (expandoBridge.hasAttribute("onlyoffice-collaborative-editor-key")) {
+            ExpandoValue value = ExpandoValueLocalServiceUtil.getValue(expandoBridge.getCompanyId(), expandoBridge.getClassName(),
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "onlyoffice-collaborative-editor-key", expandoBridge.getClassPK());
+
+            if (value != null && !value.getString().isEmpty()) {
+                return value.getString();
+            }
+        }
+
+        return null;
+    }
+
     @Reference
     private OnlyOfficeJWT _jwt;
 
@@ -211,6 +259,9 @@ public class OnlyOfficeUtils {
 
     @Reference
     private PermissionCheckerFactory _permissionFactory;
+
+    @Reference
+    private DLAppService _DLAppService;
 
     private static final Log _log = LogFactoryUtil.getLog(
             OnlyOfficeUtils.class);

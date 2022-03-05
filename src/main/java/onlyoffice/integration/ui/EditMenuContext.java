@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2021
+ * (c) Copyright Ascensio System SIA 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,7 +187,7 @@ extends BaseDLViewFileVersionDisplayContext {
 //      MutableRenderParameters params = portletURL.getRenderParameters();
 //      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
 
-        portletURL.setParameter("fileId", String.valueOf(Long.toString(fileVersion.getFileVersionId())));
+        portletURL.setParameter("fileId", Long.toString(fileVersion.getFileEntryId()));
 
         try {
             portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
@@ -208,7 +208,7 @@ extends BaseDLViewFileVersionDisplayContext {
 //      MutableRenderParameters params = portletURL.getRenderParameters();
 //      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
 
-        portletURL.setParameter("fileId", String.valueOf(Long.toString(fileVersion.getFileVersionId())));
+        portletURL.setParameter("fileId", String.valueOf(fileVersion.getFileEntryId()));
 
         try {
             portletURL.setWindowState(LiferayWindowState.POP_UP);

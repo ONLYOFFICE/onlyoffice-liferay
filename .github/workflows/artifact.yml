@@ -1,0 +1,74 @@
+name: Artifact
+
+on:
+  workflow_dispatch:
+  pull_request:
+      types: [opened, reopened]
+      branches: [master]
+
+jobs:
+  platforms:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.platform-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Get Liferay Platforms
+        id: platform-matrix
+        run: |
+          content=$(cat ./release.json)
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          echo "::set-output name=matrix::{\"include\":$content}"
+  build:
+    needs: platforms
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.platforms.outputs.matrix)}}
+    steps:
+      - name: Checkout Repository
+        if: ${{ !matrix.branch }}
+        uses: actions/checkout@v2
+      - name: Checkout Specific
+        if: ${{ matrix.branch }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ matrix.branch }}
+      - name: Get Package Info 
+        run:  |
+          echo "::set-output name=package::$(sed -n -e 's/^Bundle-SymbolicName: //p' bnd.bnd)"
+          echo "::set-output name=version::$(sed -n -e 's/^Bundle-Version: //p' bnd.bnd)"
+        id: info
+      - name: Install Java 8
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+      - name: Build with Liferay Blade CLI
+        shell: bash
+        run: |
+          cd ${{ github.workspace }}
+          cwd=$(pwd)
+          java -version
+          git submodule update --init --recursive
+          curl -L https://raw.githubusercontent.com/liferay/liferay-blade-cli/master/cli/installers/local | sh
+          echo 'export PATH="$PATH:$HOME/jpm/bin"' >> ~/.bash_profile
+          source ~/.bash_profile
+          blade version
+          blade init -v ${{ matrix.platform }} workspace
+          cd workspace/modules
+          modules=$(pwd)
+          mkdir onlyoffice-liferay
+          cd $cwd
+          rsync -av --exclude='workspace' ./ ./workspace/modules/onlyoffice-liferay
+          cd $modules
+          blade gw jar
+          cd ./onlyoffice-liferay/build/libs
+          mv ${{ steps.info.outputs.package }}-${{ steps.info.outputs.version }}.jar $cwd/
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.info.outputs.package }}-${{ steps.info.outputs.version }}-${{ matrix.name }}
+          path: ${{ steps.info.outputs.package }}-${{ steps.info.outputs.version }}.jar
