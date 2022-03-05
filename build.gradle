@@ -17,6 +17,7 @@ dependencies {
 	compileOnly group: "javax.servlet", name: "servlet-api", version: "2.5"
 	compileOnly group: "jstl", name: "jstl"
 	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations"
+	compileOnly group: "org.osgi", name: "org.osgi.framework", version: "1.9.0"
 	compileOnly group: "org.json", name: "json"
 	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
 	
