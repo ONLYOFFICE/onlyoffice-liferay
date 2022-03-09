@@ -161,7 +161,7 @@ extends BaseDLViewFileVersionDisplayContext {
     private void InitConvertItem(JavaScriptUIItem item) {
         String lang = null;
         if (_isMasterForm) {
-            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-create-from");
+            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-create-form");
         } else {
             lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-convert");
         }

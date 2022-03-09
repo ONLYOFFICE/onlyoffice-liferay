@@ -6,6 +6,7 @@
 
 ## Changed
 - checkin/checkout instead of lock/unlock
+- fixed deployment error for portal-7.4 [#24](https://github.com/ONLYOFFICE/onlyoffice-liferay/issues/24)
 
 ## 2.1.0
 ## Added
