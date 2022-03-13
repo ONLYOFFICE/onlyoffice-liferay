@@ -123,8 +123,8 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                 processData(fileEntry, jsonObj, request);
             }
         } catch (Exception ex) {
-            _log.error("Unable to process ONLYOFFICE response: " + ex.getMessage(), ex);
-            error = ex.getMessage();
+            error = "Unable to process ONLYOFFICE response: " + ex.getMessage();
+            _log.error(error, ex);
         }
 
         try {
