@@ -42,7 +42,6 @@ import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -155,7 +154,6 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         }
 
         String download = null;
-        Lock lockFile = fileEntry.getLock();
 
         switch(body.getInt("status")) {
             case 0:
@@ -198,17 +196,12 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
                 download = _utils.replaceDocServerURLToInternal(body.getString("url"));
 
-                if (userId.longValue() != lockFile.getUserId()) {
-                    setUserThreadLocal(lockFile.getUserId());
-                    _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
-
-                    setUserThreadLocal(userId);
-                    _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
-                } else {
-                    setUserThreadLocal(userId);
-                }
+                checkLockFileEntry(fileEntry, userId, serviceContext);
 
                 updateFile(fileEntry, userId, download, DLVersionNumberIncrease.MAJOR, serviceContext);
+
+                fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntry.getFileEntryId());
+
                 _utils.setCollaborativeEditingKey(fileEntry, null);
 
                 _log.info("Document saved.");
@@ -230,22 +223,16 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                 if (_config.forceSaveEnabled()) {
                     download = _utils.replaceDocServerURLToInternal(body.getString("url"));
 
-                    if (userId.longValue() != lockFile.getUserId()) {
-                        setUserThreadLocal(lockFile.getUserId());
-                        _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
-
-                        setUserThreadLocal(userId);
-                        _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
-                    } else {
-                        setUserThreadLocal(userId);
-                    }
+                    checkLockFileEntry(fileEntry, userId, serviceContext);
 
                     updateFile(fileEntry, userId, download, DLVersionNumberIncrease.MINOR, serviceContext);
 
+                    fileEntry = _dlApp.getFileEntry(fileEntry.getFileEntryId());
+
                     String key = _utils.getCollaborativeEditingKey(fileEntry);
+
                     _utils.setCollaborativeEditingKey(fileEntry, null);
 
-                    fileEntry = _dlApp.getFileEntry(fileEntry.getFileEntryId());
                     _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
 
                     _utils.setCollaborativeEditingKey(fileEntry, key);
@@ -275,7 +262,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         } catch (Exception e) {
             String msg = "Couldn't download or save file: " + e.getMessage();
             _log.error(msg, e);
-            throw new Exception(msg);
+            throw e;
         }
     }
 
@@ -287,6 +274,17 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
         PrincipalThreadLocal.setName(userId);
         PermissionThreadLocal.setPermissionChecker(permissionChecker);
+    }
+
+    private void checkLockFileEntry(FileEntry fileEntry, Long userId, ServiceContext serviceContext) throws PortalException {
+        if (fileEntry.isCheckedOut() && userId.longValue() != fileEntry.getLock().getUserId()) {
+            setUserThreadLocal(fileEntry.getLock().getUserId());
+            _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
+
+            setUserThreadLocal(userId);
+        } else {
+            setUserThreadLocal(userId);
+        }
     }
 
     private static final long serialVersionUID = 1L;
