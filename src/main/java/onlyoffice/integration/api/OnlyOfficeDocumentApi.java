@@ -174,12 +174,13 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                         if (action.getLong("type") == 1) {
                             if (!fileEntry.isCheckedOut()) {
                                 setUserThreadLocal(userId);
-                                _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
 
                                 if (_utils.getCollaborativeEditingKey(fileEntry) == null) {
                                     String key = body.getString("key");
                                     _utils.setCollaborativeEditingKey(fileEntry, key);
                                 }
+
+                                _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
 
                                 _log.info("Document opened for editing, locking document");
                             } else {
@@ -229,13 +230,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
                     fileEntry = _dlApp.getFileEntry(fileEntry.getFileEntryId());
 
-                    String key = _utils.getCollaborativeEditingKey(fileEntry);
-
-                    _utils.setCollaborativeEditingKey(fileEntry, null);
-
                     _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
-
-                    _utils.setCollaborativeEditingKey(fileEntry, key);
 
                     _log.info("Document saved (forcesave).");
                 } else {
