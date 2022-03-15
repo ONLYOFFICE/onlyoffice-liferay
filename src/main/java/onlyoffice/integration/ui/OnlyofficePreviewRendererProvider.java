@@ -23,6 +23,7 @@ import com.liferay.document.library.preview.DLPreviewRendererProvider;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Optional;
 
@@ -47,7 +48,11 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
         return Optional.of( (request, response) -> {
             RequestDispatcher requestDispatcher = _servletContext.getRequestDispatcher("/preview.jsp");
 
-            request.setAttribute("fileId", fileVersion.getFileEntryId());
+            request.setAttribute("fileEntryId", fileVersion.getFileEntryId());
+
+            if (request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_VERSION) != null) {
+                request.setAttribute("version", fileVersion.getVersion());
+            }
 
             requestDispatcher.include(request, response);
         });
