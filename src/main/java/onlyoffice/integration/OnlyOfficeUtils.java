@@ -223,7 +223,7 @@ public class OnlyOfficeUtils {
     }
 
     private String getDocKey(FileVersion fileVersion, boolean versionSpecific) throws PortalException {
-        if (versionSpecific) {
+        if (versionSpecific && !fileVersion.getVersion().equals("PWC")) {
             return createDocKey(fileVersion, true);
         } else {
             String key = getCollaborativeEditingKey(fileVersion.getFileEntry());
