@@ -4,6 +4,11 @@
         "platform": "dxp-7.2-ga1"
     },
     {
+        "name": "DXP7.2-FP5",
+        "platform": "dxp-7.2-ga1",
+        "branch": "feature/ce-7.3"
+    },
+    {
         "name": "DXP7.3",
         "platform": "dxp-7.3-ga1",
         "branch": "feature/dxp-7.3"

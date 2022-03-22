@@ -3,6 +3,7 @@
 ## Added
 - preview of the documents
 - keep intermediate versions when editing (forcesave)
+- Galician empty file templates
 
 ## Changed
 - checkin/checkout instead of lock/unlock
