@@ -5,7 +5,7 @@
     },
     {
         "name": "DXP7.2-FP5",
-        "platform": "dxp-7.2-ga1",
+        "platform": "dxp-7.2-fp5",
         "branch": "feature/ce-7.3"
     },
     {
