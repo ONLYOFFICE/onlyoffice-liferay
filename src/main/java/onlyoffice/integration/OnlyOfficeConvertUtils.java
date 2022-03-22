@@ -101,7 +101,7 @@ public class OnlyOfficeConvertUtils {
             body.put("filetype", ext);
             body.put("outputtype", convertsTo(ext));
             body.put("key", Long.toString(fileEntry.getFileEntryId()) + key);
-            body.put("url", _utils.getFileUrl(req, fileEntry.getFileEntryId()));
+            body.put("url", _utils.getFileUrl(req, fileEntry.getFileVersion().getFileVersionId()));
             body.put("region", region);
 
             StringEntity requestEntity = new StringEntity(body.toString(), ContentType.APPLICATION_JSON);

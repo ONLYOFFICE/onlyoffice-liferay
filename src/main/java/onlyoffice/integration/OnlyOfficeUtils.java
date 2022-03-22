@@ -43,12 +43,14 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Arrays;
 import java.util.List;
@@ -118,7 +120,7 @@ public class OnlyOfficeUtils {
         return portletURL.toString();
     }
 
-    public String getDocumentConfig(Long fileEntryId, Boolean preview, RenderRequest req) {
+    public String getDocumentConfig(Long fileEntryId, String version, Boolean preview, RenderRequest req) {
         JSONObject responseJson = new JSONObject();
         JSONObject documentObject = new JSONObject();
         JSONObject editorConfigObject = new JSONObject();
@@ -130,7 +132,15 @@ public class OnlyOfficeUtils {
         try {
             FileEntry fileEntry = _DLAppService.getFileEntry(fileEntryId);
 
-            String ext = fileEntry.getExtension();
+            boolean versionSpecific = false;
+
+            if (!Validator.isNull(version)) {
+                versionSpecific = true;
+            }
+
+            FileVersion fileVersion =  versionSpecific ? fileEntry.getFileVersion(version) : fileEntry.getLatestFileVersion();
+
+            String ext = fileVersion.getExtension();
             User user = PortalUtil.getUser(req);
 
             PermissionChecker checker = _permissionFactory.create(PortalUtil.getUser(req));
@@ -141,17 +151,24 @@ public class OnlyOfficeUtils {
             }
 
             boolean edit = (isEditable(ext) || isFillForm(ext)) && editPerm && !preview;
-            String url = getFileUrl(PortalUtil.getHttpServletRequest(req), fileEntryId);
+            String url = getFileUrl(PortalUtil.getHttpServletRequest(req), fileVersion.getFileVersionId());
+
+            String title = versionSpecific ? String.format("%s (%s %s)",
+                                                            fileVersion.getFileName(),
+                                                            LanguageUtil.get(req.getLocale(), "version"),
+                                                            fileVersion.getVersion()
+                                                        )
+                                            : fileVersion.getFileName();
 
             responseJson.put("type", preview ? "embedded" : "desktop");
             responseJson.put("width", "100%");
             responseJson.put("height", "100%");
             responseJson.put("documentType", getDocType(ext));
             responseJson.put("document", documentObject);
-            documentObject.put("title", fileEntry.getFileName());
+            documentObject.put("title", title);
             documentObject.put("url", url);
             documentObject.put("fileType", ext);
-            documentObject.put("key", getDocKey(fileEntry));
+            documentObject.put("key", getDocKey(fileVersion, versionSpecific));
             documentObject.put("permissions", permObject);
             permObject.put("edit", edit);
 
@@ -164,7 +181,7 @@ public class OnlyOfficeUtils {
             goBackObject.put("url", getGoBackUrl(req, fileEntry));
 
             if (edit) {
-                editorConfigObject.put("callbackUrl", url);
+                editorConfigObject.put("callbackUrl", getFileUrl(PortalUtil.getHttpServletRequest(req), fileEntry.getFileEntryId()));
             }
             editorConfigObject.put("user", userObject);
             userObject.put("id", Long.toString(user.getUserId()));
@@ -205,13 +222,28 @@ public class OnlyOfficeUtils {
         return null;
     }
 
-    private String getDocKey(FileEntry fileEntry) throws PortalException {
-        String key = getCollaborativeEditingKey(fileEntry);
-        if (key != null) {
-            return key;
+    private String getDocKey(FileVersion fileVersion, boolean versionSpecific) throws PortalException {
+        if (versionSpecific && !fileVersion.getVersion().equals("PWC")) {
+            return createDocKey(fileVersion, true);
         } else {
-            return fileEntry.getUuid() + "_" + fileEntry.getVersion().hashCode();
+            String key = getCollaborativeEditingKey(fileVersion.getFileEntry());
+
+            if (key != null) {
+                return key;
+            } else {
+                return createDocKey(fileVersion, false);
+            }
         }
+    }
+
+    private String createDocKey(FileVersion fileVersion, boolean versionSpecific) throws PortalException {
+        String key = fileVersion.getFileEntry().getUuid() + "_" + fileVersion.getVersion().hashCode();
+
+        if (versionSpecific) {
+            key = key + "_version";
+        }
+
+        return key;
     }
 
     public void setCollaborativeEditingKey(FileEntry fileEntry, String key) throws PortalException {
