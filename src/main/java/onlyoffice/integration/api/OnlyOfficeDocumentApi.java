@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
@@ -78,17 +79,16 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         throws IOException, ServletException {
 
         String key = ParamUtil.getString(request, "key");
-        Long fileEntryId = _hasher.validate(key);
+        Long fileVersionId = _hasher.validate(key);
 
-        FileEntry fileEntry;
         try {
-            fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
+            FileVersion fileVersion = DLAppLocalServiceUtil.getFileVersion(fileVersionId);
 
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileEntry.getFileName() + "\"");
-            response.setHeader("Content-Length", Long.toString(fileEntry.getSize()));
-            response.setContentType(fileEntry.getMimeType());
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileVersion.getFileName() + "\"");
+            response.setHeader("Content-Length", Long.toString(fileVersion.getSize()));
+            response.setContentType(fileVersion.getMimeType());
 
-            StreamUtil.transfer(fileEntry.getContentStream(), response.getOutputStream());
+            StreamUtil.transfer(fileVersion.getContentStream(false), response.getOutputStream());
         } catch (PortalException e) {
             _log.error(e.getMessage(), e);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
