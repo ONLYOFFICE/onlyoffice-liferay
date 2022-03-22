@@ -38,7 +38,8 @@
 <%
     BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeUtils.class).getBundleContext();
 
-    Long fileEntryId = (Long)request.getAttribute("fileId");
+    Long fileEntryId = (Long)request.getAttribute("fileEntryId");
+    String version = (String)request.getAttribute("version");
     FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
     OnlyOfficeUtils utils = bc.getService(bc.getServiceReference(OnlyOfficeUtils.class));
 %>
@@ -68,7 +69,7 @@
                     divOnlyofficePreview.querySelector("div.preview-file-error-container").style.display = "block";
                     divOnlyofficePreview.querySelector("div.preview-file").style.display = "none";
                 } else {
-                    var config = JSON.parse('<%= utils.getDocumentConfig(fileEntryId, true, renderRequest) %>');
+                    var config = JSON.parse('<%= utils.getDocumentConfig(fileEntryId, version, true, renderRequest) %>');
                     docEditor = new DocsAPI.DocEditor("placeholder", config);
                 }
             };

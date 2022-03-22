@@ -42,11 +42,11 @@ import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
@@ -79,17 +79,16 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         throws IOException, ServletException {
 
         String key = ParamUtil.getString(request, "key");
-        Long fileEntryId = _hasher.validate(key);
+        Long fileVersionId = _hasher.validate(key);
 
-        FileEntry fileEntry;
         try {
-            fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
+            FileVersion fileVersion = DLAppLocalServiceUtil.getFileVersion(fileVersionId);
 
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileEntry.getFileName() + "\"");
-            response.setHeader("Content-Length", Long.toString(fileEntry.getSize()));
-            response.setContentType(fileEntry.getMimeType());
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileVersion.getFileName() + "\"");
+            response.setHeader("Content-Length", Long.toString(fileVersion.getSize()));
+            response.setContentType(fileVersion.getMimeType());
 
-            StreamUtil.transfer(fileEntry.getContentStream(), response.getOutputStream());
+            StreamUtil.transfer(fileVersion.getContentStream(false), response.getOutputStream());
         } catch (PortalException e) {
             _log.error(e.getMessage(), e);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
@@ -123,8 +122,8 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                 processData(fileEntry, jsonObj, request);
             }
         } catch (Exception ex) {
-            _log.error("Unable to process ONLYOFFICE response: " + ex.getMessage(), ex);
-            error = ex.getMessage();
+            error = "Unable to process ONLYOFFICE response: " + ex.getMessage();
+            _log.error(error, ex);
         }
 
         try {
@@ -155,7 +154,6 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         }
 
         String download = null;
-        Lock lockFile = fileEntry.getLock();
 
         switch(body.getInt("status")) {
             case 0:
@@ -176,12 +174,13 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                         if (action.getLong("type") == 1) {
                             if (!fileEntry.isCheckedOut()) {
                                 setUserThreadLocal(userId);
-                                _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
 
                                 if (_utils.getCollaborativeEditingKey(fileEntry) == null) {
                                     String key = body.getString("key");
                                     _utils.setCollaborativeEditingKey(fileEntry, key);
                                 }
+
+                                _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
 
                                 _log.info("Document opened for editing, locking document");
                             } else {
@@ -198,17 +197,12 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
                 download = _utils.replaceDocServerURLToInternal(body.getString("url"));
 
-                if (userId.longValue() != lockFile.getUserId()) {
-                    setUserThreadLocal(lockFile.getUserId());
-                    _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
-
-                    setUserThreadLocal(userId);
-                    _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
-                } else {
-                    setUserThreadLocal(userId);
-                }
+                checkLockFileEntry(fileEntry, userId, serviceContext);
 
                 updateFile(fileEntry, userId, download, DLVersionNumberIncrease.MAJOR, serviceContext);
+
+                fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntry.getFileEntryId());
+
                 _utils.setCollaborativeEditingKey(fileEntry, null);
 
                 _log.info("Document saved.");
@@ -230,25 +224,13 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
                 if (_config.forceSaveEnabled()) {
                     download = _utils.replaceDocServerURLToInternal(body.getString("url"));
 
-                    if (userId.longValue() != lockFile.getUserId()) {
-                        setUserThreadLocal(lockFile.getUserId());
-                        _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
-
-                        setUserThreadLocal(userId);
-                        _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
-                    } else {
-                        setUserThreadLocal(userId);
-                    }
+                    checkLockFileEntry(fileEntry, userId, serviceContext);
 
                     updateFile(fileEntry, userId, download, DLVersionNumberIncrease.MINOR, serviceContext);
 
-                    String key = _utils.getCollaborativeEditingKey(fileEntry);
-                    _utils.setCollaborativeEditingKey(fileEntry, null);
-
                     fileEntry = _dlApp.getFileEntry(fileEntry.getFileEntryId());
-                    _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
 
-                    _utils.setCollaborativeEditingKey(fileEntry, key);
+                    _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
 
                     _log.info("Document saved (forcesave).");
                 } else {
@@ -275,7 +257,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         } catch (Exception e) {
             String msg = "Couldn't download or save file: " + e.getMessage();
             _log.error(msg, e);
-            throw new Exception(msg);
+            throw e;
         }
     }
 
@@ -287,6 +269,17 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
         PrincipalThreadLocal.setName(userId);
         PermissionThreadLocal.setPermissionChecker(permissionChecker);
+    }
+
+    private void checkLockFileEntry(FileEntry fileEntry, Long userId, ServiceContext serviceContext) throws PortalException {
+        if (fileEntry.isCheckedOut() && userId.longValue() != fileEntry.getLock().getUserId()) {
+            setUserThreadLocal(fileEntry.getLock().getUserId());
+            _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
+
+            setUserThreadLocal(userId);
+        } else {
+            setUserThreadLocal(userId);
+        }
     }
 
     private static final long serialVersionUID = 1L;
