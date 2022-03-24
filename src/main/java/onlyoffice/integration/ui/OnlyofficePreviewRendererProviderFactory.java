@@ -55,6 +55,7 @@ public class OnlyofficePreviewRendererProviderFactory {
             "application/vnd.ms-powerpoint",
             "text/csv",
             "text/rtf",
+            "application/rtf",
             "text/plain",
             "application/pdf"
         ));
