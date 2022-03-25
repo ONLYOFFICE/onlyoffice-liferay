@@ -118,7 +118,7 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
         ServiceContext serviceContext = ServiceContextFactory.getInstance(OnlyOfficeDocumentConvert.class.getName(), request);
 
         _dlApp.addFileEntry(user.getUserId(), fileEntry.getRepositoryId(), fileEntry.getFolderId(), filename,
-                _convert.getMimeType(fileEntry.getExtension()), filename, fileEntry.getDescription(), "ONLYOFFICE Convert",
+                _convert.getMimeType(_convert.convertsTo(fileEntry.getExtension())), filename, fileEntry.getDescription(), "ONLYOFFICE Convert",
                 in, con.getContentLength(), serviceContext);
 
         _log.info("Document saved.");
