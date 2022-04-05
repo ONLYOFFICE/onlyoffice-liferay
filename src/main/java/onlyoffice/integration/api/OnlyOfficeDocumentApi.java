@@ -250,8 +250,8 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             InputStream in = con.getInputStream();
 
             _dlApp.updateFileEntry(userId, fileEntry.getFileEntryId(), fileEntry.getFileName(), fileEntry.getMimeType(),
-                    fileEntry.getTitle(), fileEntry.getDescription(), "ONLYOFFICE Edit",dlVersionNumberIncrease, in,
-                    con.getContentLength(), serviceContext);
+                    fileEntry.getTitle(), fileEntry.getTitle(), fileEntry.getDescription(), "ONLYOFFICE Edit", dlVersionNumberIncrease, in,
+                    con.getContentLength(), fileEntry.getExpirationDate(), fileEntry.getReviewDate(), serviceContext);
 
             _dlAppService.checkInFileEntry(fileEntry.getFileEntryId(), dlVersionNumberIncrease, "ONLYOFFICE Edit", serviceContext);
         } catch (Exception e) {

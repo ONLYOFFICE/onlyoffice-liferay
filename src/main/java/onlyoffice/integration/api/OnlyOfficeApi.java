@@ -125,7 +125,8 @@ public class OnlyOfficeApi extends HttpServlet {
             String uniqueFileName = DLUtil.getUniqueFileName(
                     file.getRepositoryId(),
                     file.getFolderId(), 
-                    fileName.substring(0, fileName.lastIndexOf(".") + 1) + fileType
+                    fileName.substring(0, fileName.lastIndexOf(".") + 1) + fileType,
+                    false
             );
 
             ServiceContext serviceContext = ServiceContextFactory.getInstance(OnlyOfficeDocumentConvert.class.getName(), request);

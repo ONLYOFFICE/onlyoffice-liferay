@@ -89,12 +89,12 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 			File sourceFile = FileUtil.createTempFile(streamSourceFile);
 			String mimeType = MimeTypesUtil.getContentType(sourceFile);
 
-			String uniqueFileName = DLUtil.getUniqueFileName(repositoryId, folderId, title + "." + type);
+			String uniqueFileName = DLUtil.getUniqueFileName(repositoryId, folderId, title + "." + type, false);
 
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(DLFileEntry.class.getName(), actionRequest);
 
-			FileEntry newFile = _dlAppService.addFileEntry(repositoryId, folderId, uniqueFileName, mimeType,
-					uniqueFileName, description, (String) null, sourceFile,serviceContext);
+			FileEntry newFile = _dlAppService.addFileEntry(null, repositoryId, folderId, uniqueFileName, mimeType,
+					uniqueFileName, uniqueFileName, description, (String) null, sourceFile, null, null, serviceContext);
 
 			actionResponse.setRenderParameter("fileEntryId", String.valueOf(newFile.getFileEntryId()));
 		} catch (Exception e) {
