@@ -14,6 +14,16 @@
         "branch": "feature/dxp-7.3"
     },
     {
+        "name": "DXP7.4",
+        "platform": "dxp-7.4-ga1",
+        "branch": "feature/ce-7.4"
+    },
+    {
+        "name": "DXP7.4-u18",
+        "platform": "dxp-7.4-u18",
+        "branch": "feature/ce-7.4-ga18"
+    },
+    {
         "name": "CE7.2",
         "platform": "portal-7.2-ga1"
     },
@@ -26,5 +36,10 @@
         "name": "CE7.4",
         "platform": "portal-7.4-ga1",
         "branch": "feature/ce-7.4"
+    },
+    {
+        "name": "CE7.4-u18",
+        "platform": "portal-7.4-ga18",
+        "branch": "feature/ce-7.4-ga18"
     }
 ]
