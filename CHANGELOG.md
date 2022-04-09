@@ -1,5 +1,6 @@
 # Change Log
 
+## 2.2.0
 ## Added
 - preview of the documents
 - keep intermediate versions when editing (forcesave)

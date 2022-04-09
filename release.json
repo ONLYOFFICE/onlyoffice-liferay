@@ -19,7 +19,7 @@
         "branch": "feature/ce-7.4"
     },
     {
-        "name": "DXP7.4-u18",
+        "name": "DXP7.4-U18",
         "platform": "dxp-7.4-u18",
         "branch": "feature/ce-7.4-ga18"
     },
@@ -38,7 +38,7 @@
         "branch": "feature/ce-7.4"
     },
     {
-        "name": "CE7.4-u18",
+        "name": "CE7.4-GA18",
         "platform": "portal-7.4-ga18",
         "branch": "feature/ce-7.4-ga18"
     }
