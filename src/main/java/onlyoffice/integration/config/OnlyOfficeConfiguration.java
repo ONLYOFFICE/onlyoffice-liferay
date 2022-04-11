@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2021
+ * (c) Copyright Ascensio System SIA 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,4 +58,15 @@ public @interface OnlyOfficeConfiguration {
     )
     public String secret() default "";
 
+    @AttributeDefinition(
+        required = false,
+        name = "onlyoffice-config-force-save-name", description = "onlyoffice-config-force-save-desc"
+    )
+    public boolean forceSave() default false;
+
+    @AttributeDefinition(
+        required = false,
+        name = "onlyoffice-config-webpreview"
+    )
+    public boolean webPreview() default false;
 }

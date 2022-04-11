@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2021
+ * (c) Copyright Ascensio System SIA 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -161,7 +161,7 @@ extends BaseDLViewFileVersionDisplayContext {
     private void InitConvertItem(JavaScriptUIItem item) {
         String lang = null;
         if (_isMasterForm) {
-            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-create-from");
+            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-create-form");
         } else {
             lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-convert");
         }
@@ -170,7 +170,7 @@ extends BaseDLViewFileVersionDisplayContext {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Liferay.Util.openWindow({");
-        sb.append("dialog: {cache:false,width:500,height:200,modal:true,resizable: false},");
+        sb.append("dialog: {destroyOnHide:true,cache:false,width:500,height:200,modal:true,resizable: false},");
         sb.append("title: '" + lang + "',id: ");
         sb.append("'onlyofficeConvertPopup',uri:'");
         sb.append(getConvertUrl() + "'});");
@@ -187,7 +187,7 @@ extends BaseDLViewFileVersionDisplayContext {
 //      MutableRenderParameters params = portletURL.getRenderParameters();
 //      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
 
-        portletURL.setParameter("fileId", String.valueOf(Long.toString(fileVersion.getFileVersionId())));
+        portletURL.setParameter("fileId", Long.toString(fileVersion.getFileEntryId()));
 
         try {
             portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
@@ -208,7 +208,7 @@ extends BaseDLViewFileVersionDisplayContext {
 //      MutableRenderParameters params = portletURL.getRenderParameters();
 //      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
 
-        portletURL.setParameter("fileId", String.valueOf(Long.toString(fileVersion.getFileVersionId())));
+        portletURL.setParameter("fileId", String.valueOf(fileVersion.getFileEntryId()));
 
         try {
             portletURL.setWindowState(LiferayWindowState.POP_UP);

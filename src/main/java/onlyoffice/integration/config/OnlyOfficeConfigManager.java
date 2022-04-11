@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2021
+ * (c) Copyright Ascensio System SIA 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,14 @@ public class OnlyOfficeConfigManager {
 
     public String getSecret() {
         return configuration.secret();
+    }
+
+    public boolean forceSaveEnabled() {
+        return configuration.forceSave();
+    }
+
+    public boolean webPreview() {
+        return configuration.webPreview();
     }
 
     @Activate

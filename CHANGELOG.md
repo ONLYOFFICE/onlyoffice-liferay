@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.2.0
+## Added
+- preview of the documents
+- keep intermediate versions when editing (forcesave)
+- Galician empty file templates
+
+## Changed
+- checkin/checkout instead of lock/unlock
+- fixed deployment error for portal-7.4 [#24](https://github.com/ONLYOFFICE/onlyoffice-liferay/issues/24)
+
 ## 2.1.0
 ## Added
 - support docxf and oform formats

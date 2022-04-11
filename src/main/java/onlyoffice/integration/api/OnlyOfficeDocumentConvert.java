@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2021
+ * (c) Copyright Ascensio System SIA 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Locale;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -40,7 +41,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
@@ -75,26 +75,26 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
             return;
         }
 
-        Long versionId = ParamUtil.getLong(request , "fileId");
+        Long fileEntryId = ParamUtil.getLong(request , "fileId");
         String key = ParamUtil.getString(request , "key");
         String fn = ParamUtil.getString(request , "fileName");
+        Locale locale = user.getLocale();
 
         response.setContentType("application/json");
         PrintWriter writer = response.getWriter();
 
         try {
-            FileVersion file = DLAppLocalServiceUtil.getFileVersion(versionId);
+            FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
 
             PermissionChecker checker = _permissionFactory.create(user);
-            FileEntry fe = file.getFileEntry();
-            if (!fe.containsPermission(checker, ActionKeys.VIEW) || !fe.getFolder().containsPermission(checker, ActionKeys.ADD_DOCUMENT)) {
+            if (!fileEntry.containsPermission(checker, ActionKeys.VIEW) || !fileEntry.getFolder().containsPermission(checker, ActionKeys.ADD_DOCUMENT)) {
                 throw new Exception("User don't have rights");
             }
 
-            JSONObject json = _convert.convert(request, file, key);
+            JSONObject json = _convert.convert(request, fileEntry, key, locale.toLanguageTag());
 
             if (json.has("endConvert") && json.getBoolean("endConvert")) {
-                savefile(request, file, json.getString("fileUrl"), fn);
+                savefile(request, fileEntry, json.getString("fileUrl"), fn);
             } else if (json.has("error")) {
                 writer.write("{\"error\":\"Unknown conversion error\"}");
                 return;
@@ -108,7 +108,7 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
     }
 
 
-    private void savefile(HttpServletRequest request, FileVersion file, String url, String filename) throws Exception {
+    private void savefile(HttpServletRequest request, FileEntry fileEntry, String url, String filename) throws Exception {
         User user = PortalUtil.getUser(request);
 
         _log.info("Trying to download file from URL: " + url);
@@ -117,8 +117,8 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
         InputStream in = con.getInputStream();
         ServiceContext serviceContext = ServiceContextFactory.getInstance(OnlyOfficeDocumentConvert.class.getName(), request);
 
-        _dlApp.addFileEntry(user.getUserId(), file.getRepositoryId(), file.getFileEntry().getFolderId(), filename,
-                _convert.getMimeType(file.getExtension()), filename, file.getDescription(), "ONLYOFFICE Convert",
+        _dlApp.addFileEntry(user.getUserId(), fileEntry.getRepositoryId(), fileEntry.getFolderId(), filename,
+                _convert.getMimeType(_convert.convertsTo(fileEntry.getExtension())), filename, fileEntry.getDescription(), "ONLYOFFICE Convert",
                 in, con.getContentLength(), serviceContext);
 
         _log.info("Document saved.");

@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2021
+ * (c) Copyright Ascensio System SIA 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,14 @@ import org.osgi.service.component.annotations.Reference;
 
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.expando.kernel.model.ExpandoColumnConstants;
+import com.liferay.expando.kernel.model.ExpandoTableConstants;
+import com.liferay.expando.kernel.service.ExpandoValueLocalServiceUtil;
+import com.liferay.expando.kernel.model.ExpandoValue;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -43,6 +50,7 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Arrays;
 import java.util.List;
@@ -112,7 +120,7 @@ public class OnlyOfficeUtils {
         return portletURL.toString();
     }
 
-    public String getDocumentConfig(FileVersion file, RenderRequest req) {
+    public String getDocumentConfig(Long fileEntryId, String version, Boolean preview, RenderRequest req) {
         JSONObject responseJson = new JSONObject();
         JSONObject documentObject = new JSONObject();
         JSONObject editorConfigObject = new JSONObject();
@@ -122,29 +130,45 @@ public class OnlyOfficeUtils {
         JSONObject permObject = new JSONObject();
 
         try {
-            String ext = file.getExtension();
+            FileEntry fileEntry = _DLAppService.getFileEntry(fileEntryId);
+
+            boolean versionSpecific = false;
+
+            if (!Validator.isNull(version)) {
+                versionSpecific = true;
+            }
+
+            FileVersion fileVersion =  versionSpecific ? fileEntry.getFileVersion(version) : fileEntry.getLatestFileVersion();
+
+            String ext = fileVersion.getExtension();
             User user = PortalUtil.getUser(req);
-            Long fileVersionId = file.getFileVersionId();
 
             PermissionChecker checker = _permissionFactory.create(PortalUtil.getUser(req));
-            FileEntry fe = file.getFileEntry();
-            boolean editPerm = fe.containsPermission(checker, ActionKeys.UPDATE);
-            if (!fe.containsPermission(checker, ActionKeys.VIEW)) {
+
+            boolean editPerm = fileEntry.containsPermission(checker, ActionKeys.UPDATE);
+            if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)) {
                 throw new Exception("User don't have read rights");
             }
 
-            boolean edit = (isEditable(ext) || isFillForm(ext)) && editPerm;
-            String url = getFileUrl(PortalUtil.getHttpServletRequest(req), fileVersionId);
+            boolean edit = (isEditable(ext) || isFillForm(ext)) && editPerm && !preview;
+            String url = getFileUrl(PortalUtil.getHttpServletRequest(req), fileVersion.getFileVersionId());
 
-            responseJson.put("type", "desktop");
+            String title = versionSpecific ? String.format("%s (%s %s)",
+                                                            fileVersion.getFileName(),
+                                                            LanguageUtil.get(req.getLocale(), "version"),
+                                                            fileVersion.getVersion()
+                                                        )
+                                            : fileVersion.getFileName();
+
+            responseJson.put("type", preview ? "embedded" : "desktop");
             responseJson.put("width", "100%");
             responseJson.put("height", "100%");
             responseJson.put("documentType", getDocType(ext));
             responseJson.put("document", documentObject);
-            documentObject.put("title", file.getFileName());
+            documentObject.put("title", title);
             documentObject.put("url", url);
             documentObject.put("fileType", ext);
-            documentObject.put("key", file.getUuid() + "_" + file.getVersion().hashCode());
+            documentObject.put("key", getDocKey(fileVersion, versionSpecific));
             documentObject.put("permissions", permObject);
             permObject.put("edit", edit);
 
@@ -153,10 +177,11 @@ public class OnlyOfficeUtils {
             editorConfigObject.put("mode", edit ? "edit" : "view");
             editorConfigObject.put("customization", customizationObject);
             customizationObject.put("goback", goBackObject);
-            goBackObject.put("url", getGoBackUrl(req, fe));
+            customizationObject.put("forcesave", _config.forceSaveEnabled());
+            goBackObject.put("url", getGoBackUrl(req, fileEntry));
 
             if (edit) {
-                editorConfigObject.put("callbackUrl", url);
+                editorConfigObject.put("callbackUrl", getFileUrl(PortalUtil.getHttpServletRequest(req), fileEntry.getFileEntryId()));
             }
             editorConfigObject.put("user", userObject);
             userObject.put("id", Long.toString(user.getUserId()));
@@ -197,6 +222,61 @@ public class OnlyOfficeUtils {
         return null;
     }
 
+    private String getDocKey(FileVersion fileVersion, boolean versionSpecific) throws PortalException {
+        if (versionSpecific && !fileVersion.getVersion().equals("PWC")) {
+            return createDocKey(fileVersion, true);
+        } else {
+            String key = getCollaborativeEditingKey(fileVersion.getFileEntry());
+
+            if (key != null) {
+                return key;
+            } else {
+                return createDocKey(fileVersion, false);
+            }
+        }
+    }
+
+    private String createDocKey(FileVersion fileVersion, boolean versionSpecific) throws PortalException {
+        String key = fileVersion.getFileEntry().getUuid() + "_" + fileVersion.getVersion().hashCode();
+
+        if (versionSpecific) {
+            key = key + "_version";
+        }
+
+        return key;
+    }
+
+    public void setCollaborativeEditingKey(FileEntry fileEntry, String key) throws PortalException {
+        ExpandoBridge expandoBridge = fileEntry.getExpandoBridge();
+
+        if (!expandoBridge.hasAttribute("onlyoffice-collaborative-editor-key")) {
+            expandoBridge.addAttribute("onlyoffice-collaborative-editor-key", ExpandoColumnConstants.STRING, false);
+        }
+
+        if (key == null || key.isEmpty()) {
+            ExpandoValueLocalServiceUtil.deleteValue(expandoBridge.getCompanyId(), expandoBridge.getClassName(),
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "onlyoffice-collaborative-editor-key", expandoBridge.getClassPK());
+        } else {
+            ExpandoValueLocalServiceUtil.addValue(expandoBridge.getCompanyId(), expandoBridge.getClassName(),
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "onlyoffice-collaborative-editor-key", expandoBridge.getClassPK(), key);
+        }
+    }
+
+    public String getCollaborativeEditingKey(FileEntry fileEntry) throws PortalException {
+        ExpandoBridge expandoBridge = fileEntry.getExpandoBridge();
+
+        if (expandoBridge.hasAttribute("onlyoffice-collaborative-editor-key")) {
+            ExpandoValue value = ExpandoValueLocalServiceUtil.getValue(expandoBridge.getCompanyId(), expandoBridge.getClassName(),
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "onlyoffice-collaborative-editor-key", expandoBridge.getClassPK());
+
+            if (value != null && !value.getString().isEmpty()) {
+                return value.getString();
+            }
+        }
+
+        return null;
+    }
+
     @Reference
     private OnlyOfficeJWT _jwt;
 
@@ -211,6 +291,9 @@ public class OnlyOfficeUtils {
 
     @Reference
     private PermissionCheckerFactory _permissionFactory;
+
+    @Reference
+    private DLAppService _DLAppService;
 
     private static final Log _log = LogFactoryUtil.getLog(
             OnlyOfficeUtils.class);
