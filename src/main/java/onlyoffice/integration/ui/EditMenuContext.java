@@ -83,7 +83,7 @@ extends BaseDLViewFileVersionDisplayContext {
         _themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
             WebKeys.THEME_DISPLAY);
         _resourceBundle = ResourceBundleUtil.getBundle("content.Language",
-                httpServletRequest.getLocale(), getClass());
+                _themeDisplay.getLocale(), getClass());
 
         boolean editPerm = false;
         boolean viewPerm = false;
