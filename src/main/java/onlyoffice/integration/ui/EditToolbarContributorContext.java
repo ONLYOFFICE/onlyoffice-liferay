@@ -28,7 +28,7 @@ import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionHelper;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionUtil;
 import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -55,7 +55,7 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 			PortletRequest portletRequest, PortletResponse portletResponse) {
 		try {
 			long folderId = folder != null ? folder.getFolderId() : 0L;
-			Boolean hasPermission = ModelResourcePermissionHelper.contains(_dlFolderModelResourcePermission,
+			Boolean hasPermission = ModelResourcePermissionUtil.contains(_dlFolderModelResourcePermission,
 					themeDisplay.getPermissionChecker(), themeDisplay.getScopeGroupId(), folderId, ActionKeys.ADD_DOCUMENT);
 
 			if (hasPermission) {
