@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import onlyoffice.integration.OnlyOfficeConvertUtils;
+import onlyoffice.integration.permission.OnlyOfficePermissionUtils;
 
 @Component(
     immediate = true,
@@ -87,7 +88,7 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
             FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
 
             PermissionChecker checker = _permissionFactory.create(user);
-            if (!fileEntry.containsPermission(checker, ActionKeys.VIEW) || !fileEntry.getFolder().containsPermission(checker, ActionKeys.ADD_DOCUMENT)) {
+            if (!fileEntry.containsPermission(checker, ActionKeys.VIEW) || !OnlyOfficePermissionUtils.create(fileEntry.getGroupId(), fileEntry.getFolderId(), user)) {
                 throw new Exception("User don't have rights");
             }
 
