@@ -16,7 +16,6 @@
 
 package onlyoffice.integration.ui;
 
-import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.portlet.toolbar.contributor.DLPortletToolbarContributorContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
@@ -26,9 +25,6 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionUtil;
 import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -40,6 +36,7 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import onlyoffice.integration.permission.OnlyOfficePermissionUtils;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
@@ -55,8 +52,7 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 			PortletRequest portletRequest, PortletResponse portletResponse) {
 		try {
 			long folderId = folder != null ? folder.getFolderId() : 0L;
-			Boolean hasPermission = ModelResourcePermissionUtil.contains(_dlFolderModelResourcePermission,
-					themeDisplay.getPermissionChecker(), themeDisplay.getScopeGroupId(), folderId, ActionKeys.ADD_DOCUMENT);
+			Boolean hasPermission = OnlyOfficePermissionUtils.create(themeDisplay.getScopeGroupId(), folderId, themeDisplay.getUser());
 
 			if (hasPermission) {
 				Layout layout = themeDisplay.getLayout();
@@ -106,9 +102,6 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 
 	private static final Log _log = LogFactoryUtil.getLog(EditToolbarContributorContext.class);
 
-	@Reference(target = "(model.class.name=com.liferay.document.library.kernel.model.DLFolder)")
-	private ModelResourcePermission<DLFolder> _dlFolderModelResourcePermission;
-	
 	@Reference
 	private Language _language;
 

@@ -37,10 +37,15 @@ public class OnlyOfficePermissionUtils {
     public static boolean saveAs(FileEntry file, User user) throws PortalException {
         PermissionChecker checker = PermissionCheckerFactoryUtil.create(user); 
 
-        return file.containsPermission(checker, ActionKeys.VIEW) &&
-                ModelResourcePermissionUtil.contains(
-                        _folderModelResourcePermission, checker, file.getGroupId(),
-                        file.getFolderId(), ActionKeys.ADD_DOCUMENT);
+        return file.containsPermission(checker, ActionKeys.VIEW) && create(file.getGroupId(), file.getFolderId(), user);
+    }
+
+    public static boolean create(long groupId, long folderId, User user) throws PortalException {
+        PermissionChecker checker = PermissionCheckerFactoryUtil.create(user); 
+
+        return ModelResourcePermissionUtil.contains(
+                        _folderModelResourcePermission, checker, groupId,
+                        folderId, ActionKeys.ADD_DOCUMENT);
     }
 
     @Reference(

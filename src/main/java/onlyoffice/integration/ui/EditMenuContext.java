@@ -35,11 +35,11 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
@@ -66,6 +66,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import onlyoffice.integration.OnlyOfficeConvertUtils;
 import onlyoffice.integration.OnlyOfficeUtils;
+import onlyoffice.integration.permission.OnlyOfficePermissionUtils;
 
 public class EditMenuContext
 extends BaseDLViewFileVersionDisplayContext {
@@ -90,13 +91,13 @@ extends BaseDLViewFileVersionDisplayContext {
         boolean convPerm = false;
 
         try {
-            PermissionChecker checker = permissionFactory.create(PortalUtil.getUser(httpServletRequest));
+            User user = PortalUtil.getUser(httpServletRequest);
+            PermissionChecker checker = permissionFactory.create(user);
             FileEntry fe = fileVersion.getFileEntry();
-            Folder folder = fe.getFolder();
 
             editPerm = fe.containsPermission(checker, ActionKeys.UPDATE);
             viewPerm = fe.containsPermission(checker, ActionKeys.VIEW);
-            convPerm = folder.containsPermission(checker, ActionKeys.ADD_DOCUMENT) && viewPerm;
+            convPerm = OnlyOfficePermissionUtils.create(fe.getGroupId(), fe.getFolderId(), user) && viewPerm;
         } catch (PortalException e) { }
 
         String ext = fileVersion.getExtension();
