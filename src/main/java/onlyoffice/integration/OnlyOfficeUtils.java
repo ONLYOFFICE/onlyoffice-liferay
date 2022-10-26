@@ -18,6 +18,7 @@
 
 package onlyoffice.integration;
 
+import javax.portlet.MutableRenderParameters;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -110,11 +111,13 @@ public class OnlyOfficeUtils {
 
         long folderId = fileEntry.getFolderId();
 
+        MutableRenderParameters params = portletURL.getRenderParameters();
+
         if (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-            portletURL.setParameter("mvcRenderCommandName", "/document_library/view");
+            params.setValue("mvcRenderCommandName", "/document_library/view");
         } else {
-            portletURL.setParameter("mvcRenderCommandName", "/document_library/view_folder");
-            portletURL.setParameter("folderId", String.valueOf(folderId));
+            params.setValue("mvcRenderCommandName", "/document_library/view_folder");
+            params.setValue("folderId", String.valueOf(folderId));
         }
 
         return portletURL.toString();

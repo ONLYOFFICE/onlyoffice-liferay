@@ -37,6 +37,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import onlyoffice.integration.permission.OnlyOfficePermissionUtils;
+
+import javax.portlet.MutableRenderParameters;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
@@ -67,11 +69,13 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 							themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 				}
 
-				portletURL.setParameter("mvcRenderCommandName", "/document_library/create_onlyoffice");
-				portletURL.setParameter("redirect", PortalUtil.getCurrentURL(portletRequest));
-				
+				MutableRenderParameters params = portletURL.getRenderParameters();
+
+				params.setValue("mvcRenderCommandName", "/document_library/create_onlyoffice");
+				params.setValue("redirect", PortalUtil.getCurrentURL(portletRequest));
+
 				if (folder != null) {
-					portletURL.setParameter("folderId", String.valueOf(folder.getFolderId()));
+					params.setValue("folderId", String.valueOf(folder.getFolderId()));
 				}
 
 				String labelMenu = _translate(portletRequest, "onlyoffice-context-action-create");

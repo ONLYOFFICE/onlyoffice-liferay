@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
+import javax.portlet.MutableRenderParameters;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.WindowStateException;
@@ -219,11 +220,8 @@ extends BaseDLViewFileVersionDisplayContext {
             request, "onlyoffice_integration_ui_EditActionPortlet",
             _themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 
-//      MutableRenderParameters added in portlet version 3.0
-//      MutableRenderParameters params = portletURL.getRenderParameters();
-//      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
-
-        portletURL.setParameter("fileId", Long.toString(fileVersion.getFileEntryId()));
+        MutableRenderParameters params = portletURL.getRenderParameters();
+        params.setValue("fileId", Long.toString(fileVersion.getFileEntryId()));
 
         try {
             portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
@@ -240,11 +238,8 @@ extends BaseDLViewFileVersionDisplayContext {
             request, "onlyoffice_integration_ui_ConvertActionPortlet",
             _themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 
-//      MutableRenderParameters added in portlet version 3.0
-//      MutableRenderParameters params = portletURL.getRenderParameters();
-//      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
-
-        portletURL.setParameter("fileId", String.valueOf(fileVersion.getFileEntryId()));
+        MutableRenderParameters params = portletURL.getRenderParameters();
+        params.setValue("fileId", String.valueOf(fileVersion.getFileEntryId()));
 
         try {
             portletURL.setWindowState(LiferayWindowState.POP_UP);

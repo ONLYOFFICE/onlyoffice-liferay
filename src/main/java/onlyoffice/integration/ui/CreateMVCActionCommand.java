@@ -44,6 +44,7 @@ import java.util.Locale;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.MutableRenderParameters;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -70,8 +71,10 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 		InputStream streamSourceFile = null;
 
 		try {
-			actionResponse.setRenderParameter("folderId", String.valueOf(folderId));
-			actionResponse.setRenderParameter("redirect", redirect);
+
+			MutableRenderParameters params = actionResponse.getRenderParameters();
+			params.setValue("folderId", String.valueOf(folderId));
+			params.setValue("redirect", redirect);
 
 			ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 			Long repositoryId = themeDisplay.getScopeGroupId();
@@ -96,7 +99,7 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 			FileEntry newFile = _dlAppService.addFileEntry(null, repositoryId, folderId, uniqueFileName, mimeType,
 					uniqueFileName, uniqueFileName, description, (String) null, sourceFile, null, null, serviceContext);
 
-			actionResponse.setRenderParameter("fileEntryId", String.valueOf(newFile.getFileEntryId()));
+			params.setValue("fileEntryId", String.valueOf(newFile.getFileEntryId()));
 		} catch (Exception e) {
 			_log.error(e.getMessage(), e);
 			if (e instanceof FileNameException || e instanceof PrincipalException.MustHavePermission) {
