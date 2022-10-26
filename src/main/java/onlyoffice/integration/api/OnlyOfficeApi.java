@@ -21,8 +21,6 @@ package onlyoffice.integration.api;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.kernel.util.DLUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -155,8 +153,6 @@ public class OnlyOfficeApi extends HttpServlet {
     }
 
     private static final long serialVersionUID = 1L;
-
-    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeApi.class);
 
     @Reference
     private OnlyOfficeUtils _utils;

@@ -2,8 +2,6 @@ package onlyoffice.integration.ui;
 
 import com.liferay.document.library.preview.DLPreviewRenderer;
 import com.liferay.document.library.preview.DLPreviewRendererProvider;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -77,6 +75,4 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
 
     @Reference
     private OnlyOfficeConfigManager _config;
-
-    private static final Log _log = LogFactoryUtil.getLog(OnlyofficePreviewRendererProvider.class);
 }
