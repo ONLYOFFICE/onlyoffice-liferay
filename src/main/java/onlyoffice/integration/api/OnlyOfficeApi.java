@@ -137,8 +137,8 @@ public class OnlyOfficeApi extends HttpServlet {
             sourceFile = FileUtil.createTempFile(inputStream);
             String mimeType = MimeTypesUtil.getContentType(sourceFile);
 
-            _dlApp.addFileEntry(user.getUserId(), file.getRepositoryId(), file.getFolderId(), uniqueFileName,
-                    mimeType, uniqueFileName, null, null, sourceFile, serviceContext);
+            _dlApp.addFileEntry(null, user.getUserId(), file.getRepositoryId(), file.getFolderId(), uniqueFileName,
+                    mimeType, uniqueFileName, null, null, null, sourceFile, null, null, serviceContext);
 
             response.setContentType("application/json");
             PrintWriter writer = response.getWriter();
