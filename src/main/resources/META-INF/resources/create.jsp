@@ -23,6 +23,7 @@
 <%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 <%@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
+<%@ taglib uri="http://liferay.com/tld/clay" prefix="clay" %>
 
 <%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
@@ -33,6 +34,8 @@
 <%@ page import="com.liferay.portal.kernel.util.ResourceBundleUtil" %>
 
 <%@ page import="java.util.ResourceBundle" %>
+
+<liferay-frontend:defineObjects />
 
 <liferay-theme:defineObjects />
 
@@ -51,45 +54,46 @@ portletDisplay.setURLBack(redirect);
 renderResponse.setTitle(headerTitle);
 %>
 
-<liferay-portlet:actionURL name="/document_library/create_onlyoffice" var="createFileEntryURL">
-	<liferay-portlet:param name="mvcRenderCommandName" value="/document_library/create_onlyoffice" />
-</liferay-portlet:actionURL>
+<clay:container-fluid cssClass="container-form-lg">
 
-<div class="container-fluid-1280">
+	<portlet:actionURL name="/document_library/create_onlyoffice" var="createFileEntryURL">
+		<portlet:param name="mvcRenderCommandName" value="/document_library/create_onlyoffice" />
+	</portlet:actionURL>
+
 	<aui:form action="<%= createFileEntryURL %>" cssClass="lfr-dynamic-form" method="post" id="fmCreate" name="fmCreate">
 		<aui:input name="folderId" type="hidden" value="<%= folderId %>" />
 		<aui:input name="redirectUrl" type="hidden" value="<%= redirect %>" />
-		<div class="lfr-form-content">
-			<liferay-ui:error exception="<%= Exception.class %>">
-				<liferay-ui:message key="an-unexpected-error-occurred" />
-			</liferay-ui:error>
-			<liferay-ui:error exception="<%= FileNameException.class %>">
-				<liferay-ui:message key="please-enter-a-file-with-a-valid-file-name" />
-			</liferay-ui:error>
-			<liferay-ui:error exception="<%= PrincipalException.MustHavePermission.class %>">
-				<liferay-ui:message key="you-do-not-have-the-required-permissions" />
-			</liferay-ui:error>
-			<div class="hide" id="<portlet:namespace />error-messages"></div>
-			<aui:fieldset-group markupView="lexicon">
-				<aui:fieldset>
-					<aui:select label="onlyoffice-context-create-format" id="type" name="type">
-						<aui:option label="onlyoffice-context-create-type-docx" value="docx" />
-						<aui:option label="onlyoffice-context-create-type-xlsx" value="xlsx" />
-						<aui:option label="onlyoffice-context-create-type-pptx" value="pptx" />
-						<aui:option label="onlyoffice-context-create-type-docxf" value="docxf" />
-					</aui:select>
-					<aui:input name="title" type="text"  required="true" showRequiredLabel="true" />
-					<aui:input name="description" type="textarea" />
-				</aui:fieldset>
-			</aui:fieldset-group>
-		</div>
 
-		<aui:button-row>
-			<aui:button name="saveButton" type="submit" />
-			<aui:button href="<%= redirect %>" type="cancel" />
-		</aui:button-row>
+		<liferay-ui:error exception="<%= Exception.class %>">
+			<liferay-ui:message key="an-unexpected-error-occurred" />
+		</liferay-ui:error>
+		<liferay-ui:error exception="<%= FileNameException.class %>">
+			<liferay-ui:message key="please-enter-a-file-with-a-valid-file-name" />
+		</liferay-ui:error>
+		<liferay-ui:error exception="<%= PrincipalException.MustHavePermission.class %>">
+			<liferay-ui:message key="you-do-not-have-the-required-permissions" />
+		</liferay-ui:error>
+
+		<div class="hide" id="<portlet:namespace />error-messages"></div>
+
+		<aui:fieldset-group markupView="lexicon">
+			<aui:fieldset>
+				<aui:select label="onlyoffice-context-create-format" id="type" name="type">
+					<aui:option label="onlyoffice-context-create-type-docx" value="docx" />
+					<aui:option label="onlyoffice-context-create-type-xlsx" value="xlsx" />
+					<aui:option label="onlyoffice-context-create-type-pptx" value="pptx" />
+					<aui:option label="onlyoffice-context-create-type-docxf" value="docxf" />
+				</aui:select>
+				<aui:input name="title" type="text"  required="true" showRequiredLabel="true" />
+				<aui:input name="description" type="textarea" />
+			</aui:fieldset>
+			<div class="sheet-footer">
+				<aui:button name="saveButton" type="submit" />
+				<aui:button href="<%= redirect %>" type="cancel" />
+			</div>
+		</aui:fieldset-group>
 	</aui:form>
-</div>
+</clay:container-fluid>
 
 <c:if test="<%= (fileEntryId != 0) %>">	
 	<liferay-portlet:renderURL portletName="onlyoffice_integration_ui_EditActionPortlet" var="editURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
