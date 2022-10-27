@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
-import javax.portlet.MutableRenderParameters;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.WindowStateException;
@@ -63,6 +62,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
 
 import onlyoffice.integration.OnlyOfficeConvertUtils;
 import onlyoffice.integration.OnlyOfficeUtils;
@@ -108,6 +109,21 @@ extends BaseDLViewFileVersionDisplayContext {
         _isMasterForm = ext.equals("docxf");
     }
 
+    public List<DropdownItem> getActionDropdownItems() throws PortalException {
+        List<DropdownItem> dropdownItems = super.getActionDropdownItems();
+
+        if (showAction()) {
+            if (_canView) {
+                dropdownItems.add(_createViewDropdownItem());
+            }
+            if (_canConvert) {
+                dropdownItems.add(_createConvertDropdownItem());
+            }
+        }
+
+        return dropdownItems;
+    }
+
     public Menu getMenu() throws PortalException {
         Menu menu = super.getMenu();
         List<MenuItem> list = menu.getMenuItems();
@@ -133,14 +149,10 @@ extends BaseDLViewFileVersionDisplayContext {
         List<ToolbarItem> toolbarItems = super.getToolbarItems();
 
         if (_canView) {
-            URLToolbarItem item = new URLToolbarItem();
-            InitViewItem(item);
-            toolbarItems.add(item);
+            toolbarItems.add(_createViewUIItem());
         }
         if (_canConvert) {
-            JavaScriptToolbarItem item = new JavaScriptToolbarItem();
-            InitConvertItem(item);
-            toolbarItems.add(item);
+            toolbarItems.add(_createConvertUIItem());
         }
         return toolbarItems;
     }
@@ -177,6 +189,89 @@ extends BaseDLViewFileVersionDisplayContext {
         sb.append(getConvertUrl() + "'});");
 
         item.setOnClick(sb.toString());
+    }
+
+    private DropdownItem _createViewDropdownItem()
+            throws PortalException {
+
+        String labelKey = "onlyoffice-context-action-view";
+
+        if (_canEdit) {
+            labelKey = "onlyoffice-context-action-edit";
+        } else if (_canFillForm)  {
+            labelKey = "onlyoffice-context-action-fillForm";
+        }
+
+        return DropdownItemBuilder.setHref(
+                    getDocUrl())
+                .setLabel(LanguageUtil.get(request, _resourceBundle, labelKey))
+                .setTarget("_blank")
+                .build();
+    }
+
+    private DropdownItem _createConvertDropdownItem()
+            throws PortalException {
+
+        String lang = null;
+        if (_isMasterForm) {
+            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-create-form");
+        } else {
+            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-convert");
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Liferay.Util.openWindow({");
+        sb.append("dialog: {destroyOnHide:true,cache:false,width:500,height:200,modal:true,resizable: false},");
+        sb.append("title: '" + lang + "',id: ");
+        sb.append("'onlyofficeConvertPopup',uri:'");
+        sb.append(getConvertUrl() + "'});");
+
+        return DropdownItemBuilder.setHref("javascript:" + sb)
+                .setLabel(lang)
+                .build();
+    }
+
+    private URLToolbarItem _createViewUIItem() {
+        URLToolbarItem toolbarItem = new URLToolbarItem();
+
+        String labelKey = "onlyoffice-context-action-view";
+
+        if (_canEdit) {
+            labelKey = "onlyoffice-context-action-edit";
+        } else if (_canFillForm)  {
+            labelKey = "onlyoffice-context-action-fillForm";
+        }
+
+        toolbarItem.setLabel(LanguageUtil.get(request, _resourceBundle, labelKey));
+        toolbarItem.setTarget("_blank");
+        toolbarItem.setURL(getDocUrl());
+        
+        return toolbarItem;
+    }
+
+    private JavaScriptToolbarItem _createConvertUIItem() {
+        JavaScriptToolbarItem toolbarItem = new JavaScriptToolbarItem();
+
+        String lang = null;
+        if (_isMasterForm) {
+            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-create-form");
+        } else {
+            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-convert");
+        }
+        toolbarItem.setLabel(lang);
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Liferay.Util.openWindow({");
+        sb.append("dialog: {destroyOnHide:true,cache:false,width:500,height:200,modal:true,resizable: false},");
+        sb.append("title: '" + lang + "',id: ");
+        sb.append("'onlyofficeConvertPopup',uri:'");
+        sb.append(getConvertUrl() + "'});");
+
+        toolbarItem.setOnClick(sb.toString());
+
+        return toolbarItem;
     }
 
     private String getDocUrl() {

@@ -23,6 +23,7 @@ dependencies {
 	
 	compileInclude group: "org.apache.httpcomponents", name: "httpclient", version: "4.5.8"
 	compileInclude group: "org.apache.avalon.framework", name: "avalon-framework-api", version: "4.3.1"
-
+	implementation group: 'com.liferay', name: 'com.liferay.frontend.taglib.clay', version: '9.2.8'
+	
 	cssBuilder group: "com.liferay", name: "com.liferay.css.builder", version: "3.0.2"
 }
