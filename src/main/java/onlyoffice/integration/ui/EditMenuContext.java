@@ -42,15 +42,9 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
-import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptMenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptToolbarItem;
-import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptUIItem;
-import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
-import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.ToolbarItem;
-import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLToolbarItem;
-import com.liferay.portal.kernel.servlet.taglib.ui.URLUIItem;
 import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsException;
@@ -124,26 +118,6 @@ extends BaseDLViewFileVersionDisplayContext {
         return dropdownItems;
     }
 
-    public Menu getMenu() throws PortalException {
-        Menu menu = super.getMenu();
-        List<MenuItem> list = menu.getMenuItems();
-
-        if (showAction()) {
-            if (_canView) {
-                URLMenuItem item = new URLMenuItem();
-                InitViewItem(item);
-                list.add(item);
-            }
-            if (_canConvert) {
-                JavaScriptMenuItem item = new JavaScriptMenuItem();
-                InitConvertItem(item);
-                list.add(item);
-            }
-        }
-
-        return menu;
-    }
-
     @Override
     public List<ToolbarItem> getToolbarItems() throws PortalException {
         List<ToolbarItem> toolbarItems = super.getToolbarItems();
@@ -155,40 +129,6 @@ extends BaseDLViewFileVersionDisplayContext {
             toolbarItems.add(_createConvertUIItem());
         }
         return toolbarItems;
-    }
-
-    private void InitViewItem(URLUIItem item) {
-        String labelKey = "onlyoffice-context-action-view";
-
-        if (_canEdit) {
-            labelKey = "onlyoffice-context-action-edit";
-        } else if (_canFillForm)  {
-            labelKey = "onlyoffice-context-action-fillForm";
-        }
-
-        item.setLabel(LanguageUtil.get(request, _resourceBundle, labelKey));
-        item.setTarget("_blank");
-        item.setURL(getDocUrl());
-    }
-
-    private void InitConvertItem(JavaScriptUIItem item) {
-        String lang = null;
-        if (_isMasterForm) {
-            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-create-form");
-        } else {
-            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-convert");
-        }
-        item.setLabel(lang);
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("Liferay.Util.openWindow({");
-        sb.append("dialog: {destroyOnHide:true,cache:false,width:500,height:200,modal:true,resizable: false},");
-        sb.append("title: '" + lang + "',id: ");
-        sb.append("'onlyofficeConvertPopup',uri:'");
-        sb.append(getConvertUrl() + "'});");
-
-        item.setOnClick(sb.toString());
     }
 
     private DropdownItem _createViewDropdownItem()
