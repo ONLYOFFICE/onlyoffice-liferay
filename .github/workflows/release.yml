@@ -26,13 +26,7 @@ jobs:
       upload_url: ${{steps.create_release.outputs.upload_url}}
     steps:
       - name: Checkout Repository
-        if: ${{ !matrix.branch }}
         uses: actions/checkout@v2
-      - name: Checkout Specific
-        if: ${{ matrix.branch }}
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ matrix.branch }}
       - name: Generate Changelog
         run: |
           awk '/## [0-9]/{p++} p; /## [0-9]/{if (p > 1) exit}' CHANGELOG.md | awk 'NR>2 {print last} {last=$0}' > RELEASE.md
@@ -59,8 +53,14 @@ jobs:
       matrix: ${{fromJson(needs.platforms.outputs.matrix)}}
     steps:
       - name: Checkout Repository
+        if: ${{ !matrix.branch }}
         uses: actions/checkout@v2
-      - name: Get Package Info 
+      - name: Checkout Specific
+        if: ${{ matrix.branch }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ matrix.branch }}
+      - name: Get Package Info
         run:  |
           echo "::set-output name=package::$(sed -n -e 's/^Bundle-SymbolicName: //p' bnd.bnd)"
           echo "::set-output name=version::$(sed -n -e 's/^Bundle-Version: //p' bnd.bnd)"
