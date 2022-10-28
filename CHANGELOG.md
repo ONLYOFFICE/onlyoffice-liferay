@@ -1,5 +1,8 @@
 # Change Log
 
+## Added
+- Chinese (Traditional, Taiwan), Basque (Spain) and Malay (Malaysia) empty file templates
+
 ## 2.2.0
 ## Added
 - preview of the documents
