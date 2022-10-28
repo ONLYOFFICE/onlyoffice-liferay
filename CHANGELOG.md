@@ -1,5 +1,9 @@
 # Change Log
 
+## Added
+- Chinese (Traditional, Taiwan), Basque (Spain) and Malay (Malaysia) empty file templates
+- new route to open in desktop app
+
 ## 2.2.0
 ## Added
 - preview of the documents
