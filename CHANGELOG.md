@@ -1,5 +1,8 @@
 # Change Log
 
+## Added
+- new route to open in desktop app
+
 ## 2.2.0
 ## Added
 - preview of the documents
