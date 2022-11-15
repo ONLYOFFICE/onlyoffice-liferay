@@ -51,6 +51,11 @@ public class OnlyOfficeConfigManager {
         return configuration.secret();
     }
 
+    public String getJwtHeader() {
+        String jwtHeader = configuration.jwtHeader();
+        return jwtHeader == null || jwtHeader.isEmpty() ? "Authorization" : jwtHeader;
+    }
+
     public boolean forceSaveEnabled() {
         return configuration.forceSave();
     }

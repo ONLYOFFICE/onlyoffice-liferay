@@ -35,6 +35,10 @@ Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace
 
 In order to configure it you must navigate to *System Settings* `(Control Panel -> Configuration -> System Settings)`. In *Platform* section click on *Connectors* category and select ONLYOFFICE.
 
+Starting from version 7.2, JWT is enabled by default and the secret key is generated automatically to restrict the access to ONLYOFFICE Docs and for security reasons and data integrity. 
+Specify your own **Secret key** on the Liferay **System Settings** page. 
+In the ONLYOFFICE Docs [config file](https://api.onlyoffice.com/editors/signature/), specify the same secret key and enable the validation.
+
 ## Compiling Liferay ONLYOFFICE connector
 
 Simply run `gradle build`. Output .jar will be placed inside `build/libs` directory.
