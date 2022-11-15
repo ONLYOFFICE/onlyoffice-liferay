@@ -1,9 +1,5 @@
 [
     {
-        "name": "DXP7.2",
-        "platform": "dxp-7.2-ga1"
-    },
-    {
         "name": "DXP7.2-FP5",
         "platform": "dxp-7.2-fp5",
         "branch": "feature/ce-7.3"
@@ -12,31 +8,6 @@
         "name": "DXP7.3",
         "platform": "dxp-7.3-ga1",
         "branch": "feature/dxp-7.3"
-    },
-    {
-        "name": "DXP7.4",
-        "platform": "dxp-7.4-ga1",
-        "branch": "feature/ce-7.4"
-    },
-    {
-        "name": "DXP7.4-U18",
-        "platform": "dxp-7.4-u18",
-        "branch": "feature/ce-7.4-ga18"
-    },
-    {
-        "name": "DXP7.4-U21",
-        "platform": "dxp-7.4-u21",
-        "branch": "feature/ce-7.4-ga21"
-    },
-    {
-        "name": "DXP7.4-U23",
-        "platform": "dxp-7.4-u23",
-        "branch": "feature/ce-7.4-ga23"
-    },
-    {
-        "name": "DXP7.4-U39",
-        "platform": "dxp-7.4-u39",
-        "branch": "feature/ce-7.4-ga39"
     },
     {
         "name": "DXP7.4-U44",
@@ -51,31 +22,6 @@
         "name": "CE7.3",
         "platform": "portal-7.3-ga1",
         "branch": "feature/ce-7.3"
-    },
-    {
-        "name": "CE7.4",
-        "platform": "portal-7.4-ga1",
-        "branch": "feature/ce-7.4"
-    },
-    {
-        "name": "CE7.4-GA18",
-        "platform": "portal-7.4-ga18",
-        "branch": "feature/ce-7.4-ga18"
-    },
-    {
-        "name": "CE7.4-GA21",
-        "platform": "portal-7.4-ga21",
-        "branch": "feature/ce-7.4-ga21"
-    },
-    {
-        "name": "CE7.4-GA23",
-        "platform": "portal-7.4-ga23",
-        "branch": "feature/ce-7.4-ga23"
-    },
-    {
-        "name": "CE7.4-GA39",
-        "platform": "portal-7.4-ga39",
-        "branch": "feature/ce-7.4-ga39"
     },
     {
         "name": "CE7.4-GA44",
