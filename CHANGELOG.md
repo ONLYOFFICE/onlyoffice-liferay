@@ -1,8 +1,11 @@
 # Change Log
 
+## 2.3.0
 ## Added
 - Chinese (Traditional, Taiwan), Basque (Spain) and Malay (Malaysia) empty file templates
 - new route to open in desktop app
+- setting jwt header on configuration page
+
 
 ## 2.2.0
 ## Added

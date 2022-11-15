@@ -36,6 +36,8 @@ import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import onlyoffice.integration.config.OnlyOfficeConfigManager;
+
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -115,7 +117,7 @@ public class OnlyOfficeConvertUtils {
                 payloadBody.put("payload", body);
                 String headerToken = _jwt.createToken(body);
                 body.put("token", token);
-                request.setHeader("Authorization", "Bearer " + headerToken);
+                request.setHeader(_config.getJwtHeader(), "Bearer " + headerToken);
             }
 
             _log.debug("Sending POST to Docserver: " + body.toString());
@@ -160,6 +162,9 @@ public class OnlyOfficeConvertUtils {
 
     @Reference
     private OnlyOfficeUtils _utils;
+
+    @Reference
+    private OnlyOfficeConfigManager _config;
 
     private static final Log _log = LogFactoryUtil.getLog(
             OnlyOfficeConvertUtils.class);

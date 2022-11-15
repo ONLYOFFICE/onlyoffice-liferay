@@ -60,6 +60,12 @@ public @interface OnlyOfficeConfiguration {
 
     @AttributeDefinition(
         required = false,
+        name = "onlyoffice-config-jwt-header", description = "onlyoffice-config-jwt-header-desc"
+    )
+    public String jwtHeader() default "";
+
+    @AttributeDefinition(
+        required = false,
         name = "onlyoffice-config-force-save-name", description = "onlyoffice-config-force-save-desc"
     )
     public boolean forceSave() default false;
