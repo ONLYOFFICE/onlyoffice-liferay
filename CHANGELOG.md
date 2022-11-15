@@ -1,6 +1,6 @@
 # Change Log
 
-##
+## 2.3.0
 ## Added
 - Chinese (Traditional, Taiwan), Basque (Spain) and Malay (Malaysia) empty file templates
 - new route to open in desktop app
