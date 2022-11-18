@@ -70,7 +70,7 @@ public class OnlyOfficeJWT {
         Boolean inBody = true;
 
         if (token == null || token == "") {
-            String header = req.getHeader("Authorization");
+            String header = req.getHeader(_config.getJwtHeader());
             token = (header != null && header.startsWith("Bearer ")) ? header.substring(7) : header;
             inBody = false;
         }
