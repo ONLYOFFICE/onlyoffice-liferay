@@ -43,9 +43,6 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
-import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptToolbarItem;
-import com.liferay.portal.kernel.servlet.taglib.ui.ToolbarItem;
-import com.liferay.portal.kernel.servlet.taglib.ui.URLToolbarItem;
 import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsException;
@@ -119,19 +116,6 @@ extends BaseDLViewFileVersionDisplayContext {
         return dropdownItems;
     }
 
-    @Override
-    public List<ToolbarItem> getToolbarItems() throws PortalException {
-        List<ToolbarItem> toolbarItems = super.getToolbarItems();
-
-        if (_canView) {
-            toolbarItems.add(_createViewUIItem());
-        }
-        if (_canConvert) {
-            toolbarItems.add(_createConvertUIItem());
-        }
-        return toolbarItems;
-    }
-
     private DropdownItem _createViewDropdownItem()
             throws PortalException {
 
@@ -171,48 +155,6 @@ extends BaseDLViewFileVersionDisplayContext {
         return DropdownItemBuilder.setHref("javascript:" + sb)
                 .setLabel(lang)
                 .build();
-    }
-
-    private URLToolbarItem _createViewUIItem() {
-        URLToolbarItem toolbarItem = new URLToolbarItem();
-
-        String labelKey = "onlyoffice-context-action-view";
-
-        if (_canEdit) {
-            labelKey = "onlyoffice-context-action-edit";
-        } else if (_canFillForm)  {
-            labelKey = "onlyoffice-context-action-fillForm";
-        }
-
-        toolbarItem.setLabel(LanguageUtil.get(request, _resourceBundle, labelKey));
-        toolbarItem.setTarget("_blank");
-        toolbarItem.setURL(getDocUrl());
-        
-        return toolbarItem;
-    }
-
-    private JavaScriptToolbarItem _createConvertUIItem() {
-        JavaScriptToolbarItem toolbarItem = new JavaScriptToolbarItem();
-
-        String lang = null;
-        if (_isMasterForm) {
-            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-create-form");
-        } else {
-            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-convert");
-        }
-        toolbarItem.setLabel(lang);
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("Liferay.Util.openWindow({");
-        sb.append("dialog: {destroyOnHide:true,cache:false,width:500,height:200,modal:true,resizable: false},");
-        sb.append("title: '" + lang + "',id: ");
-        sb.append("'onlyofficeConvertPopup',uri:'");
-        sb.append(getConvertUrl() + "'});");
-
-        toolbarItem.setOnClick(sb.toString());
-
-        return toolbarItem;
     }
 
     private String getDocUrl() {
