@@ -76,22 +76,24 @@ renderResponse.setTitle(headerTitle);
 
 		<div class="hide" id="<portlet:namespace />error-messages"></div>
 
-		<aui:fieldset-group markupView="lexicon">
-			<aui:fieldset>
-				<aui:select label="onlyoffice-context-create-format" id="type" name="type">
-					<aui:option label="onlyoffice-context-create-type-docx" value="docx" />
-					<aui:option label="onlyoffice-context-create-type-xlsx" value="xlsx" />
-					<aui:option label="onlyoffice-context-create-type-pptx" value="pptx" />
-					<aui:option label="onlyoffice-context-create-type-docxf" value="docxf" />
-				</aui:select>
-				<aui:input name="title" type="text"  required="true" showRequiredLabel="true" />
-				<aui:input name="description" type="textarea" />
-			</aui:fieldset>
-			<div class="sheet-footer">
-				<aui:button name="saveButton" type="submit" />
-				<aui:button href="<%= redirect %>" type="cancel" />
+		<div class="sheet">
+			<div class="panel-group panel-group-flush">
+				<aui:fieldset>
+					<aui:select label="onlyoffice-context-create-format" id="type" name="type">
+						<aui:option label="onlyoffice-context-create-type-docx" value="docx" />
+						<aui:option label="onlyoffice-context-create-type-xlsx" value="xlsx" />
+						<aui:option label="onlyoffice-context-create-type-pptx" value="pptx" />
+						<aui:option label="onlyoffice-context-create-type-docxf" value="docxf" />
+					</aui:select>
+					<aui:input name="title" type="text"  required="true" showRequiredLabel="true" />
+					<aui:input name="description" type="textarea" />
+				</aui:fieldset>
+				<div class="sheet-footer">
+					<aui:button name="saveButton" type="submit" />
+					<aui:button href="<%= redirect %>" type="cancel" />
+				</div>
 			</div>
-		</aui:fieldset-group>
+		</div>
 	</aui:form>
 </clay:container-fluid>
 

@@ -7,7 +7,6 @@ dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.frontend.taglib.util"
 	compileOnly group: "com.liferay", name: "com.liferay.journal.taglib"
 	compileOnly group: "com.liferay", name: "com.liferay.layout.taglib"
-	compileOnly group: "com.liferay", name: "com.liferay.site.taglib"
 	compileOnly group: "com.liferay", name:"com.liferay.dynamic.data.mapping.api"
 	compileOnly group: "com.liferay", name: "com.liferay.document.library.api"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.function"
