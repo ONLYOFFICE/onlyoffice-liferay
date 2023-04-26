@@ -11,62 +11,34 @@ jobs:
       matrix: ${{ steps.platform-matrix.outputs.matrix }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Get Liferay Platforms
         id: platform-matrix
         run: |
           content=$(cat ./release.json)
-          content="${content//'%'/'%25'}"
-          content="${content//$'\n'/'%0A'}"
-          content="${content//$'\r'/'%0D'}"
-          echo "::set-output name=matrix::{\"include\":$content}"
-  release:
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{steps.create_release.outputs.upload_url}}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-      - name: Generate Changelog
-        run: |
-          awk '/## [0-9]/{p++} p; /## [0-9]/{if (p > 1) exit}' CHANGELOG.md | awk 'NR>2 {print last} {last=$0}' > RELEASE.md
-      - name: Get Package Info 
-        run:  |
-          echo "::set-output name=package::$(sed -n -e 's/^Bundle-SymbolicName: //p' bnd.bnd)"
-          echo "::set-output name=version::$(sed -n -e 's/^Bundle-Version: //p' bnd.bnd)"
-        id: info
-      - name: Create Release
-        uses: actions/create-release@v1
-        id: create_release
-        with:
-          draft: false
-          prerelease: false
-          release_name: v${{ steps.info.outputs.version }}
-          tag_name: v${{ steps.info.outputs.version }}
-          body_path: ./RELEASE.md
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+          content=$(echo $content | jq -c .)
+          echo "matrix={\"include\":$content}" >> $GITHUB_OUTPUT
   build:
-    needs: [platforms,release]
+    needs: [platforms]
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{fromJson(needs.platforms.outputs.matrix)}}
     steps:
       - name: Checkout Repository
         if: ${{ !matrix.branch }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Checkout Specific
         if: ${{ matrix.branch }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ matrix.branch }}
       - name: Get Package Info
         run:  |
-          echo "::set-output name=package::$(sed -n -e 's/^Bundle-SymbolicName: //p' bnd.bnd)"
-          echo "::set-output name=version::$(sed -n -e 's/^Bundle-Version: //p' bnd.bnd)"
+          echo "package=$(sed -n -e 's/^Bundle-SymbolicName: //p' bnd.bnd)" >> $GITHUB_OUTPUT
+          echo "version=$(sed -n -e 's/^Bundle-Version: //p' bnd.bnd)" >> $GITHUB_OUTPUT
         id: info
       - name: Install Java 8
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '8'
@@ -90,13 +62,34 @@ jobs:
           cd $modules
           blade gw jar
           cd ./onlyoffice-liferay/build/libs
-          mv ${{ steps.info.outputs.package }}-${{ steps.info.outputs.version }}.jar $cwd/
-      - name: Upload Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+          mv ${{ steps.info.outputs.package }}-${{ steps.info.outputs.version }}.jar $cwd/${{ steps.info.outputs.package }}-${{ steps.info.outputs.version }}-${{ matrix.name }}.jar
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ${{ steps.info.outputs.package }}-${{ steps.info.outputs.version }}.jar
-          asset_name: ${{ steps.info.outputs.package }}-${{ steps.info.outputs.version }}-${{ matrix.name }}.jar
-          asset_content_type: application/java-archive
+          name: ${{ steps.info.outputs.package }}-${{ steps.info.outputs.version }}-${{ matrix.name }}.jar
+          path: ${{ steps.info.outputs.package }}-${{ steps.info.outputs.version }}-${{ matrix.name }}.jar
+  upload:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Get Package Info 
+        run:  |
+          echo "package=$(sed -n -e 's/^Bundle-SymbolicName: //p' bnd.bnd)" >> $GITHUB_OUTPUT
+          echo "version=$(sed -n -e 's/^Bundle-Version: //p' bnd.bnd)" >> $GITHUB_OUTPUT
+        id: info
+      - name: Generate Changelog
+        run: |
+          awk '/## [0-9]/{p++} p; /## [0-9]/{if (p > 1) exit}' CHANGELOG.md | awk 'NR>2 {print last} {last=$0}' > RELEASE.md
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: ${{ github.workspace }}/artifacts
+      - name: Upload Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ steps.info.outputs.version }}"
+          body_path: RELEASE.md
+          files: |
+            **/*.jar
