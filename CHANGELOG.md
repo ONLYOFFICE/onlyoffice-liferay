@@ -2,8 +2,8 @@
 
 ##
 ## Added
-- compatible with Liferay CE 7.4 GA44 - GA66
-- compatible with Liferay DXP 7.4 U44 - U66
+- compatible with Liferay CE 7.4 GA44 - GA73
+- compatible with Liferay DXP 7.4 U44 - U73
 
 ## 2.3.0
 ## Added
