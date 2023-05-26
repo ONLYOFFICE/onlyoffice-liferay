@@ -1,6 +1,6 @@
 Bundle-Name: onlyoffice-integration-web
 Bundle-SymbolicName: onlyoffice.integration.web
-Bundle-Version: 2.3.0
+Bundle-Version: 2.4.0
 Import-Package: !org.apache.log,*;version="0"
 -metatype: *
 -includeresource:\
