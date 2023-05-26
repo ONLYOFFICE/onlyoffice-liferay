@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.4.0
+## Added
+- compatible with Liferay CE 7.4 GA44 - GA73
+- compatible with Liferay DXP 7.4 U44 - U73
+
 ## 2.3.0
 ## Added
 - Chinese (Traditional, Taiwan), Basque (Spain) and Malay (Malaysia) empty file templates
