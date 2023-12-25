@@ -46,7 +46,7 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsException;
-import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
+import com.liferay.portal.kernel.settings.FallbackKeysSettingsUtil;
 import com.liferay.portal.kernel.settings.TypedSettings;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -202,7 +202,7 @@ extends BaseDLViewFileVersionDisplayContext {
             return true;
         }
 
-        Settings settings = SettingsFactoryUtil.getSettings(
+        Settings settings = FallbackKeysSettingsUtil.getSettings(
             new PortletInstanceSettingsLocator(
                 _themeDisplay.getLayout(), portletDisplay.getId()));
 
