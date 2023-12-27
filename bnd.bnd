@@ -5,3 +5,6 @@ Import-Package: !org.apache.log,*;version="0"
 -metatype: *
 -includeresource:\
 	lib/httpclient.jar=httpclient-*.jar,\
+	lib/docs-integration-sdk-1.0.0.jar=docs-integration-sdk-*.jar\
+
+-fixupmessages "Classes found in the wrong directory"; restrict:=error; is:=warning

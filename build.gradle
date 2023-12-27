@@ -23,6 +23,10 @@ dependencies {
 	
 	compileInclude group: "org.apache.httpcomponents", name: "httpclient", version: "4.5.8"
 	compileInclude group: "org.apache.avalon.framework", name: "avalon-framework-api", version: "4.3.1"
+	compileInclude group: "com.auth0", name: "java-jwt", version: "4.0.0"
+	compileInclude group: "com.fasterxml.jackson.core", name: "jackson-core", version: "2.13.4"
+	compileInclude group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-properties', version: '2.13.5'
 
 	cssBuilder group: "com.liferay", name: "com.liferay.css.builder", version: "3.0.2"
+	compileInclude files('libs/docs-integration-sdk-1.0.0.jar')
 }
