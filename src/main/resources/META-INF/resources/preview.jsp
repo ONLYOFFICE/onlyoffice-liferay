@@ -28,7 +28,8 @@
 <%@ page import="org.osgi.framework.BundleContext" %>
 <%@ page import="org.osgi.framework.FrameworkUtil" %>
 
-<%@ page import="onlyoffice.integration.OnlyOfficeUtils" %>
+<%@ page import="onlyoffice.integration.utils.OnlyOfficeEditorUtils" %>
+<%@ page import="com.onlyoffice.manager.url.UrlManager" %>
 
 <liferay-theme:defineObjects />
 
@@ -36,12 +37,13 @@
 
 
 <%
-    BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeUtils.class).getBundleContext();
+    BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeEditorUtils.class).getBundleContext();
 
     Long fileEntryId = (Long)request.getAttribute("fileEntryId");
     String version = (String)request.getAttribute("version");
     FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
-    OnlyOfficeUtils utils = bc.getService(bc.getServiceReference(OnlyOfficeUtils.class));
+    OnlyOfficeEditorUtils editorUtils = bc.getService(bc.getServiceReference(OnlyOfficeEditorUtils.class));
+    UrlManager urlManager = bc.getService(bc.getServiceReference(UrlManager.class));
 %>
 
 <div id="onlyoffice-preview">
@@ -61,7 +63,7 @@
             var scriptApi = document.createElement("script");
 
             scriptApi.setAttribute("type", "text/javascript");
-            scriptApi.setAttribute("src", "<%= utils.getDocServerUrl() %>web-apps/apps/api/documents/api.js");
+            scriptApi.setAttribute("src", "<%= urlManager.getDocumentServerApiUrl() %>");
 
             scriptApi.onload = scriptApi.onerror = function() {
                 if (typeof DocsAPI === "undefined") {
@@ -69,7 +71,7 @@
                     divOnlyofficePreview.querySelector("div.preview-file-error-container").style.display = "block";
                     divOnlyofficePreview.querySelector("div.preview-file").style.display = "none";
                 } else {
-                    var config = JSON.parse('<%= utils.getDocumentConfig(fileEntryId, version, true, renderRequest) %>');
+                    var config = JSON.parse('<%= editorUtils.getConfigPreview(fileEntryId, version, renderRequest) %>');
                     docEditor = new DocsAPI.DocEditor("placeholder", config);
                 }
             };
