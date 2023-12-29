@@ -31,13 +31,13 @@ import com.liferay.portal.kernel.util.FileUtil;
 
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.onlyoffice.manager.request.RequestManager;
+import com.onlyoffice.manager.url.UrlManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.net.URL;
-import java.net.URLConnection;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -45,12 +45,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpEntity;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import onlyoffice.integration.OnlyOfficeParsingUtils;
-import onlyoffice.integration.OnlyOfficeUtils;
 import onlyoffice.integration.permission.OnlyOfficePermissionUtils;
 
 @Component(
@@ -130,12 +130,17 @@ public class OnlyOfficeApi extends HttpServlet {
 
             ServiceContext serviceContext = ServiceContextFactory.getInstance(OnlyOfficeDocumentConvert.class.getName(), request);
 
-            url = _utils.replaceDocServerURLToInternal(url);
+            url = urlManager.replaceToInnerDocumentServerUrl(url);
 
-            URLConnection connection = new URL(url).openConnection();
-            InputStream inputStream = connection.getInputStream();
+            sourceFile = requestManager.executeGetRequest(url, new RequestManager.Callback<File>() {
+                @Override
+                public File doWork(final Object response) throws Exception {
+                    InputStream inputStream = ((HttpEntity) response).getContent();
 
-            sourceFile = FileUtil.createTempFile(inputStream);
+                    return FileUtil.createTempFile(inputStream);
+                }
+            });
+
             String mimeType = MimeTypesUtil.getContentType(sourceFile);
 
             _dlApp.addFileEntry(user.getUserId(), file.getRepositoryId(), file.getFolderId(), uniqueFileName,
@@ -158,11 +163,14 @@ public class OnlyOfficeApi extends HttpServlet {
     private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeApi.class);
 
     @Reference
-    private OnlyOfficeUtils _utils;
-
-    @Reference
     private OnlyOfficeParsingUtils _parsingUtils;
 
     @Reference
     private DLAppLocalService _dlApp;
+
+    @Reference
+    private RequestManager requestManager;
+
+    @Reference
+    private UrlManager urlManager;
 }
