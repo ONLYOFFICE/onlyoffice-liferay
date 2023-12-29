@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
-import javax.portlet.MutableRenderParameters;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.WindowStateException;
@@ -63,9 +62,7 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-
-import onlyoffice.integration.OnlyOfficeConvertUtils;
-import onlyoffice.integration.OnlyOfficeUtils;
+import com.onlyoffice.manager.document.DocumentManager;
 
 public class EditMenuContext
 extends BaseDLViewFileVersionDisplayContext {
@@ -73,7 +70,7 @@ extends BaseDLViewFileVersionDisplayContext {
     public EditMenuContext(
         UUID uuid, DLViewFileVersionDisplayContext parentDLDisplayContext,
         HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse, FileVersion fileVersion, OnlyOfficeUtils utils,  OnlyOfficeConvertUtils convertUtils,
+        HttpServletResponse httpServletResponse, FileVersion fileVersion, DocumentManager documentManager,
         PermissionCheckerFactory permissionFactory) {
 
         super(
@@ -99,12 +96,12 @@ extends BaseDLViewFileVersionDisplayContext {
             convPerm = folder.containsPermission(checker, ActionKeys.ADD_DOCUMENT) && viewPerm;
         } catch (PortalException e) { }
 
-        String ext = fileVersion.getExtension();
-        _canEdit = utils.isEditable(ext) && editPerm;
-        _canFillForm = utils.isFillForm(ext) && editPerm;
-        _canView = utils.isViewable(ext) && viewPerm;
-        _canConvert = convertUtils.isConvertable(ext) && convPerm;
-        _isMasterForm = ext.equals("docxf");
+        String fileName = fileVersion.getFileName();
+        _canEdit = documentManager.isEditable(fileName) && editPerm;
+        _canFillForm = documentManager.isFillable(fileName) && editPerm;
+        _canView = documentManager.isViewable(fileName) && viewPerm;
+        _canConvert = documentManager.getDefaultConvertExtension(fileName) != null && convPerm;
+        _isMasterForm = fileVersion.getExtension().equals("docxf");
     }
 
     public Menu getMenu() throws PortalException {
