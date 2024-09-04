@@ -83,7 +83,7 @@ jobs:
         run: |
           awk '/## [0-9]/{p++} p; /## [0-9]/{if (p > 1) exit}' CHANGELOG.md | awk 'NR>2 {print last} {last=$0}' > RELEASE.md
       - name: Download Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           path: ${{ github.workspace }}/artifacts
       - name: Upload Release
