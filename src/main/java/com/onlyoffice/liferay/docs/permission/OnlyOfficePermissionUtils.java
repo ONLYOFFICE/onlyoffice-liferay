@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 public class OnlyOfficePermissionUtils {
 
     public static boolean saveAs(final FileEntry file, final User user) throws PortalException {
-        PermissionChecker checker = PermissionCheckerFactoryUtil.create(user); 
+        PermissionChecker checker = PermissionCheckerFactoryUtil.create(user);
 
         return file.containsPermission(checker, ActionKeys.VIEW) &&
                 ModelResourcePermissionHelper.contains(

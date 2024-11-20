@@ -64,7 +64,7 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 			throws Exception {
 		long folderId = ParamUtil.getLong(actionRequest, "folderId");
 		String type = ParamUtil.getString(actionRequest, "type");
-		String title = ParamUtil.getString(actionRequest, "title");	
+		String title = ParamUtil.getString(actionRequest, "title");
 		String description = ParamUtil.getString(actionRequest, "description");
 		String redirect = ParamUtil.getString(actionRequest, "redirectUrl");
 

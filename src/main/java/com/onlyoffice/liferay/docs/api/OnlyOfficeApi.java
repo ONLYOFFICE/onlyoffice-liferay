@@ -102,7 +102,7 @@ public class OnlyOfficeApi extends HttpServlet {
             String url = bodyJson.getString("url");
             String fileType = bodyJson.getString("fileType");
             Long fileEntryId = bodyJson.getLong("fileEntryId");
-            
+
             if (url == null || url.isEmpty() || fileType == null || fileType.isEmpty() || fileEntryId == null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
@@ -119,7 +119,7 @@ public class OnlyOfficeApi extends HttpServlet {
 
             String uniqueFileName = DLUtil.getUniqueFileName(
                     file.getRepositoryId(),
-                    file.getFolderId(), 
+                    file.getFolderId(),
                     fileName.substring(0, fileName.lastIndexOf(".") + 1) + fileType
             );
 

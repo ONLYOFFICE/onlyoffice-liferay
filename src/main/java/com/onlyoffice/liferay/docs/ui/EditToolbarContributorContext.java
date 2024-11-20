@@ -75,7 +75,7 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 
 				portletURL.setParameter("mvcRenderCommandName", "/document_library/create_onlyoffice");
 				portletURL.setParameter("redirect", PortalUtil.getCurrentURL(portletRequest));
-				
+
 				if (folder != null) {
 					portletURL.setParameter("folderId", String.valueOf(folder.getFolderId()));
 				}
@@ -98,7 +98,7 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 		menuItem.setURL(url);
 		return menuItem;
 	}
-	
+
 	private String _translate(final PortletRequest portletRequest, final String key) {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			_portal.getLocale(portletRequest),
@@ -112,7 +112,7 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 
 	@Reference(target = "(model.class.name=com.liferay.document.library.kernel.model.DLFolder)")
 	private ModelResourcePermission<DLFolder> _dlFolderModelResourcePermission;
-	
+
 	@Reference
 	private Language _language;
 

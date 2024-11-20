@@ -64,7 +64,7 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
     }
 
     private final SettingsManager _settingsManager;
-    
+
     private final ServletContext _servletContext;
 
     private static final Log _log = LogFactoryUtil.getLog(OnlyofficePreviewRendererProvider.class);
