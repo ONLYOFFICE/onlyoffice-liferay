@@ -120,7 +120,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         try {
             JSONObject respBody = new JSONObject();
             if (error != null) {
-                response.setStatus(500);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 respBody.put("error", 1);
                 respBody.put("message", error);
             } else {

@@ -38,6 +38,8 @@ import javax.servlet.ServletContext;
         immediate = true, service = OnlyofficePreviewRendererProviderFactory.class
 )
 public class OnlyofficePreviewRendererProviderFactory {
+    private static final int OONLYOFFICE_PREVIEW_SERVICE_RANKING = 100;
+
     private ServiceRegistration<DLPreviewRendererProvider> dlPreviewRendererProviderServiceRegistration;
 
     @Reference
@@ -70,7 +72,7 @@ public class OnlyofficePreviewRendererProviderFactory {
     protected void activate(final BundleContext bundleContext) {
         Dictionary<String, Object> properties = new HashMapDictionary<>();
 
-        properties.put("service.ranking", 100);
+        properties.put("service.ranking", OONLYOFFICE_PREVIEW_SERVICE_RANKING);
         properties.put("content.type", getMimeTypes().toArray());
 
         dlPreviewRendererProviderServiceRegistration =

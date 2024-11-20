@@ -49,7 +49,7 @@ public class DesktopJSDynamicInclude extends BaseDynamicInclude {
 		if (userAgent.contains("AscDesktopEditor")) {
 			ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 
-			StringBundler sb = new StringBundler(7);
+			StringBundler sb = new StringBundler();
 
 			sb.append("<script src=\"");
 			sb.append(themeDisplay.getPortalURL());
