@@ -25,9 +25,7 @@ import org.osgi.service.metatype.annotations.Designate;
 
 @Designate(ocd = OnlyOfficeConfiguration.class)
 @Component(
-    configurationPid = {
-        "com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration"
-    },
+    configurationPid = "com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration",
     immediate = true,
     service = OnlyOfficeConfigManager.class
 )

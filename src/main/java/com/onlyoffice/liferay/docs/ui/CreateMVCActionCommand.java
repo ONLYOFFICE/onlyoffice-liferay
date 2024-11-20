@@ -55,7 +55,7 @@ import javax.portlet.ActionResponse;
                 "javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
                 "mvc.command.name=/document_library/create_onlyoffice"
         },
-        service = {MVCActionCommand.class}
+        service = MVCActionCommand.class
 )
 public class CreateMVCActionCommand extends BaseMVCActionCommand {
     private static final Log log = LogFactoryUtil.getLog(CreateMVCActionCommand.class);

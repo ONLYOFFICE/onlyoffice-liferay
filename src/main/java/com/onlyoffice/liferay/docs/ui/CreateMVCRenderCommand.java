@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletResponse;
                 "javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
                 "mvc.command.name=/document_library/create_onlyoffice"
         },
-        service = {MVCRenderCommand.class}
+        service = MVCRenderCommand.class
 )
 public class CreateMVCRenderCommand implements MVCRenderCommand {
     @Reference(target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)")

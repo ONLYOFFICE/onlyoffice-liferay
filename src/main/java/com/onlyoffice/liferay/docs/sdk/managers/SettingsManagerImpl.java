@@ -27,9 +27,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 
 @Component(
-    configurationPid = {
-            "com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration"
-    },
+    configurationPid = "com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration",
     immediate = true,
     service = SettingsManager.class
 )
