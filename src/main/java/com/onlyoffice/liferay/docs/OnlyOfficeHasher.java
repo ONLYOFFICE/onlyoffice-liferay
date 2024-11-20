@@ -59,7 +59,7 @@ public class OnlyOfficeHasher {
                 return Long.parseLong(payloadParts[1]);
             }
         } catch (Exception ex) {
-            _log.error(ex.getMessage(), ex);
+            log.error(ex.getMessage(), ex);
         }
         return (long) 0;
     }
@@ -76,7 +76,7 @@ public class OnlyOfficeHasher {
 
             return b64;
         } catch (Exception ex) {
-            _log.error(ex.getMessage(), ex);
+            log.error(ex.getMessage(), ex);
         }
         return "";
     }
