@@ -65,7 +65,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class EditMenuContext
 extends BaseDLViewFileVersionDisplayContext {
-    private static final Log _log = LogFactoryUtil.getLog(EditMenuContext.class);
+    private static final Log log = LogFactoryUtil.getLog(EditMenuContext.class);
 
     private ThemeDisplay themeDisplay;
     private ResourceBundle resourceBundle;
@@ -196,7 +196,7 @@ extends BaseDLViewFileVersionDisplayContext {
         try {
             portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
         } catch (WindowStateException wse) {
-            _log.error(wse.getMessage(), wse);
+            log.error(wse.getMessage(), wse);
         }
 
         return portletURL.toString();
@@ -216,7 +216,7 @@ extends BaseDLViewFileVersionDisplayContext {
         try {
             portletURL.setWindowState(LiferayWindowState.POP_UP);
         } catch (WindowStateException wse) {
-            _log.error(wse.getMessage(), wse);
+            log.error(wse.getMessage(), wse);
         }
 
         return portletURL.toString();

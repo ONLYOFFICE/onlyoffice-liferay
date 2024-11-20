@@ -20,8 +20,6 @@ package com.onlyoffice.liferay.docs.ui;
 
 import com.liferay.document.library.preview.DLPreviewRenderer;
 import com.liferay.document.library.preview.DLPreviewRendererProvider;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.onlyoffice.manager.settings.SettingsManager;
@@ -31,8 +29,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 
 public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvider {
-    private static final Log _log = LogFactoryUtil.getLog(OnlyofficePreviewRendererProvider.class);
-
     private final SettingsManager settingsManager;
     private final ServletContext servletContext;
 

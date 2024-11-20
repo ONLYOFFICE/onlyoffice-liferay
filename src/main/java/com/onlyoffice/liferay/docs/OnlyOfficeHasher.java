@@ -31,7 +31,7 @@ import java.util.Base64;
     service = OnlyOfficeHasher.class
 )
 public class OnlyOfficeHasher {
-    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeHasher.class);
+    private static final Log log = LogFactoryUtil.getLog(OnlyOfficeHasher.class);
 
     @Reference
     private SettingsManager settingsManager;
@@ -43,7 +43,7 @@ public class OnlyOfficeHasher {
             String payload = getHashString(str + getSecret()) + "?" + str;
             return Base64.getUrlEncoder().encodeToString(payload.getBytes("UTF-8"));
         } catch (Exception ex) {
-            _log.error(ex.getMessage(), ex);
+            log.error(ex.getMessage(), ex);
         }
         return "";
     }

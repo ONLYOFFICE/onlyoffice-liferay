@@ -58,7 +58,7 @@ import javax.portlet.ActionResponse;
 	service = {MVCActionCommand.class}
 )
 public class CreateMVCActionCommand extends BaseMVCActionCommand {
-	private static final Log _log = LogFactoryUtil.getLog(CreateMVCActionCommand.class);
+	private static final Log log = LogFactoryUtil.getLog(CreateMVCActionCommand.class);
 
 	@Reference
 	private DLAppService dlAppService;
@@ -102,7 +102,7 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 
 			actionResponse.setRenderParameter("fileEntryId", String.valueOf(newFile.getFileEntryId()));
 		} catch (Exception e) {
-			_log.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			if (e instanceof FileNameException || e instanceof PrincipalException.MustHavePermission) {
 				SessionErrors.add(actionRequest, e.getClass());
 			} else {

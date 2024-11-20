@@ -48,7 +48,7 @@ import javax.portlet.PortletResponse;
 
 @Component(immediate = true, service = { DLPortletToolbarContributorContext.class })
 public class EditToolbarContributorContext implements DLPortletToolbarContributorContext {
-    private static final Log _log = LogFactoryUtil.getLog(EditToolbarContributorContext.class);
+    private static final Log log = LogFactoryUtil.getLog(EditToolbarContributorContext.class);
 
     @Reference(target = "(model.class.name=com.liferay.document.library.kernel.model.DLFolder)")
     private ModelResourcePermission<DLFolder> dlFolderModelResourcePermission;
@@ -108,7 +108,7 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
                 ));
             }
         } catch (PortalException e) {
-            _log.error(e);
+            log.error(e);
         }
     }
 

@@ -55,7 +55,7 @@ import java.util.List;
     service = CallbackService.class
 )
 public class CallbackServiceImpl extends DefaultCallbackService {
-    private static final Log _log = LogFactoryUtil.getLog(CallbackServiceImpl.class);
+    private static final Log log = LogFactoryUtil.getLog(CallbackServiceImpl.class);
 
     @Reference
     private DLAppService dlAppService;
@@ -106,9 +106,9 @@ public class CallbackServiceImpl extends DefaultCallbackService {
 
                         dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
 
-                        _log.info("Document opened for editing, locking document");
+                        log.info("Document opened for editing, locking document");
                     } else {
-                        _log.info("Document already locked, another user has entered");
+                        log.info("Document already locked, another user has entered");
                     }
                 }
             }
@@ -116,7 +116,7 @@ public class CallbackServiceImpl extends DefaultCallbackService {
     }
 
     public void handlerSave(final Callback callback, final String fileId) throws Exception {
-        _log.info("Document updated, changing content");
+        log.info("Document updated, changing content");
 
         Long userId = (long) -1;
 
@@ -137,11 +137,11 @@ public class CallbackServiceImpl extends DefaultCallbackService {
 
         utils.setCollaborativeEditingKey(fileEntry, null);
 
-        _log.info("Document saved.");
+        log.info("Document saved.");
     }
 
     public void handlerClosed(final Callback callback, final String fileId) throws Exception {
-        _log.info("No document updates, unlocking document");
+        log.info("No document updates, unlocking document");
 
         FileEntry fileEntry = dlAppLocalService.getFileEntry(Long.parseLong(fileId));
 
@@ -173,16 +173,16 @@ public class CallbackServiceImpl extends DefaultCallbackService {
 
             dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
 
-            _log.info("Document saved (forcesave).");
+            log.info("Document saved (forcesave).");
         } else {
-            _log.info("Forcesave is disabled, ignoring forcesave request");
+            log.info("Forcesave is disabled, ignoring forcesave request");
         }
     }
 
     private void updateFile(final FileEntry fileEntry, final  Long userId, final String url,
                             final DLVersionNumberIncrease dlVersionNumberIncrease, final ServiceContext serviceContext)
             throws Exception {
-        _log.info("Trying to download file from URL: " + url);
+        log.info("Trying to download file from URL: " + url);
 
         try {
             URLConnection con = new URL(url).openConnection();
@@ -200,7 +200,7 @@ public class CallbackServiceImpl extends DefaultCallbackService {
             );
         } catch (Exception e) {
             String msg = "Couldn't download or save file: " + e.getMessage();
-            _log.error(msg, e);
+            log.error(msg, e);
             throw e;
         }
     }
