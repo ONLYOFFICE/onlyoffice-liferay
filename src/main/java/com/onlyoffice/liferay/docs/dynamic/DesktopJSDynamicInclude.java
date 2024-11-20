@@ -47,7 +47,7 @@ public class DesktopJSDynamicInclude extends BaseDynamicInclude {
 
 		String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
 		if (userAgent.contains("AscDesktopEditor")) {
-			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+			ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 
 			StringBundler sb = new StringBundler(7);
 

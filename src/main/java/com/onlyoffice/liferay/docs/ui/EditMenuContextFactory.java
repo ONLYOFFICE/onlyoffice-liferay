@@ -58,7 +58,7 @@ public class EditMenuContextFactory implements DLDisplayContextFactory {
 
     public DLViewFileVersionDisplayContext getDLViewFileVersionDisplayContext(
             final DLViewFileVersionDisplayContext parentDLViewFileVersionDisplayContext,
-            final HttpServletRequest httpServletRequest,final HttpServletResponse httpServletResponse,
+            final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse,
             final FileShortcut fileShortcut) {
 
         return parentDLViewFileVersionDisplayContext;

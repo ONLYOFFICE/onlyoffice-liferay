@@ -80,7 +80,7 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 			actionResponse.setRenderParameter("folderId", String.valueOf(folderId));
 			actionResponse.setRenderParameter("redirect", redirect);
 
-			ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 			Long repositoryId = themeDisplay.getScopeGroupId();
 
 			Locale locale = themeDisplay.getLocale();
@@ -97,8 +97,17 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 					actionRequest
 			);
 
-			FileEntry newFile = dlAppService.addFileEntry(repositoryId, folderId, uniqueFileName, mimeType,
-					uniqueFileName, description, (String) null, sourceFile,serviceContext);
+			FileEntry newFile = dlAppService.addFileEntry(
+					repositoryId,
+					folderId,
+					uniqueFileName,
+					mimeType,
+					uniqueFileName,
+					description,
+					(String) null,
+					sourceFile,
+					serviceContext
+			);
 
 			actionResponse.setRenderParameter("fileEntryId", String.valueOf(newFile.getFileEntryId()));
 		} catch (Exception e) {

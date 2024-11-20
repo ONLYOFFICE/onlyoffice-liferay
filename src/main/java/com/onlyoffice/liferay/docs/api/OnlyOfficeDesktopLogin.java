@@ -68,8 +68,8 @@ public class OnlyOfficeDesktopLogin extends HttpServlet {
             User user = portal.getUser(request);
 
             if (user == null) {
-                String userIdString = (String)httpSession.getAttribute("j_username");
-                String password = (String)httpSession.getAttribute("j_password");
+                String userIdString = (String) httpSession.getAttribute("j_username");
+                String password = (String) httpSession.getAttribute("j_password");
 
                 if ((userIdString != null) && (password != null)) {
                     long userId = GetterUtil.getLong(userIdString);

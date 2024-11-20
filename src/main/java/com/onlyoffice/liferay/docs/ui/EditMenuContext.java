@@ -84,8 +84,7 @@ extends BaseDLViewFileVersionDisplayContext {
             uuid, parentDLDisplayContext, httpServletRequest,
             httpServletResponse, fileVersion);
 
-        themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
-            WebKeys.THEME_DISPLAY);
+        themeDisplay = (ThemeDisplay) httpServletRequest.getAttribute(WebKeys.THEME_DISPLAY);
         resourceBundle = ResourceBundleUtil.getBundle("content.Language",
                 httpServletRequest.getLocale(), getClass());
 

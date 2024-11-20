@@ -188,9 +188,19 @@ public class CallbackServiceImpl extends DefaultCallbackService {
             URLConnection con = new URL(url).openConnection();
             InputStream in = con.getInputStream();
 
-            dlAppLocalService.updateFileEntry(userId, fileEntry.getFileEntryId(), fileEntry.getFileName(), fileEntry.getMimeType(),
-                    fileEntry.getTitle(), fileEntry.getDescription(), "ONLYOFFICE Edit",dlVersionNumberIncrease, in,
-                    con.getContentLength(), serviceContext);
+            dlAppLocalService.updateFileEntry(
+                    userId,
+                    fileEntry.getFileEntryId(),
+                    fileEntry.getFileName(),
+                    fileEntry.getMimeType(),
+                    fileEntry.getTitle(),
+                    fileEntry.getDescription(),
+                    "ONLYOFFICE Edit",
+                    dlVersionNumberIncrease,
+                    in,
+                    con.getContentLength(),
+                    serviceContext
+            );
 
             dlAppService.checkInFileEntry(
                     fileEntry.getFileEntryId(),
