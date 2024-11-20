@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 @Component(
-    service = DocumentManager.class
+        service = DocumentManager.class
 )
 public class DocumentManagerImpl extends DefaultDocumentManager {
     @Reference

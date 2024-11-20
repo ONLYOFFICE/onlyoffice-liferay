@@ -27,9 +27,9 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 
 @Component(
-    configurationPid = "com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration",
-    immediate = true,
-    service = SettingsManager.class
+        configurationPid = "com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration",
+        immediate = true,
+        service = SettingsManager.class
 )
 public class SettingsManagerImpl extends DefaultSettingsManager {
     private OnlyOfficeConfiguration configuration;

@@ -35,7 +35,8 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 
 @Component(
-        immediate = true, service = OnlyofficePreviewRendererProviderFactory.class
+        immediate = true,
+        service = OnlyofficePreviewRendererProviderFactory.class
 )
 public class OnlyofficePreviewRendererProviderFactory {
     private static final int OONLYOFFICE_PREVIEW_SERVICE_RANKING = 100;

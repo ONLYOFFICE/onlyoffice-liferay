@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Reference;
 
 
 @Component(
-    service = JwtManager.class
+        service = JwtManager.class
 )
 public class JwtManagerImpl extends DefaultJwtManager {
 

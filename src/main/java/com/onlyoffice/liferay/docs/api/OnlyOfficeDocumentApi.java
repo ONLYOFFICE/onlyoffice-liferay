@@ -43,12 +43,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component(
-    immediate = true,
-    property = {
-        "osgi.http.whiteboard.context.path=/",
-        "osgi.http.whiteboard.servlet.pattern=/onlyoffice/doc/*"
-    },
-    service = Servlet.class
+        immediate = true,
+        property = {
+                "osgi.http.whiteboard.context.path=/",
+                "osgi.http.whiteboard.servlet.pattern=/onlyoffice/doc/*"
+        },
+        service = Servlet.class
 )
 public class OnlyOfficeDocumentApi extends HttpServlet {
     private static final long serialVersionUID = 1L;

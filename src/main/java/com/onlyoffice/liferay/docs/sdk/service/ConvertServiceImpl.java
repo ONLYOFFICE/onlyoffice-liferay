@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 
 
 @Component(
-    service = ConvertService.class
+        service = ConvertService.class
 )
 public class ConvertServiceImpl extends DefaultConvertService implements ConvertService {
     public ConvertServiceImpl() {

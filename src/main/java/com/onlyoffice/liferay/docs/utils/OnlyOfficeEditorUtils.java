@@ -40,9 +40,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import javax.portlet.RenderRequest;
 
-@Component(
-    service = OnlyOfficeEditorUtils.class
-)
+@Component(service = OnlyOfficeEditorUtils.class)
 public class OnlyOfficeEditorUtils {
     @Reference
     private PermissionCheckerFactory permissionFactory;

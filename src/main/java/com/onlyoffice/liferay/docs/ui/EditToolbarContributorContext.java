@@ -46,7 +46,10 @@ import java.util.ResourceBundle;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
-@Component(immediate = true, service = DLPortletToolbarContributorContext.class)
+@Component(
+        immediate = true,
+        service = DLPortletToolbarContributorContext.class
+)
 public class EditToolbarContributorContext implements DLPortletToolbarContributorContext {
     private static final Log log = LogFactoryUtil.getLog(EditToolbarContributorContext.class);
 

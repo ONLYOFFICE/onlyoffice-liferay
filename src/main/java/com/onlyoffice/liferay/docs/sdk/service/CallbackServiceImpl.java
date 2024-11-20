@@ -52,7 +52,7 @@ import java.net.URLConnection;
 import java.util.List;
 
 @Component(
-    service = CallbackService.class
+        service = CallbackService.class
 )
 public class CallbackServiceImpl extends DefaultCallbackService {
     private static final Log log = LogFactoryUtil.getLog(CallbackServiceImpl.class);

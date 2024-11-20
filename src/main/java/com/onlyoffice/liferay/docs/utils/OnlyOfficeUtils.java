@@ -27,9 +27,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import org.osgi.service.component.annotations.Component;
 
-@Component(
-    service = OnlyOfficeUtils.class
-)
+@Component(service = OnlyOfficeUtils.class)
 public class OnlyOfficeUtils {
     public void setCollaborativeEditingKey(final FileEntry fileEntry, final String key) throws PortalException {
         ExpandoBridge expandoBridge = fileEntry.getExpandoBridge();

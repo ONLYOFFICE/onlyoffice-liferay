@@ -34,7 +34,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@Component(immediate = true, service = DynamicInclude.class)
+@Component(
+        immediate = true,
+        service = DynamicInclude.class
+)
 public class DesktopJSDynamicInclude extends BaseDynamicInclude {
     @Reference
     private Portal portal;

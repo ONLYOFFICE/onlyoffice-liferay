@@ -41,7 +41,7 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
 @Component(
-    service = UrlManager.class
+        service = UrlManager.class
 )
 public class UrlManagerImpl extends DefaultUrlManager {
     @Reference

@@ -24,9 +24,7 @@ import org.osgi.service.component.annotations.Component;
 import java.io.InputStream;
 import java.util.Scanner;
 
-@Component(
-    service = OnlyOfficeParsingUtils.class
-)
+@Component(service = OnlyOfficeParsingUtils.class)
 public class OnlyOfficeParsingUtils {
 
     public String getBody(final InputStream stream) {

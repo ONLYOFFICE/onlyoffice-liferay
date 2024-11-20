@@ -27,9 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 import java.security.MessageDigest;
 import java.util.Base64;
 
-@Component(
-    service = OnlyOfficeHasher.class
-)
+@Component(service = OnlyOfficeHasher.class)
 public class OnlyOfficeHasher {
     private static final Log log = LogFactoryUtil.getLog(OnlyOfficeHasher.class);
 

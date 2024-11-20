@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 @Component(
-    service = ConfigService.class
+        service = ConfigService.class
 )
 public class ConfigServiceImpl extends DefaultConfigService {
     @Reference

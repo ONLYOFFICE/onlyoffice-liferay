@@ -33,7 +33,10 @@ import org.osgi.service.component.annotations.Reference;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@Component(immediate = true, service = DLDisplayContextFactory.class)
+@Component(
+        immediate = true,
+        service = DLDisplayContextFactory.class
+)
 public class EditMenuContextFactory implements DLDisplayContextFactory {
     @Reference
     private DocumentManager documentManager;

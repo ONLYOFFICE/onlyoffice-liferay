@@ -36,12 +36,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Component(
-    immediate = true,
-    property = {
-        "osgi.http.whiteboard.context.path=/",
-        "osgi.http.whiteboard.servlet.pattern=/onlyoffice/desktop/login/*"
-    },
-    service = Servlet.class
+        immediate = true,
+        property = {
+                "osgi.http.whiteboard.context.path=/",
+                "osgi.http.whiteboard.servlet.pattern=/onlyoffice/desktop/login/*"
+        },
+        service = Servlet.class
 )
 public class OnlyOfficeDesktopLogin extends HttpServlet {
     public static final String DOCUMENT_LIBRARY_ADMIN =

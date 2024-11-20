@@ -30,7 +30,10 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-@Component(immediate = true, service = {})
+@Component(
+        immediate = true,
+        service = {}
+)
 public class OnlyOfficePermissionUtils {
     private static ModelResourcePermission<Folder> folderModelResourcePermission;
 
