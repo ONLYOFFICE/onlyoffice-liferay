@@ -64,8 +64,7 @@ public class OnlyOfficeApi extends HttpServlet {
 
         String type = request.getParameter("type");
             if (type != null) {
-                switch (type.toLowerCase())
-                {
+                switch (type.toLowerCase()) {
                     case "save-as":
                         saveAs(request, response);
                         break;
