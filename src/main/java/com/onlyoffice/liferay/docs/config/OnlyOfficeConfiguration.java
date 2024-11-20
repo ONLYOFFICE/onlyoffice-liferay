@@ -37,41 +37,41 @@ public @interface OnlyOfficeConfiguration {
         required = true,
         name = "onlyoffice-config-docserv-url-name", description = "onlyoffice-config-docserv-url-desc"
     )
-    public String docServUrl() default "http://127.0.0.1/";
+    String docServUrl() default "http://127.0.0.1/";
 
     @AttributeDefinition(
         required = false,
         name = "onlyoffice-config-docserv-inner-url-name", description = "onlyoffice-config-docserv-inner-url-desc"
     )
-    public String docServInnerUrl() default "";
+    String docServInnerUrl() default "";
 
     @AttributeDefinition(
         required = false,
         name = "onlyoffice-config-liferay-url-name", description = "onlyoffice-config-liferay-url-desc"
     )
-    public String liferayUrl() default "";
+    String liferayUrl() default "";
 
     @AttributeDefinition(
         required = false,
         name = "onlyoffice-config-secret-name", description = "onlyoffice-config-secret-desc"
     )
-    public String secret() default "";
+    String secret() default "";
 
     @AttributeDefinition(
         required = false,
         name = "onlyoffice-config-jwt-header", description = "onlyoffice-config-jwt-header-desc"
     )
-    public String jwtHeader() default "";
+    String jwtHeader() default "";
 
     @AttributeDefinition(
         required = false,
         name = "onlyoffice-config-force-save-name", description = "onlyoffice-config-force-save-desc"
     )
-    public boolean forceSave() default false;
+    boolean forceSave() default false;
 
     @AttributeDefinition(
         required = false,
         name = "onlyoffice-config-webpreview"
     )
-    public boolean webPreview() default false;
+    boolean webPreview() default false;
 }
