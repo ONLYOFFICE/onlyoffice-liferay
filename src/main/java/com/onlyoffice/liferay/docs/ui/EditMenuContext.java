@@ -65,6 +65,15 @@ import javax.servlet.http.HttpServletResponse;
 
 public class EditMenuContext
 extends BaseDLViewFileVersionDisplayContext {
+    private static final Log _log = LogFactoryUtil.getLog(EditMenuContext.class);
+
+    private ThemeDisplay _themeDisplay;
+    private ResourceBundle _resourceBundle;
+    private boolean _canEdit;
+    private boolean _canFillForm;
+    private boolean _canView;
+    private boolean _canConvert;
+    private boolean _isMasterForm;
 
     public EditMenuContext(final UUID uuid, final DLViewFileVersionDisplayContext parentDLDisplayContext,
                            final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse,
@@ -230,15 +239,4 @@ extends BaseDLViewFileVersionDisplayContext {
 
         return typedSettings.getBooleanValue("showActions");
     }
-
-    private static final Log _log = LogFactoryUtil.getLog(
-        EditMenuContext.class);
-
-    private ThemeDisplay _themeDisplay;
-    private ResourceBundle _resourceBundle;
-    boolean _canEdit;
-    boolean _canFillForm;
-    boolean _canView;
-    boolean _canConvert;
-    boolean _isMasterForm;
 }

@@ -44,9 +44,18 @@ import javax.portlet.PortletURL;
     service = UrlManager.class
 )
 public class UrlManagerImpl extends DefaultUrlManager {
+    @Reference
+    private OnlyOfficeHasher _hasher;
+    @Reference
+    private DLAppService _DLAppService;
 
     public UrlManagerImpl() {
         super(null);
+    }
+
+    @Reference(service = SettingsManager.class, unbind = "-")
+    public void setSettingsManager(final SettingsManager settingsManager) {
+        super.setSettingsManager(settingsManager);
     }
 
     @Override
@@ -114,16 +123,5 @@ public class UrlManagerImpl extends DefaultUrlManager {
         } else {
             return sanitizeUrl(serviceContext.getPortalURL());
         }
-    }
-
-    @Reference
-    private OnlyOfficeHasher _hasher;
-
-    @Reference
-    private DLAppService _DLAppService;
-
-    @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(final SettingsManager settingsManager) {
-        super.setSettingsManager(settingsManager);
     }
 }

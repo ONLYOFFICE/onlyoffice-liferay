@@ -31,6 +31,10 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 
 public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvider {
+    private static final Log _log = LogFactoryUtil.getLog(OnlyofficePreviewRendererProvider.class);
+
+    private final SettingsManager _settingsManager;
+    private final ServletContext _servletContext;
 
     public OnlyofficePreviewRendererProvider(final ServletContext servletContext,
                                              final SettingsManager settingsManager) {
@@ -62,10 +66,4 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
         // TODO Auto-generated method stub
         return Optional.empty();
     }
-
-    private final SettingsManager _settingsManager;
-
-    private final ServletContext _servletContext;
-
-    private static final Log _log = LogFactoryUtil.getLog(OnlyofficePreviewRendererProvider.class);
 }

@@ -36,6 +36,10 @@ import javax.servlet.http.HttpServletResponse;
 
 @Component(immediate = true, service = DynamicInclude.class)
 public class DesktopJSDynamicInclude extends BaseDynamicInclude {
+	@Reference
+	private Portal _portal;
+	@Reference(target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)")
+	private ServletContext _servletContext;
 
 	@Override
 	public void include(final HttpServletRequest request, final HttpServletResponse response, final String key)
@@ -66,10 +70,4 @@ public class DesktopJSDynamicInclude extends BaseDynamicInclude {
 			"/html/common/themes/top_head.jsp#post"
 		);
 	}
-
-	@Reference
-	private Portal _portal;
-
-	@Reference(target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)")
-	private ServletContext _servletContext;
 }

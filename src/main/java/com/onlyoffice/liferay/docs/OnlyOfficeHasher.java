@@ -31,6 +31,11 @@ import java.util.Base64;
     service = OnlyOfficeHasher.class
 )
 public class OnlyOfficeHasher {
+    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeHasher.class);
+
+    @Reference
+    private SettingsManager settingsManager;
+
     public String getHash(final Long id) {
         try {
             String str = Long.toString(id);
@@ -75,9 +80,4 @@ public class OnlyOfficeHasher {
         }
         return "";
     }
-
-    @Reference
-    private SettingsManager settingsManager;
-
-    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeHasher.class);
 }

@@ -48,6 +48,14 @@ import javax.portlet.PortletResponse;
 
 @Component(immediate = true, service = { DLPortletToolbarContributorContext.class })
 public class EditToolbarContributorContext implements DLPortletToolbarContributorContext {
+    private static final Log _log = LogFactoryUtil.getLog(EditToolbarContributorContext.class);
+
+    @Reference(target = "(model.class.name=com.liferay.document.library.kernel.model.DLFolder)")
+    private ModelResourcePermission<DLFolder> _dlFolderModelResourcePermission;
+    @Reference
+    private Language _language;
+    @Reference
+    private Portal _portal;
 
     public EditToolbarContributorContext() {
     }
@@ -122,16 +130,4 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 
         return _language.get(resourceBundle, key);
     }
-
-    private static final Log _log = LogFactoryUtil.getLog(EditToolbarContributorContext.class);
-
-    @Reference(target = "(model.class.name=com.liferay.document.library.kernel.model.DLFolder)")
-    private ModelResourcePermission<DLFolder> _dlFolderModelResourcePermission;
-
-    @Reference
-    private Language _language;
-
-    @Reference
-    private Portal _portal;
-
 }

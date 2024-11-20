@@ -43,9 +43,33 @@ import org.osgi.service.component.annotations.Reference;
     service = ConfigService.class
 )
 public class ConfigServiceImpl extends DefaultConfigService {
+    @Reference
+    private PermissionCheckerFactory _permissionFactory;
+    @Reference
+    private DLAppService _DLAppService;
 
     public ConfigServiceImpl() {
         super(null, null, null, null);
+    }
+
+    @Reference(service = SettingsManager.class, unbind = "-")
+    public void setSettingsManager(final SettingsManager settingsManager) {
+        super.setSettingsManager(settingsManager);
+    }
+
+    @Reference(service = DocumentManager.class, unbind = "-")
+    public void setDocumentManager(final DocumentManager documentManager) {
+        super.setDocumentManager(documentManager);
+    }
+
+    @Reference(service = JwtManager.class, unbind = "-")
+    public void setJwtManager(final JwtManager jwtManager) {
+        super.setJwtManager(jwtManager);
+    }
+
+    @Reference(service = UrlManager.class, unbind = "-")
+    public void setUrlManager(final UrlManager urlManager) {
+        super.setUrlManager(urlManager);
     }
 
     @Override
@@ -90,31 +114,5 @@ public class ConfigServiceImpl extends DefaultConfigService {
                 .id(String.valueOf(user.getUserId()))
                 .name(user.getFullName())
                 .build();
-    }
-
-    @Reference
-    private PermissionCheckerFactory _permissionFactory;
-
-    @Reference
-    private DLAppService _DLAppService;
-
-    @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(final SettingsManager settingsManager) {
-        super.setSettingsManager(settingsManager);
-    }
-
-    @Reference(service = DocumentManager.class, unbind = "-")
-    public void setDocumentManager(final DocumentManager documentManager) {
-        super.setDocumentManager(documentManager);
-    }
-
-    @Reference(service = JwtManager.class, unbind = "-")
-    public void setJwtManager(final JwtManager jwtManager) {
-        super.setJwtManager(jwtManager);
-    }
-
-    @Reference(service = UrlManager.class, unbind = "-")
-    public void setUrlManager(final UrlManager urlManager) {
-        super.setUrlManager(urlManager);
     }
 }

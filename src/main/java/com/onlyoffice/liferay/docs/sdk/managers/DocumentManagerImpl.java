@@ -32,9 +32,16 @@ import org.osgi.service.component.annotations.Reference;
     service = DocumentManager.class
 )
 public class DocumentManagerImpl extends DefaultDocumentManager {
+    @Reference
+    private OnlyOfficeUtils _OOUtils;
 
     public DocumentManagerImpl() {
         super(null);
+    }
+
+    @Reference(service = SettingsManager.class, unbind = "-")
+    public void setSettingsManager(final SettingsManager settingsManager) {
+        super.setSettingsManager(settingsManager);
     }
 
     @Override
@@ -83,13 +90,4 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
 
         return key;
     }
-
-    @Reference
-    private OnlyOfficeUtils _OOUtils;
-
-    @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(final SettingsManager settingsManager) {
-        super.setSettingsManager(settingsManager);
-    }
-
 }

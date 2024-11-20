@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Modified;
     service = SettingsManager.class
 )
 public class SettingsManagerImpl extends DefaultSettingsManager {
+    private OnlyOfficeConfiguration configuration;
 
     @Activate
     @Modified
@@ -66,6 +67,4 @@ public class SettingsManagerImpl extends DefaultSettingsManager {
     @Override
     public void setSetting(final String name, final String value) {
     }
-
-    private OnlyOfficeConfiguration configuration;
 }

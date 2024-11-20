@@ -44,6 +44,12 @@ import javax.portlet.RenderRequest;
     service = OnlyOfficeEditorUtils.class
 )
 public class OnlyOfficeEditorUtils {
+    @Reference
+    private PermissionCheckerFactory _permissionFactory;
+    @Reference
+    private DLAppService _DLAppService;
+    @Reference
+    private ConfigService _configService;
 
     public String getConfig(final Long fileEntryId, final RenderRequest req) {
         ObjectMapper mapper = new ObjectMapper();
@@ -118,14 +124,4 @@ public class OnlyOfficeEditorUtils {
             throw new RuntimeException(e);
         }
     }
-
-    @Reference
-    private PermissionCheckerFactory _permissionFactory;
-
-    @Reference
-    private DLAppService _DLAppService;
-
-    @Reference
-    private ConfigService _configService;
-
 }

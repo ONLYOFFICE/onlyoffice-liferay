@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 	service = Servlet.class
 )
 public class OnlyOfficeStatus extends HttpServlet {
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
@@ -47,6 +48,4 @@ public class OnlyOfficeStatus extends HttpServlet {
 		jsonObj.put("installed", true);
 		response.getWriter().write(jsonObj.toString());
 	}
-
-	private static final long serialVersionUID = 1L;
 }

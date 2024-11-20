@@ -44,6 +44,15 @@ import javax.servlet.http.HttpSession;
     service = Servlet.class
 )
 public class OnlyOfficeDesktopLogin extends HttpServlet {
+    public static final String DOCUMENT_LIBRARY_ADMIN =
+            "/group/guest/~/control_panel/manage?p_p_id=com_liferay_document_library_web_portlet_DLAdminPortlet";
+
+    private static final long serialVersionUID = 1L;
+
+    @Reference
+    private Portal _portal;
+    @Reference
+    private UserLocalService _userLocalService;
 
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
@@ -82,15 +91,4 @@ public class OnlyOfficeDesktopLogin extends HttpServlet {
                 exception, request, response);
         }
     }
-
-    private static final long serialVersionUID = 1L;
-
-    @Reference
-    private Portal _portal;
-
-    @Reference
-    private UserLocalService _userLocalService;
-
-    public static final String DOCUMENT_LIBRARY_ADMIN =
-            "/group/guest/~/control_panel/manage?p_p_id=com_liferay_document_library_web_portlet_DLAdminPortlet";
 }

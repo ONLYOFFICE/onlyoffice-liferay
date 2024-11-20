@@ -55,9 +55,29 @@ import java.util.List;
     service = CallbackService.class
 )
 public class CallbackServiceImpl extends DefaultCallbackService {
+    private static final Log _log = LogFactoryUtil.getLog(CallbackServiceImpl.class);
+
+    @Reference
+    private DLAppService _dlAppService;
+    @Reference
+    private DLAppLocalService _dlApp;
+    @Reference
+    private OnlyOfficeUtils _OOUtils;
+    @Reference
+    private UrlManager urlManager;
 
     public CallbackServiceImpl() {
         super(null, null);
+    }
+
+    @Reference(service = SettingsManager.class, unbind = "-")
+    public void setSettingsManager(final SettingsManager settingsManager) {
+        super.setSettingsManager(settingsManager);
+    }
+
+    @Reference(service = JwtManager.class, unbind = "-")
+    public void setJwtManager(final JwtManager jwtManager) {
+        super.setJwtManager(jwtManager);
     }
 
     public void handlerEditing(final Callback callback, final String fileId) throws Exception {
@@ -205,29 +225,5 @@ public class CallbackServiceImpl extends DefaultCallbackService {
 
         PrincipalThreadLocal.setName(userId);
         PermissionThreadLocal.setPermissionChecker(permissionChecker);
-    }
-
-    private static final Log _log = LogFactoryUtil.getLog(CallbackServiceImpl.class);
-
-    @Reference
-    private DLAppService _dlAppService;
-
-    @Reference
-    private DLAppLocalService _dlApp;
-
-    @Reference
-    private OnlyOfficeUtils _OOUtils;
-
-    @Reference
-    private UrlManager urlManager;
-
-    @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(final SettingsManager settingsManager) {
-        super.setSettingsManager(settingsManager);
-    }
-
-    @Reference(service = JwtManager.class, unbind = "-")
-    public void setJwtManager(final JwtManager jwtManager) {
-        super.setJwtManager(jwtManager);
     }
 }

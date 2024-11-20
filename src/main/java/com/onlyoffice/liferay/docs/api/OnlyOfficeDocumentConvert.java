@@ -63,6 +63,19 @@ import javax.servlet.http.HttpServletResponse;
     service = Servlet.class
 )
 public class OnlyOfficeDocumentConvert extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeDocumentConvert.class);
+
+    @Reference
+    private DLAppLocalService _dlApp;
+    @Reference
+    private ConvertService convertService;
+    @Reference
+    private RequestManager requestManager;
+    @Reference
+    private DocumentManager documentManger;
+    @Reference
+    private PermissionCheckerFactory _permissionFactory;
 
     @Override
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
@@ -161,24 +174,4 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
 
         _log.info("Document saved.");
     }
-
-    private static final long serialVersionUID = 1L;
-
-    @Reference
-    private DLAppLocalService _dlApp;
-
-    @Reference
-    ConvertService convertService;
-
-    @Reference
-    RequestManager requestManager;
-
-    @Reference
-    DocumentManager documentManger;
-
-    @Reference
-    private PermissionCheckerFactory _permissionFactory;
-
-    private static final Log _log = LogFactoryUtil.getLog(
-            OnlyOfficeDocumentConvert.class);
 }

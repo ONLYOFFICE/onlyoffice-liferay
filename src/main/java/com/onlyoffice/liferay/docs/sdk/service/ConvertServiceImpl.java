@@ -34,16 +34,14 @@ import org.osgi.service.component.annotations.Reference;
     service = ConvertService.class
 )
 public class ConvertServiceImpl extends DefaultConvertService implements ConvertService {
+    @Reference
+    private PermissionCheckerFactory _permissionFactory;
+    @Reference
+    private DLAppService _DLAppService;
 
     public ConvertServiceImpl() {
         super(null, null, null, null);
     }
-
-    @Reference
-    private PermissionCheckerFactory _permissionFactory;
-
-    @Reference
-    private DLAppService _DLAppService;
 
     @Reference(service = SettingsManager.class, unbind = "-")
     public void setSettingsManager(final SettingsManager settingsManager) {

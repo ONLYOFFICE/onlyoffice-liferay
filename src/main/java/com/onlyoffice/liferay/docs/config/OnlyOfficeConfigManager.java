@@ -32,6 +32,7 @@ import org.osgi.service.metatype.annotations.Designate;
     service = OnlyOfficeConfigManager.class
 )
 public class OnlyOfficeConfigManager {
+    private OnlyOfficeConfiguration configuration;
 
     public String getDocUrl() {
         return configuration.docServUrl();
@@ -69,6 +70,4 @@ public class OnlyOfficeConfigManager {
     protected void readConfig(final OnlyOfficeConfiguration config) {
         this.configuration = config;
     }
-
-    private OnlyOfficeConfiguration configuration;
 }

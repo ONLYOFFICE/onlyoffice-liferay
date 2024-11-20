@@ -43,6 +43,8 @@ import javax.servlet.http.HttpServletResponse;
 	service = {MVCRenderCommand.class}
 )
 public class CreateMVCRenderCommand implements MVCRenderCommand {
+	@Reference(target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)")
+	protected ServletContext servletContext;
 
 	@Override
 	public String render(final RenderRequest renderRequest, final RenderResponse renderResponse)
@@ -60,7 +62,4 @@ public class CreateMVCRenderCommand implements MVCRenderCommand {
 
 		return MVCRenderConstants.MVC_PATH_VALUE_SKIP_DISPATCH;
 	}
-
-	@Reference(target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)")
-	protected ServletContext servletContext;
 }

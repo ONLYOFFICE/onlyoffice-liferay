@@ -58,6 +58,19 @@ import javax.servlet.http.HttpServletResponse;
     service = Servlet.class
 )
 public class OnlyOfficeApi extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeApi.class);
+
+    @Reference
+    private OnlyOfficeParsingUtils _parsingUtils;
+    @Reference
+    private DLAppLocalService _dlApp;
+    @Reference
+    private RequestManager requestManager;
+    @Reference
+    private UrlManager urlManager;
+
     @Override
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
             throws IOException, ServletException {
@@ -155,20 +168,4 @@ public class OnlyOfficeApi extends HttpServlet {
             }
         }
     }
-
-    private static final long serialVersionUID = 1L;
-
-    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeApi.class);
-
-    @Reference
-    private OnlyOfficeParsingUtils _parsingUtils;
-
-    @Reference
-    private DLAppLocalService _dlApp;
-
-    @Reference
-    private RequestManager requestManager;
-
-    @Reference
-    private UrlManager urlManager;
 }

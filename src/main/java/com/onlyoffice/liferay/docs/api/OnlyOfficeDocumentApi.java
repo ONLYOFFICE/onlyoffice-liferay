@@ -51,6 +51,19 @@ import javax.servlet.http.HttpServletResponse;
     service = Servlet.class
 )
 public class OnlyOfficeDocumentApi extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeDocumentApi.class);
+
+    @Reference
+    private OnlyOfficeHasher _hasher;
+    @Reference
+    private OnlyOfficeParsingUtils _parsingUtils;
+    @Reference
+    private SettingsManager settingsManager;
+    @Reference
+    private CallbackService callbackService;
+
 
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
@@ -119,20 +132,4 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
-
-    private static final long serialVersionUID = 1L;
-
-    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeDocumentApi.class);
-
-    @Reference
-    private OnlyOfficeHasher _hasher;
-
-    @Reference
-    private OnlyOfficeParsingUtils _parsingUtils;
-
-    @Reference
-    private SettingsManager settingsManager;
-
-    @Reference
-    private CallbackService callbackService;
 }

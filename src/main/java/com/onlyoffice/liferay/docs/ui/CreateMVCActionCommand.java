@@ -58,6 +58,12 @@ import javax.portlet.ActionResponse;
 	service = {MVCActionCommand.class}
 )
 public class CreateMVCActionCommand extends BaseMVCActionCommand {
+	private static final Log _log = LogFactoryUtil.getLog(CreateMVCActionCommand.class);
+
+	@Reference
+	private DLAppService _dlAppService;
+	@Reference
+	private DocumentManager documentManager;
 
 	@Override
 	protected void doProcessAction(final ActionRequest actionRequest, final ActionResponse actionResponse)
@@ -107,12 +113,4 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 			streamSourceFile.close();
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(CreateMVCActionCommand.class);
-
-	@Reference
-	private DLAppService _dlAppService;
-
-	@Reference
-	private DocumentManager documentManager;
 }

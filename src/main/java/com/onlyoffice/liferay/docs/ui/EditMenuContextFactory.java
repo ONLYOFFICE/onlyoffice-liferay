@@ -34,8 +34,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component(immediate = true, service = DLDisplayContextFactory.class)
-public class EditMenuContextFactory
-    implements DLDisplayContextFactory {
+public class EditMenuContextFactory implements DLDisplayContextFactory {
+    @Reference
+    private DocumentManager documentManager;
+    @Reference
+    private PermissionCheckerFactory _permissionFactory;
 
     public DLEditFileEntryDisplayContext getDLEditFileEntryDisplayContext(
             final DLEditFileEntryDisplayContext parentDLEditFileEntryDisplayContext,
@@ -71,10 +74,4 @@ public class EditMenuContextFactory
             parentDLViewFileVersionDisplayContext, httpServletRequest,
             httpServletResponse, fileVersion, documentManager, _permissionFactory);
     }
-
-    @Reference
-    private DocumentManager documentManager;
-
-    @Reference
-    private PermissionCheckerFactory _permissionFactory;
 }
