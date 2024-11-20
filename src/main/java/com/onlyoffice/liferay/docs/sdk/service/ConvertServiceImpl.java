@@ -46,26 +46,22 @@ public class ConvertServiceImpl extends DefaultConvertService implements Convert
     private DLAppService _DLAppService;
 
     @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(
-            SettingsManager settingsManager) {
+    public void setSettingsManager(final SettingsManager settingsManager) {
         super.setSettingsManager(settingsManager);
     }
 
     @Reference(service = DocumentManager.class, unbind = "-")
-    public void setDocumentManager(
-            DocumentManager documentManager) {
+    public void setDocumentManager(final DocumentManager documentManager) {
         super.setDocumentManager(documentManager);
     }
 
     @Reference(service = RequestManager.class, unbind = "-")
-    public void setRequestManager(
-            RequestManager requestManager) {
+    public void setRequestManager(final RequestManager requestManager) {
         super.setRequestManager(requestManager);
     }
 
     @Reference(service = UrlManager.class, unbind = "-")
-    public void setUrlManager(
-            UrlManager urlManager) {
+    public void setUrlManager(final UrlManager urlManager) {
         super.setUrlManager(urlManager);
     }
 }

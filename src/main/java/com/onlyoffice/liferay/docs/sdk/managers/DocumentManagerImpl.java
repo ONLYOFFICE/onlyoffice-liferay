@@ -38,7 +38,7 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
     }
 
     @Override
-    public String getDocumentKey(String fileId, boolean embedded) {
+    public String getDocumentKey(final String fileId, final boolean embedded) {
         try {
             FileVersion fileVersion = DLAppLocalServiceUtil.getFileVersion(Long.parseLong(fileId));
 
@@ -61,7 +61,7 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
     }
 
     @Override
-    public String getDocumentName(String fileId) {
+    public String getDocumentName(final String fileId) {
         FileVersion fileVersion;
         try {
             fileVersion = DLAppLocalServiceUtil.getFileVersion(Long.parseLong(fileId));
@@ -74,7 +74,7 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
         return fileVersion.getFileName();
     }
 
-    private String createDocKey(FileVersion fileVersion, boolean versionSpecific) throws PortalException {
+    private String createDocKey(final FileVersion fileVersion, final boolean versionSpecific) throws PortalException {
         String key = fileVersion.getFileEntry().getUuid() + "_" + fileVersion.getVersion().hashCode();
 
         if (versionSpecific) {
@@ -88,8 +88,7 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
     private OnlyOfficeUtils _OOUtils;
 
     @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(
-            SettingsManager settingsManager) {
+    public void setSettingsManager(final SettingsManager settingsManager) {
         super.setSettingsManager(settingsManager);
     }
 

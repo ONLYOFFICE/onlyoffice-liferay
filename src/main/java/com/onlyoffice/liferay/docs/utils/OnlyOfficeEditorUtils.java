@@ -45,7 +45,7 @@ import javax.portlet.RenderRequest;
 )
 public class OnlyOfficeEditorUtils {
 
-    public String getConfig(Long fileEntryId, RenderRequest req) {
+    public String getConfig(final Long fileEntryId, final RenderRequest req) {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
@@ -70,7 +70,7 @@ public class OnlyOfficeEditorUtils {
         }
     }
 
-    public String getConfigPreview(Long fileEntryId, String version, RenderRequest req) {
+    public String getConfigPreview(final Long fileEntryId, final String version, final RenderRequest req) {
         ObjectMapper mapper = new ObjectMapper();
 
         try {

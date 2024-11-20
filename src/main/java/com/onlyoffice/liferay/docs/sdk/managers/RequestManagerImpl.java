@@ -36,20 +36,17 @@ public class RequestManagerImpl extends DefaultRequestManager {
     }
 
     @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(
-            SettingsManager settingsManager) {
+    public void setSettingsManager(final SettingsManager settingsManager) {
         super.setSettingsManager(settingsManager);
     }
 
     @Reference(service = JwtManager.class, unbind = "-")
-    public void setJwtManager(
-            JwtManager jwtManager) {
+    public void setJwtManager(final JwtManager jwtManager) {
         super.setJwtManager(jwtManager);
     }
 
     @Reference(service = UrlManager.class, unbind = "-")
-    public void setUrlManager(
-            UrlManager urlManager) {
+    public void setUrlManager(final UrlManager urlManager) {
         super.setUrlManager(urlManager);
     }
 }

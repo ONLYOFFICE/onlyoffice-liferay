@@ -53,9 +53,8 @@ import javax.servlet.http.HttpServletResponse;
 public class OnlyOfficeDocumentApi extends HttpServlet {
 
     @Override
-    protected void doGet(
-            HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException {
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
+            throws IOException, ServletException {
 
         String key = ParamUtil.getString(request, "key");
         Long fileVersionId = _hasher.validate(key);
@@ -75,9 +74,8 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
     }
 
     @Override
-    protected void doPost(
-            HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException {
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
+            throws IOException, ServletException {
 
         String error = null;
 

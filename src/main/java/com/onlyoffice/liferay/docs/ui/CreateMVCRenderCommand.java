@@ -45,7 +45,8 @@ import javax.servlet.http.HttpServletResponse;
 public class CreateMVCRenderCommand implements MVCRenderCommand {
 
 	@Override
-	public String render(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException {
+	public String render(final RenderRequest renderRequest, final RenderResponse renderResponse)
+			throws PortletException {
 		RequestDispatcher requestDispatcher = this.servletContext.getRequestDispatcher("/create.jsp");
 
 		try {

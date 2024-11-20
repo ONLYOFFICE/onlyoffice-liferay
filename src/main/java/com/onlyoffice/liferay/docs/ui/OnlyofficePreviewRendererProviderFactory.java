@@ -59,7 +59,7 @@ public class OnlyofficePreviewRendererProviderFactory {
     }
 
     @Activate
-    protected void activate(BundleContext bundleContext) {
+    protected void activate(final BundleContext bundleContext) {
         Dictionary<String, Object> properties = new HashMapDictionary<>();
 
         properties.put("service.ranking", 100);

@@ -52,8 +52,9 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 	public EditToolbarContributorContext() {
 	}
 
-	public void updatePortletTitleMenuItems(List<MenuItem> menuItems, Folder folder, ThemeDisplay themeDisplay,
-			PortletRequest portletRequest, PortletResponse portletResponse) {
+	public void updatePortletTitleMenuItems(final List<MenuItem> menuItems, final Folder folder,
+											final ThemeDisplay themeDisplay, final PortletRequest portletRequest,
+											final PortletResponse portletResponse) {
 		try {
 			long folderId = folder != null ? folder.getFolderId() : 0L;
 			Boolean hasPermission = ModelResourcePermissionHelper.contains(_dlFolderModelResourcePermission,
@@ -88,7 +89,8 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 		}
 	}
 
-	protected URLMenuItem getNewMenuItem(String key, String labelMenu, String icon, String url) throws PortalException {
+	protected URLMenuItem getNewMenuItem(final String key, final String labelMenu, final String icon,
+										 final String url) throws PortalException {
 		URLMenuItem menuItem = new URLMenuItem();
 		menuItem.setKey(key);
 		menuItem.setLabel(labelMenu);
@@ -97,10 +99,11 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 		return menuItem;
 	}
 	
-	private String _translate(PortletRequest portletRequest, String key) {
+	private String _translate(final PortletRequest portletRequest, final String key) {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			_portal.getLocale(portletRequest),
-			EditToolbarContributorContext.class);
+			EditToolbarContributorContext.class
+		);
 
 		return _language.get(resourceBundle, key);
 	}

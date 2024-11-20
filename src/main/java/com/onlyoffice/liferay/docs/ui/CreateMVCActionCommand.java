@@ -60,7 +60,8 @@ import javax.portlet.ActionResponse;
 public class CreateMVCActionCommand extends BaseMVCActionCommand {
 
 	@Override
-	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
+	protected void doProcessAction(final ActionRequest actionRequest, final ActionResponse actionResponse)
+			throws Exception {
 		long folderId = ParamUtil.getLong(actionRequest, "folderId");
 		String type = ParamUtil.getString(actionRequest, "type");
 		String title = ParamUtil.getString(actionRequest, "title");	

@@ -59,7 +59,7 @@ import javax.servlet.http.HttpServletResponse;
 )
 public class OnlyOfficeApi extends HttpServlet {
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
             throws IOException, ServletException {
 
         String type = request.getParameter("type");
@@ -78,7 +78,7 @@ public class OnlyOfficeApi extends HttpServlet {
             }
     }
 
-    private void saveAs (HttpServletRequest request, HttpServletResponse response) throws IOException { 
+    private void saveAs (final HttpServletRequest request, final HttpServletResponse response) throws IOException {
         User user;
 
         try {

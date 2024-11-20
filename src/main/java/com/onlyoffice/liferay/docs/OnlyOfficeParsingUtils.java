@@ -29,7 +29,7 @@ import java.util.Scanner;
 )
 public class OnlyOfficeParsingUtils {
 
-    public String getBody(InputStream stream) {
+    public String getBody(final InputStream stream) {
         Scanner scanner = null;
         Scanner scannerUseDelimiter = null;
         try {

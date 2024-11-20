@@ -38,34 +38,33 @@ public class EditMenuContextFactory
     implements DLDisplayContextFactory {
 
     public DLEditFileEntryDisplayContext getDLEditFileEntryDisplayContext(
-        DLEditFileEntryDisplayContext parentDLEditFileEntryDisplayContext,
-        HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse,
-        DLFileEntryType dlFileEntryType) {
+            final DLEditFileEntryDisplayContext parentDLEditFileEntryDisplayContext,
+            final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse,
+            final DLFileEntryType dlFileEntryType) {
 
         return parentDLEditFileEntryDisplayContext;
     }
 
     public DLEditFileEntryDisplayContext getDLEditFileEntryDisplayContext(
-        DLEditFileEntryDisplayContext parentDLEditFileEntryDisplayContext,
-        HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse, FileEntry fileEntry) {
+            final DLEditFileEntryDisplayContext parentDLEditFileEntryDisplayContext,
+            final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse,
+            final FileEntry fileEntry) {
 
         return parentDLEditFileEntryDisplayContext;
     }
 
     public DLViewFileVersionDisplayContext getDLViewFileVersionDisplayContext(
-        DLViewFileVersionDisplayContext parentDLViewFileVersionDisplayContext,
-        HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse, FileShortcut fileShortcut) {
+            final DLViewFileVersionDisplayContext parentDLViewFileVersionDisplayContext,
+            final HttpServletRequest httpServletRequest,final HttpServletResponse httpServletResponse,
+            final FileShortcut fileShortcut) {
 
         return parentDLViewFileVersionDisplayContext;
     }
 
     public DLViewFileVersionDisplayContext getDLViewFileVersionDisplayContext(
-        DLViewFileVersionDisplayContext parentDLViewFileVersionDisplayContext,
-        HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse, FileVersion fileVersion) {
+            final DLViewFileVersionDisplayContext parentDLViewFileVersionDisplayContext,
+            final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse,
+            final FileVersion fileVersion) {
 
         return new EditMenuContext(
             parentDLViewFileVersionDisplayContext.getUuid(),

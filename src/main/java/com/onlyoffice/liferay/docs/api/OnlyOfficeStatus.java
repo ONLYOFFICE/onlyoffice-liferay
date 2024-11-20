@@ -40,8 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 public class OnlyOfficeStatus extends HttpServlet {
 
 	@Override
-	protected void doGet(
-			HttpServletRequest request, HttpServletResponse response)
+	protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
 		throws IOException, ServletException {
 
 		JSONObject jsonObj = JSONFactoryUtil.createJSONObject();

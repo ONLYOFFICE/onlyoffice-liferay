@@ -37,12 +37,12 @@ public class SettingsManagerImpl extends DefaultSettingsManager {
 
     @Activate
     @Modified
-    protected void readConfig(OnlyOfficeConfiguration config) {
+    protected void readConfig(final OnlyOfficeConfiguration config) {
         this.configuration = config;
     }
 
     @Override
-    public String getSetting(String name) {
+    public String getSetting(final String name) {
         switch(name) {
             case SettingsConstants.URL:
                 return configuration.docServUrl();
@@ -64,7 +64,7 @@ public class SettingsManagerImpl extends DefaultSettingsManager {
     }
 
     @Override
-    public void setSetting(String name, String value) {
+    public void setSetting(final String name, final String value) {
     }
 
     private OnlyOfficeConfiguration configuration;

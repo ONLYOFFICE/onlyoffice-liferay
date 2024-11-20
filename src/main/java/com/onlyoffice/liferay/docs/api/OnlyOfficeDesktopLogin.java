@@ -46,9 +46,8 @@ import javax.servlet.http.HttpSession;
 public class OnlyOfficeDesktopLogin extends HttpServlet {
 
     @Override
-    protected void doGet(
-        HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException {
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
+            throws IOException, ServletException {
 
         try {
             HttpSession httpSession = request.getSession();

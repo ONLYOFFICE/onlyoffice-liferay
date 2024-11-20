@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = {})
 public class OnlyOfficePermissionUtils {
 
-    public static boolean saveAs(FileEntry file, User user) throws PortalException {
+    public static boolean saveAs(final FileEntry file, final User user) throws PortalException {
         PermissionChecker checker = PermissionCheckerFactoryUtil.create(user); 
 
         return file.containsPermission(checker, ActionKeys.VIEW) &&
@@ -46,7 +46,7 @@ public class OnlyOfficePermissionUtils {
         target = "(model.class.name=com.liferay.portal.kernel.repository.model.Folder)",
         unbind = "-"
     )
-    protected void setFolderModelResourcePermission(ModelResourcePermission<Folder> modelResourcePermission) {
+    protected void setFolderModelResourcePermission(final ModelResourcePermission<Folder> modelResourcePermission) {
         _folderModelResourcePermission = modelResourcePermission;
     }
 

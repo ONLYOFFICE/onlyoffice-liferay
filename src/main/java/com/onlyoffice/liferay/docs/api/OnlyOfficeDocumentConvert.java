@@ -65,7 +65,7 @@ import javax.servlet.http.HttpServletResponse;
 public class OnlyOfficeDocumentConvert extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
         User user;
 
         try {
@@ -121,7 +121,8 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
     }
 
 
-    private void savefile(HttpServletRequest request, FileEntry fileEntry, String url, String filename) throws Exception {
+    private void savefile(final HttpServletRequest request, final FileEntry fileEntry, final String url,
+                          final String filename) throws Exception {
         User user = PortalUtil.getUser(request);
 
         _log.info("Trying to download file from URL: " + url);

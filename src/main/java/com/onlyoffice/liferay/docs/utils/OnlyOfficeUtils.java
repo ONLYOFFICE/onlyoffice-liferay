@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Component;
     service = OnlyOfficeUtils.class
 )
 public class OnlyOfficeUtils {
-    public void setCollaborativeEditingKey(FileEntry fileEntry, String key) throws PortalException {
+    public void setCollaborativeEditingKey(final FileEntry fileEntry, final String key) throws PortalException {
         ExpandoBridge expandoBridge = fileEntry.getExpandoBridge();
 
         if (!expandoBridge.hasAttribute("onlyoffice-collaborative-editor-key")) {
@@ -47,7 +47,7 @@ public class OnlyOfficeUtils {
         }
     }
 
-    public String getCollaborativeEditingKey(FileEntry fileEntry) throws PortalException {
+    public String getCollaborativeEditingKey(final FileEntry fileEntry) throws PortalException {
         ExpandoBridge expandoBridge = fileEntry.getExpandoBridge();
 
         if (expandoBridge.hasAttribute("onlyoffice-collaborative-editor-key")) {

@@ -31,7 +31,7 @@ import java.util.Base64;
     service = OnlyOfficeHasher.class
 )
 public class OnlyOfficeHasher {
-    public String getHash(Long id) {
+    public String getHash(final Long id) {
         try {
             String str = Long.toString(id);
 
@@ -43,7 +43,7 @@ public class OnlyOfficeHasher {
         return "";
     }
 
-    public Long validate(String base64) {
+    public Long validate(final String base64) {
         try {
             String payload = new String(Base64.getUrlDecoder().decode(base64), "UTF-8");
 
@@ -63,7 +63,7 @@ public class OnlyOfficeHasher {
         return settingsManager.getSecurityKey();
     }
 
-    private String getHashString(String str) {
+    private String getHashString(final String str) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] digest = md.digest(str.getBytes());

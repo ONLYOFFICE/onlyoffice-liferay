@@ -38,8 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 public class DesktopJSDynamicInclude extends BaseDynamicInclude {
 
 	@Override
-	public void include(
-		HttpServletRequest request, HttpServletResponse response, String key)
+	public void include(final HttpServletRequest request, final HttpServletResponse response, final String key)
 		throws IOException {
 
 		String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
@@ -62,7 +61,7 @@ public class DesktopJSDynamicInclude extends BaseDynamicInclude {
 	}
 
 	@Override
-	public void register(DynamicIncludeRegistry dynamicIncludeRegistry) {
+	public void register(final DynamicIncludeRegistry dynamicIncludeRegistry) {
 		dynamicIncludeRegistry.register(
 			"/html/common/themes/top_head.jsp#post"
 		);

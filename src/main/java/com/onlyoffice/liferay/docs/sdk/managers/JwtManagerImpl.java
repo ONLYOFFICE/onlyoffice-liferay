@@ -35,8 +35,7 @@ public class JwtManagerImpl extends DefaultJwtManager {
     }
 
     @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(
-            SettingsManager settingsManager) {
+    public void setSettingsManager(final SettingsManager settingsManager) {
         super.setSettingsManager(settingsManager);
     }
 }

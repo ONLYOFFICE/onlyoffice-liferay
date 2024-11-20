@@ -32,13 +32,14 @@ import javax.servlet.ServletContext;
 
 public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvider {
 
-    public OnlyofficePreviewRendererProvider(ServletContext servletContext, SettingsManager settingsManager) {
+    public OnlyofficePreviewRendererProvider(final ServletContext servletContext,
+                                             final SettingsManager settingsManager) {
         _servletContext = servletContext;
         _settingsManager = settingsManager;
     }
 
     @Override
-    public Optional<DLPreviewRenderer> getPreviewDLPreviewRendererOptional(FileVersion fileVersion) {
+    public Optional<DLPreviewRenderer> getPreviewDLPreviewRendererOptional(final FileVersion fileVersion) {
         if (!_settingsManager.getSettingBoolean("preview", false)) {
             return Optional.empty();
         }
@@ -57,7 +58,7 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
     }
 
     @Override
-    public Optional<DLPreviewRenderer> getThumbnailDLPreviewRendererOptional(FileVersion fileVersion) {
+    public Optional<DLPreviewRenderer> getThumbnailDLPreviewRendererOptional(final FileVersion fileVersion) {
         // TODO Auto-generated method stub
         return Optional.empty();
     }

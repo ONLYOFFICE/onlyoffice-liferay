@@ -66,11 +66,10 @@ import javax.servlet.http.HttpServletResponse;
 public class EditMenuContext
 extends BaseDLViewFileVersionDisplayContext {
 
-    public EditMenuContext(
-        UUID uuid, DLViewFileVersionDisplayContext parentDLDisplayContext,
-        HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse, FileVersion fileVersion, DocumentManager documentManager,
-        PermissionCheckerFactory permissionFactory) {
+    public EditMenuContext(final UUID uuid, final DLViewFileVersionDisplayContext parentDLDisplayContext,
+                           final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse,
+                           final FileVersion fileVersion, final DocumentManager documentManager,
+                           final PermissionCheckerFactory permissionFactory) {
 
         super(
             uuid, parentDLDisplayContext, httpServletRequest,
@@ -140,7 +139,7 @@ extends BaseDLViewFileVersionDisplayContext {
         return toolbarItems;
     }
 
-    private void InitViewItem(URLUIItem item) {
+    private void InitViewItem(final URLUIItem item) {
         String labelKey = "onlyoffice-context-action-view";
 
         if (_canEdit) {
@@ -154,7 +153,7 @@ extends BaseDLViewFileVersionDisplayContext {
         item.setURL(getDocUrl());
     }
 
-    private void InitConvertItem(JavaScriptUIItem item) {
+    private void InitConvertItem(final JavaScriptUIItem item) {
         String lang = null;
         if (_isMasterForm) {
             lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-create-form");

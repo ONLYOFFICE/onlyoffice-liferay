@@ -50,12 +50,12 @@ public class UrlManagerImpl extends DefaultUrlManager {
     }
 
     @Override
-    public String getFileUrl(String fileId) {
+    public String getFileUrl(final String fileId) {
         return getLiferayBaseUrl(false) + "/o/onlyoffice/doc?key=" + _hasher.getHash(Long.parseLong(fileId));
     }
 
     @Override
-    public String getCallbackUrl(String fileId) {
+    public String getCallbackUrl(final String fileId) {
         FileVersion fileVersion;
         Long fileEntryId;
 
@@ -72,7 +72,7 @@ public class UrlManagerImpl extends DefaultUrlManager {
     }
 
     @Override
-    public String getGobackUrl(String fileId) {
+    public String getGobackUrl(final String fileId) {
         ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
         FileVersion fileVersion;
@@ -104,7 +104,7 @@ public class UrlManagerImpl extends DefaultUrlManager {
         return portletURL.toString();
     }
 
-    private String getLiferayBaseUrl(Boolean inner) {
+    private String getLiferayBaseUrl(final Boolean inner) {
         ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
         String productInnerUrl = getSettingsManager().getSetting(SettingsConstants.PRODUCT_INNER_URL);
@@ -123,8 +123,7 @@ public class UrlManagerImpl extends DefaultUrlManager {
     private DLAppService _DLAppService;
 
     @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(
-            SettingsManager settingsManager) {
+    public void setSettingsManager(final SettingsManager settingsManager) {
         super.setSettingsManager(settingsManager);
     }
 }

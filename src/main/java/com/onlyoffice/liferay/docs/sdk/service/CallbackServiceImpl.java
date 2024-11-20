@@ -159,8 +159,9 @@ public class CallbackServiceImpl extends DefaultCallbackService {
         }
     }
 
-    private void updateFile(FileEntry fileEntry, Long userId, String url, DLVersionNumberIncrease dlVersionNumberIncrease,
-        ServiceContext serviceContext) throws Exception {
+    private void updateFile(final FileEntry fileEntry, final  Long userId, final String url,
+                            final DLVersionNumberIncrease dlVersionNumberIncrease, final ServiceContext serviceContext)
+            throws Exception {
         _log.info("Trying to download file from URL: " + url);
 
         try {
@@ -179,7 +180,8 @@ public class CallbackServiceImpl extends DefaultCallbackService {
         }
     }
 
-    private void checkLockFileEntry(FileEntry fileEntry, Long userId, ServiceContext serviceContext) throws PortalException {
+    private void checkLockFileEntry(final FileEntry fileEntry, final Long userId, final ServiceContext serviceContext)
+            throws PortalException {
         if (fileEntry.isCheckedOut() && userId.longValue() != fileEntry.getLock().getUserId()) {
             setUserThreadLocal(fileEntry.getLock().getUserId());
             _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
@@ -190,7 +192,7 @@ public class CallbackServiceImpl extends DefaultCallbackService {
         }
     }
 
-    private void setUserThreadLocal (Long userId) throws PortalException {
+    private void setUserThreadLocal(final Long userId) throws PortalException {
         User user = UserLocalServiceUtil.getUser(userId);
 
         PermissionChecker permissionChecker;
@@ -215,14 +217,12 @@ public class CallbackServiceImpl extends DefaultCallbackService {
     private UrlManager urlManager;
 
     @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(
-            SettingsManager settingsManager) {
+    public void setSettingsManager(final SettingsManager settingsManager) {
         super.setSettingsManager(settingsManager);
     }
 
     @Reference(service = JwtManager.class, unbind = "-")
-    public void setJwtManager(
-            JwtManager jwtManager) {
+    public void setJwtManager(final JwtManager jwtManager) {
         super.setJwtManager(jwtManager);
     }
 }

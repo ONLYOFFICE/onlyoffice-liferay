@@ -42,7 +42,7 @@ public class OnlyOfficeConfigManager {
         return url == null || url.isEmpty() ? getDocUrl() : url;
     }
 
-    public String getLiferayUrlOrDefault(String def) {
+    public String getLiferayUrlOrDefault(final String def) {
         String url = configuration.liferayUrl();
         return url == null || url.isEmpty() ? def : url;
     }
@@ -66,7 +66,7 @@ public class OnlyOfficeConfigManager {
 
     @Activate
     @Modified
-    protected void readConfig(OnlyOfficeConfiguration config) {
+    protected void readConfig(final OnlyOfficeConfiguration config) {
         this.configuration = config;
     }
 
