@@ -32,14 +32,14 @@ import org.osgi.service.component.annotations.Reference;
 
 @Component(immediate = true, service = {})
 public class OnlyOfficePermissionUtils {
-    private static ModelResourcePermission<Folder> _folderModelResourcePermission;
+    private static ModelResourcePermission<Folder> folderModelResourcePermission;
 
     public static boolean saveAs(final FileEntry file, final User user) throws PortalException {
         PermissionChecker checker = PermissionCheckerFactoryUtil.create(user);
 
         return file.containsPermission(checker, ActionKeys.VIEW) &&
                 ModelResourcePermissionHelper.contains(
-                        _folderModelResourcePermission, checker, file.getGroupId(),
+                        folderModelResourcePermission, checker, file.getGroupId(),
                         file.getFolderId(), ActionKeys.ADD_DOCUMENT);
     }
 
@@ -48,6 +48,6 @@ public class OnlyOfficePermissionUtils {
         unbind = "-"
     )
     protected void setFolderModelResourcePermission(final ModelResourcePermission<Folder> modelResourcePermission) {
-        _folderModelResourcePermission = modelResourcePermission;
+        folderModelResourcePermission = modelResourcePermission;
     }
 }
