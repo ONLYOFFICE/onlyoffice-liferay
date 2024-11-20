@@ -78,7 +78,7 @@ public class OnlyOfficeApi extends HttpServlet {
             }
     }
 
-    private void saveAs (final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    private void saveAs(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
         User user;
 
         try {
