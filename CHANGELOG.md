@@ -1,5 +1,15 @@
 # Change Log
 
+##
+## Added
+- shardkey parameter
+
+## Changed
+- com.onlyofficce:docs-integration-sdk:1.3.0
+- address of the convert service, /converter instead /ConvertService.ashx
+- default token lifetime is 5 minutes
+- default empty file templates
+
 ## 2.4.0
 ## Added
 - compatible with Liferay CE 7.4 GA44 - GA73

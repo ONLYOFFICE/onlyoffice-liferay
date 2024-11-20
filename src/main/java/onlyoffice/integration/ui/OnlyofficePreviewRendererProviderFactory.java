@@ -20,6 +20,7 @@ package onlyoffice.integration.ui;
 
 import com.liferay.document.library.preview.DLPreviewRendererProvider;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.onlyoffice.manager.settings.SettingsManager;
 
 import java.util.Arrays;
 import java.util.Dictionary;
@@ -34,8 +35,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-
-import onlyoffice.integration.config.OnlyOfficeConfigManager;
 
 @Component(
         immediate = true, service = OnlyofficePreviewRendererProviderFactory.class
@@ -71,7 +70,7 @@ public class OnlyofficePreviewRendererProviderFactory {
         _dlPreviewRendererProviderServiceRegistration =
             bundleContext.registerService(
                 DLPreviewRendererProvider.class,
-                new OnlyofficePreviewRendererProvider(_servletContext, onlyOfficeConfigManager),
+                new OnlyofficePreviewRendererProvider(_servletContext, settingsManager),
                 properties
             );
     }
@@ -85,7 +84,7 @@ public class OnlyofficePreviewRendererProviderFactory {
     _dlPreviewRendererProviderServiceRegistration;
 
     @Reference
-    private OnlyOfficeConfigManager onlyOfficeConfigManager;
+    private SettingsManager settingsManager;
 
     @Reference(
         target = "(osgi.web.symbolicname=onlyoffice.integration.web)"

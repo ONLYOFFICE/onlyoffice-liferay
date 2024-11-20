@@ -16,6 +16,7 @@
  *
  --%>
 
+<%@page import="com.liferay.portal.kernel.util.PortalUtil"%>
 <%@page import="java.util.Date"%>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
@@ -37,28 +38,26 @@
 <%@ page import="org.osgi.framework.BundleContext" %>
 <%@ page import="org.osgi.framework.FrameworkUtil" %>
 
-<%@ page import="onlyoffice.integration.OnlyOfficeUtils" %>
-<%@ page import="onlyoffice.integration.OnlyOfficeConvertUtils" %>
+<%@ page import="com.onlyoffice.manager.document.DocumentManager" %>
 
 <portlet:defineObjects />
 
 <%
-	BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeUtils.class).getBundleContext();
+	BundleContext bc = FrameworkUtil.getBundle(DocumentManager.class).getBundleContext();
 
 	Long fileEntryId = ParamUtil.getLong(renderRequest, "fileId");
 	FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
-	OnlyOfficeUtils utils = bc.getService(bc.getServiceReference(OnlyOfficeUtils.class));
-	OnlyOfficeConvertUtils convertUtils = bc.getService(bc.getServiceReference(OnlyOfficeConvertUtils.class));
+	DocumentManager documentManger = bc.getService(bc.getServiceReference(DocumentManager.class));
 
 	String originalFileName = fileEntry.getFileName();
-	String newFileName = originalFileName.substring(0, originalFileName.lastIndexOf('.')) + "." + convertUtils.convertsTo(fileEntry.getExtension()); 
+	String newFileName = originalFileName.substring(0, originalFileName.lastIndexOf('.')) + "." + documentManger.getDefaultConvertExtension(fileEntry.getFileName()); 
 	
 	String convertText = String.format(LanguageUtil.get(request, "onlyoffice-convert-process"),
 			"<b>" + originalFileName + "</b>", "<b>" + newFileName + "</b>");
 	String doneText = LanguageUtil.get(request, "onlyoffice-convert-done");
 	String errorText = LanguageUtil.get(request, "onlyoffice-convert-error");
 
-	String apiurl = convertUtils.getConvertUrl(request) + "?key=" + Long.toString(new Date().getTime())
+	String apiurl = PortalUtil.getPortalURL(request) + "/o/onlyoffice/convert?key=" + Long.toString(new Date().getTime())
 		+ "&fileId=" + Long.toString(fileEntryId)
 		+ "&fileName=" + newFileName;
 	

@@ -24,24 +24,23 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.onlyoffice.manager.settings.SettingsManager;
 
 import java.util.Optional;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 
-import onlyoffice.integration.config.OnlyOfficeConfigManager;
-
 public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvider {
 
-    public OnlyofficePreviewRendererProvider(ServletContext servletContext, OnlyOfficeConfigManager onlyOfficeConfigManager) {
+    public OnlyofficePreviewRendererProvider(ServletContext servletContext, SettingsManager settingsManager) {
         _servletContext = servletContext;
-        _config = onlyOfficeConfigManager;
+        _settingsManager = settingsManager;
     }
 
     @Override
     public Optional<DLPreviewRenderer> getPreviewDLPreviewRendererOptional(FileVersion fileVersion) {
-        if (!_config.webPreview()) {
+        if (!_settingsManager.getSettingBoolean("preview", false)) {
             return Optional.empty();
         }
 
@@ -64,7 +63,8 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
         return Optional.empty();
     }
 
-    private OnlyOfficeConfigManager _config;
+    private final SettingsManager _settingsManager;
+    
     private final ServletContext _servletContext;
 
     private static final Log _log = LogFactoryUtil.getLog(OnlyofficePreviewRendererProvider.class);

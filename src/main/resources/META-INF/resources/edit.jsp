@@ -33,20 +33,22 @@
 <%@ page import="org.osgi.framework.BundleContext" %>
 <%@ page import="org.osgi.framework.FrameworkUtil" %>
 
-<%@ page import="onlyoffice.integration.OnlyOfficeUtils" %>
+<%@ page import="onlyoffice.integration.utils.OnlyOfficeEditorUtils" %>
 <%@ page import="onlyoffice.integration.permission.OnlyOfficePermissionUtils" %>
+<%@ page import="com.onlyoffice.manager.url.UrlManager" %>
 
 <liferay-theme:defineObjects />
 
 <portlet:defineObjects />
 
 <%
-    BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeUtils.class).getBundleContext();
+    BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeEditorUtils.class).getBundleContext();
     ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(locale, getClass());
 
     Long fileEntryId = ParamUtil.getLong(renderRequest, "fileId");
     FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
-    OnlyOfficeUtils utils = bc.getService(bc.getServiceReference(OnlyOfficeUtils.class));
+    OnlyOfficeEditorUtils editorUtils = bc.getService(bc.getServiceReference(OnlyOfficeEditorUtils.class));
+    UrlManager urlManger = bc.getService(bc.getServiceReference(UrlManager.class));
 %>
 
 <html>
@@ -54,7 +56,7 @@
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
     <title><%= fileEntry.getFileName() %> - <%= LanguageUtil.get(resourceBundle, "onlyoffice-edit-title") %></title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css" />
-    <script id="scriptApi" type="text/javascript" src="<%= utils.getDocServerUrl() %>web-apps/apps/api/documents/api.js"></script>
+    <script id="scriptApi" type="text/javascript" src="<%= urlManger.getDocumentServerApiUrl() %>"></script>
 
     <% if (request.getHeader(HttpHeaders.USER_AGENT).contains("AscDesktopEditor")) { %>
         <script type="text/javascript">
@@ -87,14 +89,14 @@
         <div id="placeholder"></div>
     </div>
     <script>
-    var config = JSON.parse('<%= utils.getDocumentConfig(fileEntryId, null, false, renderRequest) %>');
+    var config = JSON.parse('<%= editorUtils.getConfig(fileEntryId, renderRequest) %>');
 
         var onRequestSaveAs = function (event) {
             var url = event.data.url;
             var fileType = event.data.fileType ? event.data.fileType : event.data.title.split(".").pop();
 
             var request = new XMLHttpRequest();
-            request.open("POST", '<%= utils.getSaveAsUrl(request) %>', true);
+            request.open("POST", '<%= PortalUtil.getPortalURL(request) + "/o/onlyoffice/api?type=save-as" %>', true);
             request.send(JSON.stringify({
                 url: url,
                 fileType: fileType,

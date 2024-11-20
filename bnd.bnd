@@ -1,7 +1,22 @@
 Bundle-Name: onlyoffice-integration-web
 Bundle-SymbolicName: onlyoffice.integration.web
 Bundle-Version: 2.4.0
-Import-Package: !org.apache.log,*;version="0"
+
+Import-Package: \
+	!org.brotli.dec,\
+	!org.conscrypt,\
+	!org.slf4j.impl,\
+	*
+
+-consumer-policy: ${replacestring;${range;[==,==]};.*,(.*)];$1}
+-contract: JavaPortlet,JavaServlet
+-jsp: *.jsp,*.jspf,*.jspx
 -metatype: *
--includeresource:\
-	lib/httpclient.jar=httpclient-*.jar,\
+-plugin.jsp: com.liferay.ant.bnd.jsp.JspAnalyzerPlugin
+-plugin.metatype: com.liferay.ant.bnd.metatype.MetatypePlugin
+-plugin.resourcebundle: com.liferay.ant.bnd.resource.bundle.ResourceBundleLoaderAnalyzerPlugin
+-plugin.sass: com.liferay.ant.bnd.sass.SassAnalyzerPlugin
+-provider-policy: ${replacestring;${range;[==,==]};.*,(.*)];$1}
+-sass: *
+
+-fixupmessages "Classes found in the wrong directory"; restrict:=error; is:=warning

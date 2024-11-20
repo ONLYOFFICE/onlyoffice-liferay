@@ -26,8 +26,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-
-import onlyoffice.integration.config.OnlyOfficeConfigManager;
+import com.onlyoffice.manager.settings.SettingsManager;
 
 @Component(
     service = OnlyOfficeHasher.class
@@ -69,7 +68,7 @@ public class OnlyOfficeHasher {
     }
 
     private String getSecret() {
-        return _config.getSecret();
+        return settingsManager.getSecurityKey();
     }
 
     private String getHashString(String str)
@@ -89,7 +88,7 @@ public class OnlyOfficeHasher {
     }
 
     @Reference
-    private OnlyOfficeConfigManager _config;
+    private SettingsManager settingsManager;
 
     private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeHasher.class);
 }
