@@ -146,9 +146,9 @@ public class OnlyOfficeApi extends HttpServlet {
 
             response.setContentType("application/json");
             PrintWriter writer = response.getWriter();
-            writer.write("{\"fileName\":\""+ uniqueFileName +"\"}");
+            writer.write("{\"fileName\":\"" + uniqueFileName + "\"}");
         } catch (Exception e) {
-            throw new IOException(e.getMessage(),e);
+            throw new IOException(e.getMessage(), e);
         } finally {
             if (sourceFile != null && sourceFile.exists()) {
                 sourceFile.delete();

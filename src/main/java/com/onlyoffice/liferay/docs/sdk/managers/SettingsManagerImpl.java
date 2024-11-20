@@ -43,7 +43,7 @@ public class SettingsManagerImpl extends DefaultSettingsManager {
 
     @Override
     public String getSetting(final String name) {
-        switch(name) {
+        switch (name) {
             case SettingsConstants.URL:
                 return configuration.docServUrl();
             case SettingsConstants.INNER_URL:
