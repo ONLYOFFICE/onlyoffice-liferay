@@ -92,9 +92,9 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
             return;
         }
 
-        Long fileEntryId = ParamUtil.getLong(request , "fileId");
-        String key = ParamUtil.getString(request , "key");
-        String fn = ParamUtil.getString(request , "fileName");
+        Long fileEntryId = ParamUtil.getLong(request, "fileId");
+        String key = ParamUtil.getString(request, "key");
+        String fn = ParamUtil.getString(request, "fileName");
         Locale locale = user.getLocale();
 
         response.setContentType("application/json");
