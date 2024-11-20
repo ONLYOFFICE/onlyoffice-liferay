@@ -57,9 +57,9 @@ public class SettingsManagerImpl extends DefaultSettingsManager {
                 return String.valueOf(configuration.forceSave());
             case "preview":
                 return String.valueOf(configuration.webPreview());
+            default:
+                return null;
         }
-
-        return null;
     }
 
     @Override
