@@ -33,23 +33,23 @@ import javax.servlet.ServletContext;
 public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvider {
     private static final Log _log = LogFactoryUtil.getLog(OnlyofficePreviewRendererProvider.class);
 
-    private final SettingsManager _settingsManager;
-    private final ServletContext _servletContext;
+    private final SettingsManager settingsManager;
+    private final ServletContext servletContext;
 
     public OnlyofficePreviewRendererProvider(final ServletContext servletContext,
                                              final SettingsManager settingsManager) {
-        _servletContext = servletContext;
-        _settingsManager = settingsManager;
+        this.servletContext = servletContext;
+        this.settingsManager = settingsManager;
     }
 
     @Override
     public Optional<DLPreviewRenderer> getPreviewDLPreviewRendererOptional(final FileVersion fileVersion) {
-        if (!_settingsManager.getSettingBoolean("preview", false)) {
+        if (!settingsManager.getSettingBoolean("preview", false)) {
             return Optional.empty();
         }
 
         return Optional.of( (request, response) -> {
-            RequestDispatcher requestDispatcher = _servletContext.getRequestDispatcher("/preview.jsp");
+            RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher("/preview.jsp");
 
             request.setAttribute("fileEntryId", fileVersion.getFileEntryId());
 

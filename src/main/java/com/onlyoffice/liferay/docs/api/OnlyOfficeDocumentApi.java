@@ -53,12 +53,12 @@ import javax.servlet.http.HttpServletResponse;
 public class OnlyOfficeDocumentApi extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeDocumentApi.class);
+    private static final Log log = LogFactoryUtil.getLog(OnlyOfficeDocumentApi.class);
 
     @Reference
-    private OnlyOfficeHasher _hasher;
+    private OnlyOfficeHasher hasher;
     @Reference
-    private OnlyOfficeParsingUtils _parsingUtils;
+    private OnlyOfficeParsingUtils parsingUtils;
     @Reference
     private SettingsManager settingsManager;
     @Reference
@@ -70,7 +70,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             throws IOException, ServletException {
 
         String key = ParamUtil.getString(request, "key");
-        Long fileVersionId = _hasher.validate(key);
+        Long fileVersionId = hasher.validate(key);
 
         try {
             FileVersion fileVersion = DLAppLocalServiceUtil.getFileVersion(fileVersionId);
@@ -81,7 +81,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
             StreamUtil.transfer(fileVersion.getContentStream(false), response.getOutputStream());
         } catch (PortalException e) {
-            _log.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
@@ -93,10 +93,10 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
         String error = null;
 
         String key = ParamUtil.getString(request, "key");
-        Long fileEntryId = _hasher.validate(key);
+        Long fileEntryId = hasher.validate(key);
 
         try {
-            String body = _parsingUtils.getBody(request.getInputStream());
+            String body = parsingUtils.getBody(request.getInputStream());
 
             if (body.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -114,7 +114,7 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             }
         } catch (Exception ex) {
             error = "Unable to process ONLYOFFICE response: " + ex.getMessage();
-            _log.error(error, ex);
+            log.error(error, ex);
         }
 
         try {

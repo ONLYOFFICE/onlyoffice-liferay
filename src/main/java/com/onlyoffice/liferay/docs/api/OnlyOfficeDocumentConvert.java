@@ -64,10 +64,10 @@ import javax.servlet.http.HttpServletResponse;
 )
 public class OnlyOfficeDocumentConvert extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeDocumentConvert.class);
+    private static final Log log = LogFactoryUtil.getLog(OnlyOfficeDocumentConvert.class);
 
     @Reference
-    private DLAppLocalService _dlApp;
+    private DLAppLocalService dlAppLocalService;
     @Reference
     private ConvertService convertService;
     @Reference
@@ -75,7 +75,7 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
     @Reference
     private DocumentManager documentManger;
     @Reference
-    private PermissionCheckerFactory _permissionFactory;
+    private PermissionCheckerFactory permissionCheckerFactory;
 
     @Override
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
@@ -103,7 +103,7 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
         try {
             FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
 
-            PermissionChecker checker = _permissionFactory.create(user);
+            PermissionChecker checker = permissionCheckerFactory.create(user);
             if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)
                     || !fileEntry.getFolder().containsPermission(checker, ActionKeys.ADD_DOCUMENT)) {
                 throw new Exception("User don't have rights");
@@ -133,7 +133,7 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
 
             writer.write(objectMapper.writeValueAsString(convertResponse));
         } catch (Exception ex) {
-            _log.error(ex.getMessage(), ex);
+            log.error(ex.getMessage(), ex);
             writer.write("{\"error\":\"" + ex.getMessage() + "\"}");
         }
     }
@@ -143,7 +143,7 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
                           final String filename) throws Exception {
         User user = PortalUtil.getUser(request);
 
-        _log.info("Trying to download file from URL: " + url);
+        log.info("Trying to download file from URL: " + url);
 
         requestManager.executeGetRequest(url, new RequestManager.Callback<Void>() {
             @Override
@@ -164,14 +164,24 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
                     mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
                 }
 
-                _dlApp.addFileEntry(user.getUserId(), fileEntry.getRepositoryId(), fileEntry.getFolderId(), filename,
-                        mimeType, filename, fileEntry.getDescription(), "ONLYOFFICE Convert",
-                        inputStream, bytes.length, serviceContext);
+                dlAppLocalService.addFileEntry(
+                        user.getUserId(),
+                        fileEntry.getRepositoryId(),
+                        fileEntry.getFolderId(),
+                        filename,
+                        mimeType,
+                        filename,
+                        fileEntry.getDescription(),
+                        "ONLYOFFICE Convert",
+                        inputStream,
+                        bytes.length,
+                        serviceContext
+                );
 
                 return null;
             }
         });
 
-        _log.info("Document saved.");
+        log.info("Document saved.");
     }
 }

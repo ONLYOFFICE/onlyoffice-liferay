@@ -61,7 +61,7 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 	private static final Log _log = LogFactoryUtil.getLog(CreateMVCActionCommand.class);
 
 	@Reference
-	private DLAppService _dlAppService;
+	private DLAppService dlAppService;
 	@Reference
 	private DocumentManager documentManager;
 
@@ -97,7 +97,7 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 					actionRequest
 			);
 
-			FileEntry newFile = _dlAppService.addFileEntry(repositoryId, folderId, uniqueFileName, mimeType,
+			FileEntry newFile = dlAppService.addFileEntry(repositoryId, folderId, uniqueFileName, mimeType,
 					uniqueFileName, description, (String) null, sourceFile,serviceContext);
 
 			actionResponse.setRenderParameter("fileEntryId", String.valueOf(newFile.getFileEntryId()));

@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class DocumentManagerImpl extends DefaultDocumentManager {
     @Reference
-    private OnlyOfficeUtils _OOUtils;
+    private OnlyOfficeUtils utils;
 
     public DocumentManagerImpl() {
         super(null);
@@ -52,7 +52,7 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
             if (embedded && !fileVersion.getVersion().equals("PWC")) {
                 return createDocKey(fileVersion, true);
             } else {
-                String key = _OOUtils.getCollaborativeEditingKey(fileVersion.getFileEntry());
+                String key = utils.getCollaborativeEditingKey(fileVersion.getFileEntry());
 
                 if (key != null) {
                     return key;

@@ -50,9 +50,9 @@ public class OnlyOfficeDesktopLogin extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Reference
-    private Portal _portal;
+    private Portal portal;
     @Reference
-    private UserLocalService _userLocalService;
+    private UserLocalService userLocalService;
 
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
@@ -65,7 +65,7 @@ public class OnlyOfficeDesktopLogin extends HttpServlet {
             PortalSessionThreadLocal.setHttpSession(httpSession);
             }
 
-            User user = _portal.getUser(request);
+            User user = portal.getUser(request);
 
             if (user == null) {
                 String userIdString = (String)httpSession.getAttribute("j_username");
@@ -74,20 +74,20 @@ public class OnlyOfficeDesktopLogin extends HttpServlet {
                 if ((userIdString != null) && (password != null)) {
                     long userId = GetterUtil.getLong(userIdString);
 
-                    user = _userLocalService.getUser(userId);
+                    user = userLocalService.getUser(userId);
                 }
             }
 
             if (user == null) {
                 response.sendRedirect(
                     StringBundler.concat(
-                        _portal.getPathMain(), "/portal/login?redirect=",
+                        portal.getPathMain(), "/portal/login?redirect=",
                         DOCUMENT_LIBRARY_ADMIN));
             } else {
                 response.sendRedirect(DOCUMENT_LIBRARY_ADMIN);
             }
         } catch (Exception exception) {
-            _portal.sendError(
+            portal.sendError(
                 exception, request, response);
         }
     }

@@ -45,9 +45,9 @@ import javax.portlet.PortletURL;
 )
 public class UrlManagerImpl extends DefaultUrlManager {
     @Reference
-    private OnlyOfficeHasher _hasher;
+    private OnlyOfficeHasher hasher;
     @Reference
-    private DLAppService _DLAppService;
+    private DLAppService dlAppService;
 
     public UrlManagerImpl() {
         super(null);
@@ -60,7 +60,7 @@ public class UrlManagerImpl extends DefaultUrlManager {
 
     @Override
     public String getFileUrl(final String fileId) {
-        return getLiferayBaseUrl(false) + "/o/onlyoffice/doc?key=" + _hasher.getHash(Long.parseLong(fileId));
+        return getLiferayBaseUrl(false) + "/o/onlyoffice/doc?key=" + hasher.getHash(Long.parseLong(fileId));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class UrlManagerImpl extends DefaultUrlManager {
         Long fileEntryId;
 
         try {
-            fileVersion = _DLAppService.getFileVersion(Long.parseLong(fileId));
+            fileVersion = dlAppService.getFileVersion(Long.parseLong(fileId));
             fileEntryId = fileVersion.getFileEntryId();
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
@@ -77,7 +77,7 @@ public class UrlManagerImpl extends DefaultUrlManager {
             throw new RuntimeException(e);
         }
 
-        return getLiferayBaseUrl(false) + "/o/onlyoffice/doc?key=" + _hasher.getHash(fileEntryId);
+        return getLiferayBaseUrl(false) + "/o/onlyoffice/doc?key=" + hasher.getHash(fileEntryId);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class UrlManagerImpl extends DefaultUrlManager {
         FileVersion fileVersion;
         FileEntry fileEntry;
         try {
-            fileVersion = _DLAppService.getFileVersion(Long.parseLong(fileId));
+            fileVersion = dlAppService.getFileVersion(Long.parseLong(fileId));
             fileEntry = fileVersion.getFileEntry();
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);

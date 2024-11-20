@@ -38,7 +38,7 @@ public class EditMenuContextFactory implements DLDisplayContextFactory {
     @Reference
     private DocumentManager documentManager;
     @Reference
-    private PermissionCheckerFactory _permissionFactory;
+    private PermissionCheckerFactory permissionCheckerFactory;
 
     public DLEditFileEntryDisplayContext getDLEditFileEntryDisplayContext(
             final DLEditFileEntryDisplayContext parentDLEditFileEntryDisplayContext,
@@ -72,6 +72,6 @@ public class EditMenuContextFactory implements DLDisplayContextFactory {
         return new EditMenuContext(
             parentDLViewFileVersionDisplayContext.getUuid(),
             parentDLViewFileVersionDisplayContext, httpServletRequest,
-            httpServletResponse, fileVersion, documentManager, _permissionFactory);
+            httpServletResponse, fileVersion, documentManager, permissionCheckerFactory);
     }
 }

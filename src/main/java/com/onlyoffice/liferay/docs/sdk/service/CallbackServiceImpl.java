@@ -58,11 +58,11 @@ public class CallbackServiceImpl extends DefaultCallbackService {
     private static final Log _log = LogFactoryUtil.getLog(CallbackServiceImpl.class);
 
     @Reference
-    private DLAppService _dlAppService;
+    private DLAppService dlAppService;
     @Reference
-    private DLAppLocalService _dlApp;
+    private DLAppLocalService dlAppLocalService;
     @Reference
-    private OnlyOfficeUtils _OOUtils;
+    private OnlyOfficeUtils utils;
     @Reference
     private UrlManager urlManager;
 
@@ -93,18 +93,18 @@ public class CallbackServiceImpl extends DefaultCallbackService {
             if (actions.size() > 0) {
                 Action action = actions.get(0);
                 if (Type.CONNECTED.equals(action.getType())) {
-                    FileEntry fileEntry = _dlApp.getFileEntry(Long.parseLong(fileId));
+                    FileEntry fileEntry = dlAppLocalService.getFileEntry(Long.parseLong(fileId));
 
                     if (!fileEntry.isCheckedOut()) {
                         setUserThreadLocal(userId);
                         ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
-                        if (_OOUtils.getCollaborativeEditingKey(fileEntry) == null) {
+                        if (utils.getCollaborativeEditingKey(fileEntry) == null) {
                             String key = callback.getKey();
-                            _OOUtils.setCollaborativeEditingKey(fileEntry, key);
+                            utils.setCollaborativeEditingKey(fileEntry, key);
                         }
 
-                        _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
+                        dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
 
                         _log.info("Document opened for editing, locking document");
                     } else {
@@ -125,7 +125,7 @@ public class CallbackServiceImpl extends DefaultCallbackService {
             userId = Long.parseLong(users.get(0));
         }
 
-        FileEntry fileEntry = _dlApp.getFileEntry(Long.parseLong(fileId));
+        FileEntry fileEntry = dlAppLocalService.getFileEntry(Long.parseLong(fileId));
         ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
         String url = urlManager.replaceToInnerDocumentServerUrl(callback.getUrl());
 
@@ -135,7 +135,7 @@ public class CallbackServiceImpl extends DefaultCallbackService {
 
         fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntry.getFileEntryId());
 
-        _OOUtils.setCollaborativeEditingKey(fileEntry, null);
+        utils.setCollaborativeEditingKey(fileEntry, null);
 
         _log.info("Document saved.");
     }
@@ -143,13 +143,13 @@ public class CallbackServiceImpl extends DefaultCallbackService {
     public void handlerClosed(final Callback callback, final String fileId) throws Exception {
         _log.info("No document updates, unlocking document");
 
-        FileEntry fileEntry = _dlApp.getFileEntry(Long.parseLong(fileId));
+        FileEntry fileEntry = dlAppLocalService.getFileEntry(Long.parseLong(fileId));
 
         if (fileEntry.isCheckedOut()) {
             setUserThreadLocal(fileEntry.getLock().getUserId());
-            _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
+            dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
         }
-        _OOUtils.setCollaborativeEditingKey(fileEntry, null);
+        utils.setCollaborativeEditingKey(fileEntry, null);
     }
 
     public void handlerForcesave(final Callback callback, final String fileId) throws Exception {
@@ -161,7 +161,7 @@ public class CallbackServiceImpl extends DefaultCallbackService {
                 userId = Long.parseLong(users.get(0));
             }
 
-            FileEntry fileEntry = _dlApp.getFileEntry(Long.parseLong(fileId));
+            FileEntry fileEntry = dlAppLocalService.getFileEntry(Long.parseLong(fileId));
             ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
             String url = urlManager.replaceToInnerDocumentServerUrl(callback.getUrl());
 
@@ -169,9 +169,9 @@ public class CallbackServiceImpl extends DefaultCallbackService {
 
             updateFile(fileEntry, userId, url, DLVersionNumberIncrease.MINOR, serviceContext);
 
-            fileEntry = _dlApp.getFileEntry(fileEntry.getFileEntryId());
+            fileEntry = dlAppLocalService.getFileEntry(fileEntry.getFileEntryId());
 
-            _dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
+            dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
 
             _log.info("Document saved (forcesave).");
         } else {
@@ -188,11 +188,11 @@ public class CallbackServiceImpl extends DefaultCallbackService {
             URLConnection con = new URL(url).openConnection();
             InputStream in = con.getInputStream();
 
-            _dlApp.updateFileEntry(userId, fileEntry.getFileEntryId(), fileEntry.getFileName(), fileEntry.getMimeType(),
+            dlAppLocalService.updateFileEntry(userId, fileEntry.getFileEntryId(), fileEntry.getFileName(), fileEntry.getMimeType(),
                     fileEntry.getTitle(), fileEntry.getDescription(), "ONLYOFFICE Edit",dlVersionNumberIncrease, in,
                     con.getContentLength(), serviceContext);
 
-            _dlAppService.checkInFileEntry(
+            dlAppService.checkInFileEntry(
                     fileEntry.getFileEntryId(),
                     dlVersionNumberIncrease,
                     "ONLYOFFICE Edit",
@@ -209,7 +209,7 @@ public class CallbackServiceImpl extends DefaultCallbackService {
             throws PortalException {
         if (fileEntry.isCheckedOut() && userId.longValue() != fileEntry.getLock().getUserId()) {
             setUserThreadLocal(fileEntry.getLock().getUserId());
-            _dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
+            dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
 
             setUserThreadLocal(userId);
         } else {

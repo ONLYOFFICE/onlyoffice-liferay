@@ -67,13 +67,13 @@ public class EditMenuContext
 extends BaseDLViewFileVersionDisplayContext {
     private static final Log _log = LogFactoryUtil.getLog(EditMenuContext.class);
 
-    private ThemeDisplay _themeDisplay;
-    private ResourceBundle _resourceBundle;
-    private boolean _canEdit;
-    private boolean _canFillForm;
-    private boolean _canView;
-    private boolean _canConvert;
-    private boolean _isMasterForm;
+    private ThemeDisplay themeDisplay;
+    private ResourceBundle resourceBundle;
+    private boolean canEdit;
+    private boolean canFillForm;
+    private boolean canView;
+    private boolean canConvert;
+    private boolean isMasterForm;
 
     public EditMenuContext(final UUID uuid, final DLViewFileVersionDisplayContext parentDLDisplayContext,
                            final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse,
@@ -84,9 +84,9 @@ extends BaseDLViewFileVersionDisplayContext {
             uuid, parentDLDisplayContext, httpServletRequest,
             httpServletResponse, fileVersion);
 
-        _themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+        themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
             WebKeys.THEME_DISPLAY);
-        _resourceBundle = ResourceBundleUtil.getBundle("content.Language",
+        resourceBundle = ResourceBundleUtil.getBundle("content.Language",
                 httpServletRequest.getLocale(), getClass());
 
         boolean editPerm = false;
@@ -104,11 +104,11 @@ extends BaseDLViewFileVersionDisplayContext {
         } catch (PortalException e) { }
 
         String fileName = fileVersion.getFileName();
-        _canEdit = documentManager.isEditable(fileName) && editPerm;
-        _canFillForm = documentManager.isFillable(fileName) && editPerm;
-        _canView = documentManager.isViewable(fileName) && viewPerm;
-        _canConvert = documentManager.getDefaultConvertExtension(fileName) != null && convPerm;
-        _isMasterForm = fileVersion.getExtension().equals("docxf");
+        canEdit = documentManager.isEditable(fileName) && editPerm;
+        canFillForm = documentManager.isFillable(fileName) && editPerm;
+        canView = documentManager.isViewable(fileName) && viewPerm;
+        canConvert = documentManager.getDefaultConvertExtension(fileName) != null && convPerm;
+        isMasterForm = fileVersion.getExtension().equals("docxf");
     }
 
     public Menu getMenu() throws PortalException {
@@ -116,12 +116,12 @@ extends BaseDLViewFileVersionDisplayContext {
         List<MenuItem> list = menu.getMenuItems();
 
         if (showAction()) {
-            if (_canView) {
+            if (canView) {
                 URLMenuItem item = new URLMenuItem();
                 InitViewItem(item);
                 list.add(item);
             }
-            if (_canConvert) {
+            if (canConvert) {
                 JavaScriptMenuItem item = new JavaScriptMenuItem();
                 InitConvertItem(item);
                 list.add(item);
@@ -135,12 +135,12 @@ extends BaseDLViewFileVersionDisplayContext {
     public List<ToolbarItem> getToolbarItems() throws PortalException {
         List<ToolbarItem> toolbarItems = super.getToolbarItems();
 
-        if (_canView) {
+        if (canView) {
             URLToolbarItem item = new URLToolbarItem();
             InitViewItem(item);
             toolbarItems.add(item);
         }
-        if (_canConvert) {
+        if (canConvert) {
             JavaScriptToolbarItem item = new JavaScriptToolbarItem();
             InitConvertItem(item);
             toolbarItems.add(item);
@@ -151,23 +151,23 @@ extends BaseDLViewFileVersionDisplayContext {
     private void InitViewItem(final URLUIItem item) {
         String labelKey = "onlyoffice-context-action-view";
 
-        if (_canEdit) {
+        if (canEdit) {
             labelKey = "onlyoffice-context-action-edit";
-        } else if (_canFillForm)  {
+        } else if (canFillForm)  {
             labelKey = "onlyoffice-context-action-fillForm";
         }
 
-        item.setLabel(LanguageUtil.get(request, _resourceBundle, labelKey));
+        item.setLabel(LanguageUtil.get(request, resourceBundle, labelKey));
         item.setTarget("_blank");
         item.setURL(getDocUrl());
     }
 
     private void InitConvertItem(final JavaScriptUIItem item) {
         String lang = null;
-        if (_isMasterForm) {
-            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-create-form");
+        if (isMasterForm) {
+            lang = LanguageUtil.get(request, resourceBundle, "onlyoffice-context-action-create-form");
         } else {
-            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-convert");
+            lang = LanguageUtil.get(request, resourceBundle, "onlyoffice-context-action-convert");
         }
         item.setLabel(lang);
 
@@ -185,7 +185,7 @@ extends BaseDLViewFileVersionDisplayContext {
     private String getDocUrl() {
         PortletURL portletURL = PortletURLFactoryUtil.create(
             request, "com_onlyoffice_liferay_docs_ui_EditActionPortlet",
-            _themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+            themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 
 //      MutableRenderParameters added in portlet version 3.0
 //      MutableRenderParameters params = portletURL.getRenderParameters();
@@ -205,7 +205,7 @@ extends BaseDLViewFileVersionDisplayContext {
     private String getConvertUrl() {
         PortletURL portletURL = PortletURLFactoryUtil.create(
             request, "com_onlyoffice_liferay_docs_ui_ConvertActionPortlet",
-            _themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+            themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 
 //      MutableRenderParameters added in portlet version 3.0
 //      MutableRenderParameters params = portletURL.getRenderParameters();
@@ -223,7 +223,7 @@ extends BaseDLViewFileVersionDisplayContext {
     }
 
     private boolean showAction() throws SettingsException {
-        PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
+        PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
         String portletName = portletDisplay.getPortletName();
 
@@ -233,7 +233,7 @@ extends BaseDLViewFileVersionDisplayContext {
 
         Settings settings = SettingsFactoryUtil.getSettings(
             new PortletInstanceSettingsLocator(
-                _themeDisplay.getLayout(), portletDisplay.getId()));
+                themeDisplay.getLayout(), portletDisplay.getId()));
 
         TypedSettings typedSettings = new TypedSettings(settings);
 

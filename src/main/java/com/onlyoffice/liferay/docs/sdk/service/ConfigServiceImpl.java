@@ -44,9 +44,9 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class ConfigServiceImpl extends DefaultConfigService {
     @Reference
-    private PermissionCheckerFactory _permissionFactory;
+    private PermissionCheckerFactory permissionCheckerFactory;
     @Reference
-    private DLAppService _DLAppService;
+    private DLAppService dlAppService;
 
     public ConfigServiceImpl() {
         super(null, null, null, null);
@@ -79,11 +79,11 @@ public class ConfigServiceImpl extends DefaultConfigService {
 
         try {
             com.liferay.portal.kernel.model.User user = UserLocalServiceUtil.getUserById(userId);
-            FileVersion fileVersion = _DLAppService.getFileVersion(Long.parseLong(fileId));
+            FileVersion fileVersion = dlAppService.getFileVersion(Long.parseLong(fileId));
             FileEntry fileEntry = fileVersion.getFileEntry();
             String fileName = getDocumentManager().getDocumentName(fileId);
 
-            PermissionChecker checker = _permissionFactory.create(user);
+            PermissionChecker checker = permissionCheckerFactory.create(user);
 
             boolean editPermission = fileEntry.containsPermission(checker, ActionKeys.UPDATE);
             Boolean isEditable = super.getDocumentManager().isEditable(fileName)

@@ -38,14 +38,14 @@ import javax.servlet.ServletContext;
         immediate = true, service = OnlyofficePreviewRendererProviderFactory.class
 )
 public class OnlyofficePreviewRendererProviderFactory {
-    private ServiceRegistration<DLPreviewRendererProvider> _dlPreviewRendererProviderServiceRegistration;
+    private ServiceRegistration<DLPreviewRendererProvider> dlPreviewRendererProviderServiceRegistration;
 
     @Reference
     private SettingsManager settingsManager;
     @Reference(
             target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)"
     )
-    private ServletContext _servletContext;
+    private ServletContext servletContext;
 
     public Set<String> getMimeTypes() {
         return new HashSet<>(Arrays.asList(
@@ -73,16 +73,16 @@ public class OnlyofficePreviewRendererProviderFactory {
         properties.put("service.ranking", 100);
         properties.put("content.type", getMimeTypes().toArray());
 
-        _dlPreviewRendererProviderServiceRegistration =
+        dlPreviewRendererProviderServiceRegistration =
             bundleContext.registerService(
                 DLPreviewRendererProvider.class,
-                new OnlyofficePreviewRendererProvider(_servletContext, settingsManager),
+                new OnlyofficePreviewRendererProvider(servletContext, settingsManager),
                 properties
             );
     }
 
     @Deactivate
     protected void deactivate() {
-        _dlPreviewRendererProviderServiceRegistration.unregister();
+        dlPreviewRendererProviderServiceRegistration.unregister();
     }
 }

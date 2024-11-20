@@ -51,11 +51,11 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
     private static final Log _log = LogFactoryUtil.getLog(EditToolbarContributorContext.class);
 
     @Reference(target = "(model.class.name=com.liferay.document.library.kernel.model.DLFolder)")
-    private ModelResourcePermission<DLFolder> _dlFolderModelResourcePermission;
+    private ModelResourcePermission<DLFolder> dlFolderModelResourcePermission;
     @Reference
-    private Language _language;
+    private Language language;
     @Reference
-    private Portal _portal;
+    private Portal portal;
 
     public EditToolbarContributorContext() {
     }
@@ -67,7 +67,7 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
         try {
             long folderId = folder != null ? folder.getFolderId() : 0L;
             Boolean hasPermission = ModelResourcePermissionHelper.contains(
-                    _dlFolderModelResourcePermission,
+                    dlFolderModelResourcePermission,
                     themeDisplay.getPermissionChecker(),
                     themeDisplay.getScopeGroupId(),
                     folderId,
@@ -124,10 +124,10 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
 
     private String _translate(final PortletRequest portletRequest, final String key) {
         ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-                _portal.getLocale(portletRequest),
+                portal.getLocale(portletRequest),
                 EditToolbarContributorContext.class
         );
 
-        return _language.get(resourceBundle, key);
+        return language.get(resourceBundle, key);
     }
 }

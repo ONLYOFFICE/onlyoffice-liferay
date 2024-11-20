@@ -21,8 +21,6 @@ package com.onlyoffice.liferay.docs.api;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.kernel.util.DLUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -60,12 +58,10 @@ import javax.servlet.http.HttpServletResponse;
 public class OnlyOfficeApi extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeApi.class);
-
     @Reference
-    private OnlyOfficeParsingUtils _parsingUtils;
+    private OnlyOfficeParsingUtils onlyOfficeParsingUtils;
     @Reference
-    private DLAppLocalService _dlApp;
+    private DLAppLocalService dlAppLocalService;
     @Reference
     private RequestManager requestManager;
     @Reference
@@ -105,7 +101,7 @@ public class OnlyOfficeApi extends HttpServlet {
             return;
         }
 
-        String body = _parsingUtils.getBody(request.getInputStream());
+        String body = onlyOfficeParsingUtils.getBody(request.getInputStream());
 
         File sourceFile = null;
 
@@ -154,7 +150,7 @@ public class OnlyOfficeApi extends HttpServlet {
 
             String mimeType = MimeTypesUtil.getContentType(sourceFile);
 
-            _dlApp.addFileEntry(user.getUserId(), file.getRepositoryId(), file.getFolderId(), uniqueFileName,
+            dlAppLocalService.addFileEntry(user.getUserId(), file.getRepositoryId(), file.getFolderId(), uniqueFileName,
                     mimeType, uniqueFileName, null, null, sourceFile, serviceContext);
 
             response.setContentType("application/json");

@@ -18,8 +18,6 @@
 
 package com.onlyoffice.liferay.docs.sdk.service;
 
-import com.liferay.document.library.kernel.service.DLAppService;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.request.RequestManager;
 import com.onlyoffice.manager.settings.SettingsManager;
@@ -34,11 +32,6 @@ import org.osgi.service.component.annotations.Reference;
     service = ConvertService.class
 )
 public class ConvertServiceImpl extends DefaultConvertService implements ConvertService {
-    @Reference
-    private PermissionCheckerFactory _permissionFactory;
-    @Reference
-    private DLAppService _DLAppService;
-
     public ConvertServiceImpl() {
         super(null, null, null, null);
     }

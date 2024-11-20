@@ -37,9 +37,9 @@ import javax.servlet.http.HttpServletResponse;
 @Component(immediate = true, service = DynamicInclude.class)
 public class DesktopJSDynamicInclude extends BaseDynamicInclude {
 	@Reference
-	private Portal _portal;
+	private Portal portal;
 	@Reference(target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)")
-	private ServletContext _servletContext;
+	private ServletContext servletContext;
 
 	@Override
 	public void include(final HttpServletRequest request, final HttpServletResponse response, final String key)
@@ -53,8 +53,8 @@ public class DesktopJSDynamicInclude extends BaseDynamicInclude {
 
 			sb.append("<script src=\"");
 			sb.append(themeDisplay.getPortalURL());
-			sb.append(_portal.getPathProxy());
-			sb.append(_servletContext.getContextPath());
+			sb.append(portal.getPathProxy());
+			sb.append(servletContext.getContextPath());
 			sb.append("/js/desktop.js\" ");
 			sb.append("type= \"text/javascript\">");
 			sb.append("</script>");

@@ -45,28 +45,28 @@ import javax.portlet.RenderRequest;
 )
 public class OnlyOfficeEditorUtils {
     @Reference
-    private PermissionCheckerFactory _permissionFactory;
+    private PermissionCheckerFactory permissionFactory;
     @Reference
-    private DLAppService _DLAppService;
+    private DLAppService dlAppService;
     @Reference
-    private ConfigService _configService;
+    private ConfigService configService;
 
     public String getConfig(final Long fileEntryId, final RenderRequest req) {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            FileEntry fileEntry = _DLAppService.getFileEntry(fileEntryId);
+            FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
             FileVersion fileVersion = fileEntry.getLatestFileVersion();
             User user = PortalUtil.getUser(req);
 
-            PermissionChecker checker = _permissionFactory.create(user);
+            PermissionChecker checker = permissionFactory.create(user);
 
             if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)) {
                 throw new PrincipalException.MustHavePermission(
                         user.getUserId(), ActionKeys.VIEW);
             }
 
-            Config config = _configService.createConfig(
+            Config config = configService.createConfig(
                     String.valueOf(fileVersion.getFileVersionId()),
                     Mode.EDIT,
                     Type.DESKTOP
@@ -86,20 +86,20 @@ public class OnlyOfficeEditorUtils {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            FileEntry fileEntry = _DLAppService.getFileEntry(fileEntryId);
+            FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
             FileVersion fileVersion = Validator.isNull(version)
                     ? fileEntry.getLatestFileVersion()
                     : fileEntry.getFileVersion(version);
             User user = PortalUtil.getUser(req);
 
-            PermissionChecker checker = _permissionFactory.create(user);
+            PermissionChecker checker = permissionFactory.create(user);
 
             if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)) {
                 throw new PrincipalException.MustHavePermission(
                         user.getUserId(), ActionKeys.VIEW);
             }
 
-            Config config = _configService.createConfig(
+            Config config = configService.createConfig(
                     String.valueOf(fileVersion.getFileVersionId()),
                     Mode.VIEW,
                     Type.EMBEDDED
