@@ -39,7 +39,7 @@ public class OnlyOfficePermissionUtils {
 
         return file.containsPermission(checker, ActionKeys.VIEW)
                 && ModelResourcePermissionHelper.contains(
-                        folderModelResourcePermission,checker, file.getGroupId(),
+                        folderModelResourcePermission, checker, file.getGroupId(),
                         file.getFolderId(), ActionKeys.ADD_DOCUMENT);
     }
 
