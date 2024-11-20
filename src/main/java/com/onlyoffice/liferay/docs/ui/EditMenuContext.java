@@ -119,12 +119,12 @@ extends BaseDLViewFileVersionDisplayContext {
         if (showAction()) {
             if (canView) {
                 URLMenuItem item = new URLMenuItem();
-                InitViewItem(item);
+                initViewItem(item);
                 list.add(item);
             }
             if (canConvert) {
                 JavaScriptMenuItem item = new JavaScriptMenuItem();
-                InitConvertItem(item);
+                initConvertItem(item);
                 list.add(item);
             }
         }
@@ -138,18 +138,18 @@ extends BaseDLViewFileVersionDisplayContext {
 
         if (canView) {
             URLToolbarItem item = new URLToolbarItem();
-            InitViewItem(item);
+            initViewItem(item);
             toolbarItems.add(item);
         }
         if (canConvert) {
             JavaScriptToolbarItem item = new JavaScriptToolbarItem();
-            InitConvertItem(item);
+            initConvertItem(item);
             toolbarItems.add(item);
         }
         return toolbarItems;
     }
 
-    private void InitViewItem(final URLUIItem item) {
+    private void initViewItem(final URLUIItem item) {
         String labelKey = "onlyoffice-context-action-view";
 
         if (canEdit) {
@@ -163,7 +163,7 @@ extends BaseDLViewFileVersionDisplayContext {
         item.setURL(getDocUrl());
     }
 
-    private void InitConvertItem(final JavaScriptUIItem item) {
+    private void initConvertItem(final JavaScriptUIItem item) {
         String lang = null;
         if (isMasterForm) {
             lang = LanguageUtil.get(request, resourceBundle, "onlyoffice-context-action-create-form");

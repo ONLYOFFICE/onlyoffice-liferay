@@ -98,7 +98,7 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
                     portletURL.setParameter("folderId", String.valueOf(folder.getFolderId()));
                 }
 
-                String labelMenu = _translate(portletRequest, "onlyoffice-context-action-create");
+                String labelMenu = translate(portletRequest, "onlyoffice-context-action-create");
 
                 menuItems.add(this.getNewMenuItem(
                         "#create-document-onlyoffice",
@@ -122,7 +122,7 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
         return menuItem;
     }
 
-    private String _translate(final PortletRequest portletRequest, final String key) {
+    private String translate(final PortletRequest portletRequest, final String key) {
         ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
                 portal.getLocale(portletRequest),
                 EditToolbarContributorContext.class
