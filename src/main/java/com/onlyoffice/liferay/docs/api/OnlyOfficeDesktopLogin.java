@@ -91,5 +91,6 @@ public class OnlyOfficeDesktopLogin extends HttpServlet {
     @Reference
     private UserLocalService _userLocalService;
 
-    public static final String DOCUMENT_LIBRARY_ADMIN = "/group/guest/~/control_panel/manage?p_p_id=com_liferay_document_library_web_portlet_DLAdminPortlet";
+    public static final String DOCUMENT_LIBRARY_ADMIN =
+            "/group/guest/~/control_panel/manage?p_p_id=com_liferay_document_library_web_portlet_DLAdminPortlet";
 }

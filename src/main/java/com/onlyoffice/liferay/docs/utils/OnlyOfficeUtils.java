@@ -39,11 +39,22 @@ public class OnlyOfficeUtils {
         }
 
         if (key == null || key.isEmpty()) {
-            ExpandoValueLocalServiceUtil.deleteValue(expandoBridge.getCompanyId(), expandoBridge.getClassName(),
-                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "onlyoffice-collaborative-editor-key", expandoBridge.getClassPK());
+            ExpandoValueLocalServiceUtil.deleteValue(
+                    expandoBridge.getCompanyId(),
+                    expandoBridge.getClassName(),
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME,
+                    "onlyoffice-collaborative-editor-key",
+                    expandoBridge.getClassPK()
+            );
         } else {
-            ExpandoValueLocalServiceUtil.addValue(expandoBridge.getCompanyId(), expandoBridge.getClassName(),
-                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "onlyoffice-collaborative-editor-key", expandoBridge.getClassPK(), key);
+            ExpandoValueLocalServiceUtil.addValue(
+                    expandoBridge.getCompanyId(),
+                    expandoBridge.getClassName(),
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME,
+                    "onlyoffice-collaborative-editor-key",
+                    expandoBridge.getClassPK(),
+                    key
+            );
         }
     }
 
@@ -51,8 +62,13 @@ public class OnlyOfficeUtils {
         ExpandoBridge expandoBridge = fileEntry.getExpandoBridge();
 
         if (expandoBridge.hasAttribute("onlyoffice-collaborative-editor-key")) {
-            ExpandoValue value = ExpandoValueLocalServiceUtil.getValue(expandoBridge.getCompanyId(), expandoBridge.getClassName(),
-                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "onlyoffice-collaborative-editor-key", expandoBridge.getClassPK());
+            ExpandoValue value = ExpandoValueLocalServiceUtil.getValue(
+                    expandoBridge.getCompanyId(),
+                    expandoBridge.getClassName(),
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME,
+                    "onlyoffice-collaborative-editor-key",
+                    expandoBridge.getClassPK()
+            );
 
             if (value != null && !value.getString().isEmpty()) {
                 return value.getString();

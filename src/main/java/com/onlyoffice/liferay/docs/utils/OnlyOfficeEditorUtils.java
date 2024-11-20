@@ -60,9 +60,15 @@ public class OnlyOfficeEditorUtils {
                         user.getUserId(), ActionKeys.VIEW);
             }
 
-            Config config = _configService.createConfig(String.valueOf(fileVersion.getFileVersionId()), Mode.EDIT, Type.DESKTOP);
+            Config config = _configService.createConfig(
+                    String.valueOf(fileVersion.getFileVersionId()),
+                    Mode.EDIT,
+                    Type.DESKTOP
+            );
 
-            config.getEditorConfig().setLang(LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag());
+            config.getEditorConfig().setLang(
+                    LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag()
+            );
 
             return mapper.writeValueAsString(config);
         } catch (Exception e) {
@@ -75,7 +81,9 @@ public class OnlyOfficeEditorUtils {
 
         try {
             FileEntry fileEntry = _DLAppService.getFileEntry(fileEntryId);
-            FileVersion fileVersion = Validator.isNull(version) ? fileEntry.getLatestFileVersion() : fileEntry.getFileVersion(version);
+            FileVersion fileVersion = Validator.isNull(version)
+                    ? fileEntry.getLatestFileVersion()
+                    : fileEntry.getFileVersion(version);
             User user = PortalUtil.getUser(req);
 
             PermissionChecker checker = _permissionFactory.create(user);
@@ -85,7 +93,11 @@ public class OnlyOfficeEditorUtils {
                         user.getUserId(), ActionKeys.VIEW);
             }
 
-            Config config = _configService.createConfig(String.valueOf(fileVersion.getFileVersionId()), Mode.VIEW, Type.EMBEDDED);
+            Config config = _configService.createConfig(
+                    String.valueOf(fileVersion.getFileVersionId()),
+                    Mode.VIEW,
+                    Type.EMBEDDED
+            );
 
             String title = Validator.isNull(version)
                     ? fileVersion.getFileName()
@@ -95,7 +107,9 @@ public class OnlyOfficeEditorUtils {
                             fileVersion.getVersion()
                         );
 
-            config.getEditorConfig().setLang(LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag());
+            config.getEditorConfig().setLang(
+                    LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag()
+            );
 
             config.getDocument().setTitle(title);
 

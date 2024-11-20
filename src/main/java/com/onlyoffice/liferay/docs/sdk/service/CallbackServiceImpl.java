@@ -172,7 +172,12 @@ public class CallbackServiceImpl extends DefaultCallbackService {
                     fileEntry.getTitle(), fileEntry.getDescription(), "ONLYOFFICE Edit",dlVersionNumberIncrease, in,
                     con.getContentLength(), serviceContext);
 
-            _dlAppService.checkInFileEntry(fileEntry.getFileEntryId(), dlVersionNumberIncrease, "ONLYOFFICE Edit", serviceContext);
+            _dlAppService.checkInFileEntry(
+                    fileEntry.getFileEntryId(),
+                    dlVersionNumberIncrease,
+                    "ONLYOFFICE Edit",
+                    serviceContext
+            );
         } catch (Exception e) {
             String msg = "Couldn't download or save file: " + e.getMessage();
             _log.error(msg, e);

@@ -123,7 +123,10 @@ public class OnlyOfficeApi extends HttpServlet {
                     fileName.substring(0, fileName.lastIndexOf(".") + 1) + fileType
             );
 
-            ServiceContext serviceContext = ServiceContextFactory.getInstance(OnlyOfficeDocumentConvert.class.getName(), request);
+            ServiceContext serviceContext = ServiceContextFactory.getInstance(
+                    OnlyOfficeDocumentConvert.class.getName(),
+                    request
+            );
 
             url = urlManager.replaceToInnerDocumentServerUrl(url);
 

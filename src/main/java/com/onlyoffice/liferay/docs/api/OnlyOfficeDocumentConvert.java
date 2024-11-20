@@ -65,7 +65,8 @@ import javax.servlet.http.HttpServletResponse;
 public class OnlyOfficeDocumentConvert extends HttpServlet {
 
     @Override
-    protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
+            throws IOException, ServletException {
         User user;
 
         try {
@@ -90,7 +91,8 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
             FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
 
             PermissionChecker checker = _permissionFactory.create(user);
-            if (!fileEntry.containsPermission(checker, ActionKeys.VIEW) || !fileEntry.getFolder().containsPermission(checker, ActionKeys.ADD_DOCUMENT)) {
+            if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)
+                    || !fileEntry.getFolder().containsPermission(checker, ActionKeys.ADD_DOCUMENT)) {
                 throw new Exception("User don't have rights");
             }
 
@@ -102,7 +104,10 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
 
             Long fileVersionId = fileEntry.getFileVersion().getFileVersionId();
 
-            ConvertResponse convertResponse = convertService.processConvert(convertRequest, String.valueOf(fileVersionId));
+            ConvertResponse convertResponse = convertService.processConvert(
+                    convertRequest,
+                    String.valueOf(fileVersionId)
+            );
 
             if (convertResponse.getEndConvert() != null && convertResponse.getEndConvert()) {
                 savefile(request, fileEntry, convertResponse.getFileUrl(), fn);
@@ -133,12 +138,16 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
                 byte[] bytes = FileUtil.getBytes(((HttpEntity) response).getContent());
                 InputStream inputStream = new ByteArrayInputStream(bytes);
 
-                ServiceContext serviceContext = ServiceContextFactory.getInstance(OnlyOfficeDocumentConvert.class.getName(), request);
+                ServiceContext serviceContext = ServiceContextFactory.getInstance(
+                        OnlyOfficeDocumentConvert.class.getName(),
+                        request
+                );
 
                 String defaultConvertExtension = documentManger.getDefaultConvertExtension(fileEntry.getFileName());
                 String mimeType = MimeTypesUtil.getContentType(filename + "." + defaultConvertExtension);
 
-                if (defaultConvertExtension != null && (defaultConvertExtension.equals("docxf") || defaultConvertExtension.equals("oform"))) {
+                if (defaultConvertExtension != null
+                        && (defaultConvertExtension.equals("docxf") || defaultConvertExtension.equals("oform"))) {
                     mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
                 }
 

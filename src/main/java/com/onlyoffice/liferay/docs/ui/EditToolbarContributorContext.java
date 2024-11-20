@@ -49,74 +49,89 @@ import javax.portlet.PortletResponse;
 @Component(immediate = true, service = { DLPortletToolbarContributorContext.class })
 public class EditToolbarContributorContext implements DLPortletToolbarContributorContext {
 
-	public EditToolbarContributorContext() {
-	}
+    public EditToolbarContributorContext() {
+    }
 
-	public void updatePortletTitleMenuItems(final List<MenuItem> menuItems, final Folder folder,
-											final ThemeDisplay themeDisplay, final PortletRequest portletRequest,
-											final PortletResponse portletResponse) {
-		try {
-			long folderId = folder != null ? folder.getFolderId() : 0L;
-			Boolean hasPermission = ModelResourcePermissionHelper.contains(_dlFolderModelResourcePermission,
-					themeDisplay.getPermissionChecker(), themeDisplay.getScopeGroupId(), folderId, ActionKeys.ADD_DOCUMENT);
+    public void updatePortletTitleMenuItems(final List<MenuItem> menuItems, final Folder folder,
+                                            final ThemeDisplay themeDisplay, final PortletRequest portletRequest,
+                                            final PortletResponse portletResponse
+    ) {
+        try {
+            long folderId = folder != null ? folder.getFolderId() : 0L;
+            Boolean hasPermission = ModelResourcePermissionHelper.contains(
+                    _dlFolderModelResourcePermission,
+                    themeDisplay.getPermissionChecker(),
+                    themeDisplay.getScopeGroupId(),
+                    folderId,
+                    ActionKeys.ADD_DOCUMENT
+            );
 
-			if (hasPermission) {
-				Layout layout = themeDisplay.getLayout();
-				PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+            if (hasPermission) {
+                Layout layout = themeDisplay.getLayout();
+                PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
-				LiferayPortletURL portletURL;
-				if (layout != null) {
-					portletURL = PortletURLFactoryUtil.create(portletRequest, portletDisplay.getId(), layout,
-							PortletRequest.RENDER_PHASE);
-				} else {
-					portletURL = PortletURLFactoryUtil.create(portletRequest, portletDisplay.getId(),
-							themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
-				}
+                LiferayPortletURL portletURL;
+                if (layout != null) {
+                    portletURL = PortletURLFactoryUtil.create(
+                            portletRequest,
+                            portletDisplay.getId(),
+                            layout,
+                            PortletRequest.RENDER_PHASE
+                    );
+                } else {
+                    portletURL = PortletURLFactoryUtil.create(portletRequest, portletDisplay.getId(),
+                            themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+                }
 
-				portletURL.setParameter("mvcRenderCommandName", "/document_library/create_onlyoffice");
-				portletURL.setParameter("redirect", PortalUtil.getCurrentURL(portletRequest));
+                portletURL.setParameter("mvcRenderCommandName", "/document_library/create_onlyoffice");
+                portletURL.setParameter("redirect", PortalUtil.getCurrentURL(portletRequest));
 
-				if (folder != null) {
-					portletURL.setParameter("folderId", String.valueOf(folder.getFolderId()));
-				}
+                if (folder != null) {
+                    portletURL.setParameter("folderId", String.valueOf(folder.getFolderId()));
+                }
 
-				String labelMenu = _translate(portletRequest, "onlyoffice-context-action-create");
+                String labelMenu = _translate(portletRequest, "onlyoffice-context-action-create");
 
-				menuItems.add(this.getNewMenuItem("#create-document-onlyoffice", labelMenu, "documents-and-media", portletURL.toString()));
-			}
-		} catch (PortalException e) {
-			_log.error(e);
-		}
-	}
+                menuItems.add(this.getNewMenuItem(
+                        "#create-document-onlyoffice",
+                        labelMenu,
+                        "documents-and-media",
+                        portletURL.toString()
+                ));
+            }
+        } catch (PortalException e) {
+            _log.error(e);
+        }
+    }
 
-	protected URLMenuItem getNewMenuItem(final String key, final String labelMenu, final String icon,
-										 final String url) throws PortalException {
-		URLMenuItem menuItem = new URLMenuItem();
-		menuItem.setKey(key);
-		menuItem.setLabel(labelMenu);
-		menuItem.setIcon(icon);
-		menuItem.setURL(url);
-		return menuItem;
-	}
+    protected URLMenuItem getNewMenuItem(final String key, final String labelMenu, final String icon,
+                                         final String url) throws PortalException {
+        URLMenuItem menuItem = new URLMenuItem();
+        menuItem.setKey(key);
+        menuItem.setLabel(labelMenu);
+        menuItem.setIcon(icon);
+        menuItem.setURL(url);
+        return menuItem;
+    }
 
-	private String _translate(final PortletRequest portletRequest, final String key) {
-		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-			_portal.getLocale(portletRequest),
-			EditToolbarContributorContext.class
-		);
+    private String _translate(final PortletRequest portletRequest, final String key) {
+        ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+                _portal.getLocale(portletRequest),
+                EditToolbarContributorContext.class
+        );
 
-		return _language.get(resourceBundle, key);
-	}
+        return _language.get(resourceBundle, key);
+    }
 
-	private static final Log _log = LogFactoryUtil.getLog(EditToolbarContributorContext.class);
+    private static final Log _log = LogFactoryUtil.getLog(EditToolbarContributorContext.class);
 
-	@Reference(target = "(model.class.name=com.liferay.document.library.kernel.model.DLFolder)")
-	private ModelResourcePermission<DLFolder> _dlFolderModelResourcePermission;
+    @Reference(target = "(model.class.name=com.liferay.document.library.kernel.model.DLFolder)")
+    private ModelResourcePermission<DLFolder> _dlFolderModelResourcePermission;
 
-	@Reference
-	private Language _language;
+    @Reference
+    private Language _language;
 
-	@Reference
-	private Portal _portal;
+    @Reference
+    private Portal _portal;
 
 }

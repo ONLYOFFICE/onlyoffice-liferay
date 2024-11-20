@@ -86,7 +86,10 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 
 			String uniqueFileName = DLUtil.getUniqueFileName(repositoryId, folderId, title + "." + type);
 
-			ServiceContext serviceContext = ServiceContextFactory.getInstance(DLFileEntry.class.getName(), actionRequest);
+			ServiceContext serviceContext = ServiceContextFactory.getInstance(
+					DLFileEntry.class.getName(),
+					actionRequest
+			);
 
 			FileEntry newFile = _dlAppService.addFileEntry(repositoryId, folderId, uniqueFileName, mimeType,
 					uniqueFileName, description, (String) null, sourceFile,serviceContext);
