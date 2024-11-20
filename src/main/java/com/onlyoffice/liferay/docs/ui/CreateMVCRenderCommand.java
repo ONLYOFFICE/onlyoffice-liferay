@@ -44,7 +44,7 @@ import javax.servlet.http.HttpServletResponse;
 )
 public class CreateMVCRenderCommand implements MVCRenderCommand {
     @Reference(target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)")
-    protected ServletContext servletContext;
+    private ServletContext servletContext;
 
     @Override
     public String render(final RenderRequest renderRequest, final RenderResponse renderResponse)
