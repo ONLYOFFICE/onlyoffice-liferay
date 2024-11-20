@@ -100,7 +100,9 @@ extends BaseDLViewFileVersionDisplayContext {
             editPerm = fe.containsPermission(checker, ActionKeys.UPDATE);
             viewPerm = fe.containsPermission(checker, ActionKeys.VIEW);
             convPerm = folder.containsPermission(checker, ActionKeys.ADD_DOCUMENT) && viewPerm;
-        } catch (PortalException e) { }
+        } catch (PortalException e) {
+            // Do nothing if exception
+        }
 
         String fileName = fileVersion.getFileName();
         canEdit = documentManager.isEditable(fileName) && editPerm;
