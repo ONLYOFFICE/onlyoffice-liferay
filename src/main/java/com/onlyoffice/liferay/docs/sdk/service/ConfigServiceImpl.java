@@ -36,10 +36,8 @@ import com.onlyoffice.model.common.User;
 import com.onlyoffice.model.documenteditor.config.document.Permissions;
 import com.onlyoffice.service.documenteditor.config.ConfigService;
 import com.onlyoffice.service.documenteditor.config.DefaultConfigService;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-
 
 @Component(
     service = ConfigService.class

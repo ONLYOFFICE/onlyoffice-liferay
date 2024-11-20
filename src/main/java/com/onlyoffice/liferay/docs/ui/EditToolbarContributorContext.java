@@ -38,15 +38,13 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-
 import java.util.List;
 import java.util.ResourceBundle;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 
 @Component(immediate = true, service = { DLPortletToolbarContributorContext.class })
 public class EditToolbarContributorContext implements DLPortletToolbarContributorContext {

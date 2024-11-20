@@ -19,10 +19,10 @@
 
 package com.onlyoffice.liferay.docs;
 
+import org.osgi.service.component.annotations.Component;
+
 import java.io.InputStream;
 import java.util.Scanner;
-
-import org.osgi.service.component.annotations.Component;
 
 @Component(
     service = OnlyOfficeParsingUtils.class

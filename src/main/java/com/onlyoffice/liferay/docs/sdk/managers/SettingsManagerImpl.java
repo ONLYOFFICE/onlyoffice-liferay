@@ -18,15 +18,13 @@
 
 package com.onlyoffice.liferay.docs.sdk.managers;
 
+import com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration;
 import com.onlyoffice.manager.settings.DefaultSettingsManager;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.model.settings.SettingsConstants;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
-
-import com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration;
 
 @Component(
     configurationPid = {

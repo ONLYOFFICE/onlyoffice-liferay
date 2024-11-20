@@ -18,16 +18,6 @@
 
 package com.onlyoffice.liferay.docs.ui;
 
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
-import javax.portlet.WindowStateException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.liferay.document.library.display.context.BaseDLViewFileVersionDisplayContext;
 import com.liferay.document.library.display.context.DLViewFileVersionDisplayContext;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -63,6 +53,15 @@ import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.onlyoffice.manager.document.DocumentManager;
+
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletURL;
+import javax.portlet.WindowStateException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class EditMenuContext
 extends BaseDLViewFileVersionDisplayContext {

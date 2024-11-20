@@ -21,15 +21,12 @@ package com.onlyoffice.liferay.docs.sdk.managers;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.onlyoffice.liferay.docs.utils.OnlyOfficeUtils;
 import com.onlyoffice.manager.document.DefaultDocumentManager;
 import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.settings.SettingsManager;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-
-import com.onlyoffice.liferay.docs.utils.OnlyOfficeUtils;
-
-
 
 @Component(
     service = DocumentManager.class

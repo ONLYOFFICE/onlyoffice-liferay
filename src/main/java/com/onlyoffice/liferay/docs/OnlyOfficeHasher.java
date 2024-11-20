@@ -18,15 +18,14 @@
 
 package com.onlyoffice.liferay.docs;
 
-import java.security.MessageDigest;
-import java.util.Base64;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.onlyoffice.manager.settings.SettingsManager;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import java.security.MessageDigest;
+import java.util.Base64;
 
 @Component(
     service = OnlyOfficeHasher.class

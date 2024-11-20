@@ -18,10 +18,9 @@
 
 package com.onlyoffice.liferay.docs.config;
 
+import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
-import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
-
 
 @ObjectClassDefinition(
     id = "com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration",

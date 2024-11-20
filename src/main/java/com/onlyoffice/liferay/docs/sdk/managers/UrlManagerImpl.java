@@ -29,19 +29,16 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.onlyoffice.liferay.docs.OnlyOfficeHasher;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.manager.url.DefaultUrlManager;
 import com.onlyoffice.manager.url.UrlManager;
 import com.onlyoffice.model.settings.SettingsConstants;
-
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import com.onlyoffice.liferay.docs.OnlyOfficeHasher;
-
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletURL;
 
 @Component(
     service = UrlManager.class

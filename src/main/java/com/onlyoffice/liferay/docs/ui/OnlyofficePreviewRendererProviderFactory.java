@@ -21,20 +21,18 @@ package com.onlyoffice.liferay.docs.ui;
 import com.liferay.document.library.preview.DLPreviewRendererProvider;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.onlyoffice.manager.settings.SettingsManager;
-
-import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.servlet.ServletContext;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.Set;
+import javax.servlet.ServletContext;
 
 @Component(
         immediate = true, service = OnlyofficePreviewRendererProviderFactory.class

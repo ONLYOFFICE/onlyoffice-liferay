@@ -18,11 +18,6 @@
 
 package com.onlyoffice.liferay.docs.utils;
 
-import javax.portlet.RenderRequest;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -40,6 +35,10 @@ import com.onlyoffice.model.documenteditor.Config;
 import com.onlyoffice.model.documenteditor.config.document.Type;
 import com.onlyoffice.model.documenteditor.config.editorconfig.Mode;
 import com.onlyoffice.service.documenteditor.config.ConfigService;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import javax.portlet.RenderRequest;
 
 @Component(
     service = OnlyOfficeEditorUtils.class

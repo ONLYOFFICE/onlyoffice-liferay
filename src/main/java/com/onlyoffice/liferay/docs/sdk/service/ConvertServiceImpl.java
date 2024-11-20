@@ -26,7 +26,6 @@ import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.manager.url.UrlManager;
 import com.onlyoffice.service.convert.ConvertService;
 import com.onlyoffice.service.convert.DefaultConvertService;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 

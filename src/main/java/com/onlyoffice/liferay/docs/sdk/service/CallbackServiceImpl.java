@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.onlyoffice.liferay.docs.utils.OnlyOfficeUtils;
 import com.onlyoffice.manager.security.JwtManager;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.manager.url.UrlManager;
@@ -42,17 +43,13 @@ import com.onlyoffice.model.documenteditor.callback.Action;
 import com.onlyoffice.model.documenteditor.callback.action.Type;
 import com.onlyoffice.service.documenteditor.callback.CallbackService;
 import com.onlyoffice.service.documenteditor.callback.DefaultCallbackService;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
-import com.onlyoffice.liferay.docs.utils.OnlyOfficeUtils;
-
 
 @Component(
     service = CallbackService.class

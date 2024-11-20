@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.onlyoffice.manager.settings.SettingsManager;
 
 import java.util.Optional;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 
