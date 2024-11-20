@@ -37,8 +37,7 @@ public class OnlyOfficeHasher {
 
             String payload = getHashString(str + getSecret()) + "?" + str;
             return Base64.getUrlEncoder().encodeToString(payload.getBytes("UTF-8"));
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             _log.error(ex.getMessage(), ex);
         }
         return "";

@@ -49,7 +49,8 @@ import javax.portlet.PortletResponse;
 @Component(immediate = true, service = { DLPortletToolbarContributorContext.class })
 public class EditToolbarContributorContext implements DLPortletToolbarContributorContext {
 
-	public EditToolbarContributorContext() {}
+	public EditToolbarContributorContext() {
+	}
 
 	public void updatePortletTitleMenuItems(List<MenuItem> menuItems, Folder folder, ThemeDisplay themeDisplay,
 			PortletRequest portletRequest, PortletResponse portletResponse) {

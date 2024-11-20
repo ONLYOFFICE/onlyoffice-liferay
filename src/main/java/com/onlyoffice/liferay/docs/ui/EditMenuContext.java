@@ -187,8 +187,7 @@ extends BaseDLViewFileVersionDisplayContext {
 
         try {
             portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
-        }
-        catch (WindowStateException wse) {
+        } catch (WindowStateException wse) {
             _log.error(wse.getMessage(), wse);
         }
 
@@ -208,8 +207,7 @@ extends BaseDLViewFileVersionDisplayContext {
 
         try {
             portletURL.setWindowState(LiferayWindowState.POP_UP);
-        }
-        catch (WindowStateException wse) {
+        } catch (WindowStateException wse) {
             _log.error(wse.getMessage(), wse);
         }
 
