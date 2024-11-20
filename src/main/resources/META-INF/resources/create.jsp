@@ -92,7 +92,7 @@ renderResponse.setTitle(headerTitle);
 </div>
 
 <c:if test="<%= (fileEntryId != 0) %>">	
-	<liferay-portlet:renderURL portletName="onlyoffice_integration_ui_EditActionPortlet" var="editURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
+	<liferay-portlet:renderURL portletName="com_onlyoffice_liferay_docs_ui_EditActionPortlet" var="editURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
 		<portlet:param name="fileId" value="<%= String.valueOf(fileEntryId) %>" />
 	</liferay-portlet:renderURL>
 	<aui:script>

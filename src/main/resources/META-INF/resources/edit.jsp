@@ -33,8 +33,8 @@
 <%@ page import="org.osgi.framework.BundleContext" %>
 <%@ page import="org.osgi.framework.FrameworkUtil" %>
 
-<%@ page import="onlyoffice.integration.utils.OnlyOfficeEditorUtils" %>
-<%@ page import="onlyoffice.integration.permission.OnlyOfficePermissionUtils" %>
+<%@ page import="com.onlyoffice.liferay.docs.utils.OnlyOfficeEditorUtils" %>
+<%@ page import="com.onlyoffice.liferay.docs.permission.OnlyOfficePermissionUtils" %>
 <%@ page import="com.onlyoffice.manager.url.UrlManager" %>
 
 <liferay-theme:defineObjects />
