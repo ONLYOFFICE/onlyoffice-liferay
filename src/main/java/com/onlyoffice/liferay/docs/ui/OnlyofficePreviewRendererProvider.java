@@ -44,7 +44,7 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
             return Optional.empty();
         }
 
-        return Optional.of( (request, response) -> {
+        return Optional.of((request, response) -> {
             RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher("/preview.jsp");
 
             request.setAttribute("fileEntryId", fileVersion.getFileEntryId());
