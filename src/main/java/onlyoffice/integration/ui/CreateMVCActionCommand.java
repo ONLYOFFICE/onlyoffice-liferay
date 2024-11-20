@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.onlyoffice.manager.document.DocumentManager;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 
 import java.io.File;
@@ -78,13 +79,7 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 
 			Locale locale = themeDisplay.getLocale();
 
-			String pathToSourceFile = "app_data/document-templates/" + locale.toLanguageTag() + "/new." + type;
-			streamSourceFile = this.getClass().getClassLoader().getResourceAsStream(pathToSourceFile);
-
-			if (streamSourceFile == null) {
-				pathToSourceFile = "app_data/document-templates/en-US/new." + type;
-				streamSourceFile = this.getClass().getClassLoader().getResourceAsStream(pathToSourceFile);
-			}
+			streamSourceFile = documentManager.getNewBlankFile(type, locale);
 
 			File sourceFile = FileUtil.createTempFile(streamSourceFile);
 			String mimeType = MimeTypesUtil.getContentType(sourceFile);
@@ -114,4 +109,7 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private DLAppService _dlAppService;
+
+	@Reference
+	private DocumentManager documentManager;
 }
