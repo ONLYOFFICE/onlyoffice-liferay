@@ -3,6 +3,7 @@ Bundle-SymbolicName: onlyoffice.integration.web
 Bundle-Version: 2.4.0
 
 Import-Package: \
+	!jdk.net,\
 	!org.brotli.dec,\
 	!org.conscrypt,\
 	!org.slf4j.impl,\
@@ -18,5 +19,7 @@ Import-Package: \
 -plugin.sass: com.liferay.ant.bnd.sass.SassAnalyzerPlugin
 -provider-policy: ${replacestring;${range;[==,==]};.*,(.*)];$1}
 -sass: *
+
+-includeresource: lib=target/lib/;lib:=true
 
 -fixupmessages "Classes found in the wrong directory"; restrict:=error; is:=warning
