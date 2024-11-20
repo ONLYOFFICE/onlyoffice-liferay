@@ -36,38 +36,38 @@ import javax.servlet.http.HttpServletResponse;
 
 @Component(immediate = true, service = DynamicInclude.class)
 public class DesktopJSDynamicInclude extends BaseDynamicInclude {
-	@Reference
-	private Portal portal;
-	@Reference(target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)")
-	private ServletContext servletContext;
+    @Reference
+    private Portal portal;
+    @Reference(target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)")
+    private ServletContext servletContext;
 
-	@Override
-	public void include(final HttpServletRequest request, final HttpServletResponse response, final String key)
-		throws IOException {
+    @Override
+    public void include(final HttpServletRequest request, final HttpServletResponse response, final String key)
+            throws IOException {
 
-		String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
-		if (userAgent.contains("AscDesktopEditor")) {
-			ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
+        String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+        if (userAgent.contains("AscDesktopEditor")) {
+            ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 
-			StringBundler sb = new StringBundler();
+            StringBundler sb = new StringBundler();
 
-			sb.append("<script src=\"");
-			sb.append(themeDisplay.getPortalURL());
-			sb.append(portal.getPathProxy());
-			sb.append(servletContext.getContextPath());
-			sb.append("/js/desktop.js\" ");
-			sb.append("type= \"text/javascript\">");
-			sb.append("</script>");
+            sb.append("<script src=\"");
+            sb.append(themeDisplay.getPortalURL());
+            sb.append(portal.getPathProxy());
+            sb.append(servletContext.getContextPath());
+            sb.append("/js/desktop.js\" ");
+            sb.append("type= \"text/javascript\">");
+            sb.append("</script>");
 
-			PrintWriter printWriter = response.getWriter();
-			printWriter.println(sb.toString());
-		}
-	}
+            PrintWriter printWriter = response.getWriter();
+            printWriter.println(sb.toString());
+        }
+    }
 
-	@Override
-	public void register(final DynamicIncludeRegistry dynamicIncludeRegistry) {
-		dynamicIncludeRegistry.register(
-			"/html/common/themes/top_head.jsp#post"
-		);
-	}
+    @Override
+    public void register(final DynamicIncludeRegistry dynamicIncludeRegistry) {
+        dynamicIncludeRegistry.register(
+                "/html/common/themes/top_head.jsp#post"
+        );
+    }
 }

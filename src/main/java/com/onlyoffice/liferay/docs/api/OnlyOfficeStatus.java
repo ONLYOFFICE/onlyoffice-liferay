@@ -30,22 +30,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component(
-	immediate = true,
-	property = {
-		"osgi.http.whiteboard.context.path=/",
-		"osgi.http.whiteboard.servlet.pattern=/onlyoffice/status/*"
-	},
-	service = Servlet.class
+        immediate = true,
+        property = {
+                "osgi.http.whiteboard.context.path=/",
+                "osgi.http.whiteboard.servlet.pattern=/onlyoffice/status/*"
+        },
+        service = Servlet.class
 )
 public class OnlyOfficeStatus extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
-		throws IOException, ServletException {
+    @Override
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
+            throws IOException, ServletException {
 
-		JSONObject jsonObj = JSONFactoryUtil.createJSONObject();
-		jsonObj.put("installed", true);
-		response.getWriter().write(jsonObj.toString());
-	}
+        JSONObject jsonObj = JSONFactoryUtil.createJSONObject();
+        jsonObj.put("installed", true);
+        response.getWriter().write(jsonObj.toString());
+    }
 }

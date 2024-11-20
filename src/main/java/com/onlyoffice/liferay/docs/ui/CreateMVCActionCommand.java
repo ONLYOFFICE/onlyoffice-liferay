@@ -49,77 +49,77 @@ import javax.portlet.ActionResponse;
 
 
 @Component(
-	immediate = true,
-	property = {
-		"javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY,
-		"javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
-		"mvc.command.name=/document_library/create_onlyoffice"
-	},
-	service = {MVCActionCommand.class}
+        immediate = true,
+        property = {
+                "javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY,
+                "javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
+                "mvc.command.name=/document_library/create_onlyoffice"
+        },
+        service = {MVCActionCommand.class}
 )
 public class CreateMVCActionCommand extends BaseMVCActionCommand {
-	private static final Log log = LogFactoryUtil.getLog(CreateMVCActionCommand.class);
+    private static final Log log = LogFactoryUtil.getLog(CreateMVCActionCommand.class);
 
-	@Reference
-	private DLAppService dlAppService;
-	@Reference
-	private DocumentManager documentManager;
+    @Reference
+    private DLAppService dlAppService;
+    @Reference
+    private DocumentManager documentManager;
 
-	@Override
-	protected void doProcessAction(final ActionRequest actionRequest, final ActionResponse actionResponse)
-			throws Exception {
-		long folderId = ParamUtil.getLong(actionRequest, "folderId");
-		String type = ParamUtil.getString(actionRequest, "type");
-		String title = ParamUtil.getString(actionRequest, "title");
-		String description = ParamUtil.getString(actionRequest, "description");
-		String redirect = ParamUtil.getString(actionRequest, "redirectUrl");
+    @Override
+    protected void doProcessAction(final ActionRequest actionRequest, final ActionResponse actionResponse)
+            throws Exception {
+        long folderId = ParamUtil.getLong(actionRequest, "folderId");
+        String type = ParamUtil.getString(actionRequest, "type");
+        String title = ParamUtil.getString(actionRequest, "title");
+        String description = ParamUtil.getString(actionRequest, "description");
+        String redirect = ParamUtil.getString(actionRequest, "redirectUrl");
 
-		InputStream streamSourceFile = null;
+        InputStream streamSourceFile = null;
 
-		try {
-			actionResponse.setRenderParameter("folderId", String.valueOf(folderId));
-			actionResponse.setRenderParameter("redirect", redirect);
+        try {
+            actionResponse.setRenderParameter("folderId", String.valueOf(folderId));
+            actionResponse.setRenderParameter("redirect", redirect);
 
-			ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-			Long repositoryId = themeDisplay.getScopeGroupId();
+            ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+            Long repositoryId = themeDisplay.getScopeGroupId();
 
-			Locale locale = themeDisplay.getLocale();
+            Locale locale = themeDisplay.getLocale();
 
-			streamSourceFile = documentManager.getNewBlankFile(type, locale);
+            streamSourceFile = documentManager.getNewBlankFile(type, locale);
 
-			File sourceFile = FileUtil.createTempFile(streamSourceFile);
-			String mimeType = MimeTypesUtil.getContentType(sourceFile);
+            File sourceFile = FileUtil.createTempFile(streamSourceFile);
+            String mimeType = MimeTypesUtil.getContentType(sourceFile);
 
-			String uniqueFileName = DLUtil.getUniqueFileName(repositoryId, folderId, title + "." + type);
+            String uniqueFileName = DLUtil.getUniqueFileName(repositoryId, folderId, title + "." + type);
 
-			ServiceContext serviceContext = ServiceContextFactory.getInstance(
-					DLFileEntry.class.getName(),
-					actionRequest
-			);
+            ServiceContext serviceContext = ServiceContextFactory.getInstance(
+                    DLFileEntry.class.getName(),
+                    actionRequest
+            );
 
-			FileEntry newFile = dlAppService.addFileEntry(
-					repositoryId,
-					folderId,
-					uniqueFileName,
-					mimeType,
-					uniqueFileName,
-					description,
-					(String) null,
-					sourceFile,
-					serviceContext
-			);
+            FileEntry newFile = dlAppService.addFileEntry(
+                    repositoryId,
+                    folderId,
+                    uniqueFileName,
+                    mimeType,
+                    uniqueFileName,
+                    description,
+                    (String) null,
+                    sourceFile,
+                    serviceContext
+            );
 
-			actionResponse.setRenderParameter("fileEntryId", String.valueOf(newFile.getFileEntryId()));
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			if (e instanceof FileNameException || e instanceof PrincipalException.MustHavePermission) {
-				SessionErrors.add(actionRequest, e.getClass());
-			} else {
-				SessionErrors.add(actionRequest, Exception.class);
-			}
-			return;
-		} finally {
-			streamSourceFile.close();
-		}
-	}
+            actionResponse.setRenderParameter("fileEntryId", String.valueOf(newFile.getFileEntryId()));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            if (e instanceof FileNameException || e instanceof PrincipalException.MustHavePermission) {
+                SessionErrors.add(actionRequest, e.getClass());
+            } else {
+                SessionErrors.add(actionRequest, Exception.class);
+            }
+            return;
+        } finally {
+            streamSourceFile.close();
+        }
+    }
 }
