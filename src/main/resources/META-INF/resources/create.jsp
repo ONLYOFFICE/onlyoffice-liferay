@@ -76,7 +76,7 @@ renderResponse.setTitle(headerTitle);
 						<aui:option label="onlyoffice-context-create-type-docx" value="docx" />
 						<aui:option label="onlyoffice-context-create-type-xlsx" value="xlsx" />
 						<aui:option label="onlyoffice-context-create-type-pptx" value="pptx" />
-						<aui:option label="onlyoffice-context-create-type-docxf" value="docxf" />
+						<aui:option label="onlyoffice-context-create-type-pdf" value="pdf" />
 					</aui:select>
 					<aui:input name="title" type="text"  required="true" showRequiredLabel="true" />
 					<aui:input name="description" type="textarea" />
