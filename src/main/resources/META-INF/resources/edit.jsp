@@ -33,27 +33,17 @@
 <%@ page import="org.osgi.framework.BundleContext" %>
 <%@ page import="org.osgi.framework.FrameworkUtil" %>
 
-<%@ page import="com.onlyoffice.liferay.docs.utils.OnlyOfficeEditorUtils" %>
 <%@ page import="com.onlyoffice.liferay.docs.permission.OnlyOfficePermissionUtils" %>
-<%@ page import="com.onlyoffice.manager.url.UrlManager" %>
-<%@ page import="com.onlyoffice.model.documenteditor.Config" %>
-<%@ page import="com.fasterxml.jackson.databind.ObjectMapper" %>
+
 <liferay-theme:defineObjects />
 
 <portlet:defineObjects />
 
 <%
-    ObjectMapper objectMapper = new ObjectMapper();
-    BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeEditorUtils.class).getBundleContext();
     ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(locale, getClass());
 
-    Long fileEntryId = ParamUtil.getLong(renderRequest, "fileId");
+    Long fileEntryId = ParamUtil.getLong(renderRequest, "fileEntryId");
     FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
-    OnlyOfficeEditorUtils editorUtils = bc.getService(bc.getServiceReference(OnlyOfficeEditorUtils.class));
-    UrlManager urlManger = bc.getService(bc.getServiceReference(UrlManager.class));
-
-    Config docsConfig = editorUtils.getConfig(fileEntryId, renderRequest);
-    String documentKey = docsConfig.getDocument().getKey();
 %>
 
 <html>
@@ -61,7 +51,7 @@
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
     <title><%= fileEntry.getFileName() %> - <%= LanguageUtil.get(resourceBundle, "onlyoffice-edit-title") %></title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css" />
-    <script id="scriptApi" type="text/javascript" src="<%= urlManger.getDocumentServerApiUrl(documentKey) %>"></script>
+    <script id="scriptApi" type="text/javascript" src='<%= request.getAttribute("documentServerApiUrl") %>"'></script>
 
     <% if (request.getHeader(HttpHeaders.USER_AGENT).contains("AscDesktopEditor")) { %>
         <script type="text/javascript">
@@ -94,7 +84,7 @@
         <div id="placeholder"></div>
     </div>
     <script>
-    var config = JSON.parse('<%= objectMapper.writeValueAsString(docsConfig) %>');
+    var config = JSON.parse('<%= request.getAttribute("config") %>');
 
         var onRequestSaveAs = function (event) {
             var url = event.data.url;
@@ -105,7 +95,7 @@
             request.send(JSON.stringify({
                 url: url,
                 fileType: fileType,
-                fileEntryId: "<%= fileEntryId %>"
+                fileEntryId: '<%= ParamUtil.getLong(renderRequest, "fileEntryId") %>'
             }));
 
             request.onreadystatechange = function() {

@@ -49,31 +49,6 @@ public class OnlyOfficeEditorUtils {
     @Reference
     private ConfigService configService;
 
-    public Config getConfig(final Long fileEntryId, final RenderRequest req) throws PortalException {
-        FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
-        FileVersion fileVersion = fileEntry.getLatestFileVersion();
-        User user = PortalUtil.getUser(req);
-
-        PermissionChecker checker = permissionFactory.create(user);
-
-        if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)) {
-            throw new PrincipalException.MustHavePermission(
-                    user.getUserId(), ActionKeys.VIEW);
-        }
-
-        Config config = configService.createConfig(
-                String.valueOf(fileVersion.getFileVersionId()),
-                Mode.EDIT,
-                Type.DESKTOP
-        );
-
-        config.getEditorConfig().setLang(
-                LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag()
-        );
-
-        return config;
-    }
-
     public Config getPreviewConfig(final Long fileEntryId, final String version, final RenderRequest req)
             throws PortalException {
         FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
