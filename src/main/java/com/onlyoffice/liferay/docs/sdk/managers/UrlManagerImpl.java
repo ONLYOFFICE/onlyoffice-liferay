@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
+import javax.ws.rs.core.UriBuilder;
 
 @Component(
         service = UrlManager.class
@@ -60,7 +61,16 @@ public class UrlManagerImpl extends DefaultUrlManager {
 
     @Override
     public String getFileUrl(final String fileId) {
-        return getLiferayBaseUrl(false) + "/o/onlyoffice/doc?key=" + hasher.getHash(Long.parseLong(fileId));
+        try {
+            FileVersion fileVersion = dlAppService.getFileVersion(Long.parseLong(fileId));
+
+            return UriBuilder.fromUri(getLiferayBaseUrl(false))
+                    .path("/o/onlyoffice-docs/download/{groupId}/{uuid}")
+                    .build(fileVersion.getGroupId(), fileVersion.getUuid())
+                    .toString();
+        } catch (PortalException e) {
+            return null;
+        }
     }
 
     @Override
