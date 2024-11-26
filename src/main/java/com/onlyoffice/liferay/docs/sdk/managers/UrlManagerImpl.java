@@ -83,19 +83,17 @@ public class UrlManagerImpl extends DefaultUrlManager {
 
     @Override
     public String getCallbackUrl(final String fileId) {
-        FileVersion fileVersion;
-        Long fileEntryId;
-
         try {
-            fileVersion = dlAppService.getFileVersion(Long.parseLong(fileId));
-            fileEntryId = fileVersion.getFileEntryId();
-        } catch (NumberFormatException e) {
-            throw new RuntimeException(e);
-        } catch (PortalException e) {
-            throw new RuntimeException(e);
-        }
+            FileVersion fileVersion = dlAppService.getFileVersion(Long.parseLong(fileId));
+            FileEntry fileEntry = fileVersion.getFileEntry();
 
-        return getLiferayBaseUrl(false) + "/o/onlyoffice/doc?key=" + hasher.getHash(fileEntryId);
+            return UriBuilder.fromUri(getLiferayBaseUrl(false))
+                    .path("/o/onlyoffice-docs/callback/{groupId}/{uuid}")
+                    .build(fileEntry.getGroupId(), fileEntry.getUuid())
+                    .toString();
+        } catch (PortalException e) {
+            return null;
+        }
     }
 
     @Override
