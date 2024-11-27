@@ -23,11 +23,13 @@ import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.onlyoffice.liferay.docs.OnlyOfficeHasher;
 import com.onlyoffice.manager.settings.SettingsManager;
@@ -46,6 +48,8 @@ import javax.ws.rs.core.UriBuilder;
 )
 public class UrlManagerImpl extends DefaultUrlManager {
     @Reference
+    private UserService userService;
+    @Reference
     private OnlyOfficeHasher hasher;
     @Reference
     private DLAppService dlAppService;
@@ -63,10 +67,14 @@ public class UrlManagerImpl extends DefaultUrlManager {
     public String getFileUrl(final String fileId) {
         try {
             FileVersion fileVersion = dlAppService.getFileVersion(Long.parseLong(fileId));
+            FileEntry fileEntry = fileVersion.getFileEntry();
+            User user = userService.getCurrentUser();
 
             return UriBuilder.fromUri(getLiferayBaseUrl(false))
                     .path("/o/onlyoffice-docs/download/{groupId}/{uuid}")
-                    .build(fileVersion.getGroupId(), fileVersion.getUuid())
+                    .queryParam("version", fileVersion.getVersion())
+                    .queryParam("userId", user.getUserId())
+                    .build(fileEntry.getGroupId(), fileEntry.getUuid())
                     .toString();
         } catch (PortalException e) {
             return null;

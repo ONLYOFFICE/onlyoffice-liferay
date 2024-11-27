@@ -32,6 +32,7 @@ import javax.ws.rs.core.Application;
                 JaxrsWhiteboardConstants.JAX_RS_NAME + "=OnlyofficeDocsREST.Application",
                 "liferay.access.control.disable=true",
                 "auth.verifier.guest.allowed=true",
+                "liferay.auth.verifier=false",
                 "liferay.oauth2=false"
         },
         service = Application.class
