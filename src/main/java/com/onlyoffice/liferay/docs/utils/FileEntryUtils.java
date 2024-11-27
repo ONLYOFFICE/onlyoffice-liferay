@@ -20,6 +20,8 @@ package com.onlyoffice.liferay.docs.utils;
 
 import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.onlyoffice.manager.request.RequestManager;
@@ -34,6 +36,9 @@ import java.text.MessageFormat;
 
 @Component(service = FileEntryUtils.class)
 public final class FileEntryUtils {
+    private static final String EDITOR_LOCK_OWNER = "onlyoffice-docs";
+    private static final int EDITING_HASH_LENGTH = 16;
+
     @Reference
     private DLAppService dlAppService;
     @Reference
@@ -61,6 +66,42 @@ public final class FileEntryUtils {
                 );
             }
         });
+    }
+
+    public boolean isLockedInEditor(final FileEntry fileEntry) throws PortalException {
+        return fileEntry.isCheckedOut() && getEditingHash(fileEntry) != null;
+    }
+
+    public boolean isLockedNotInEditor(final FileEntry fileEntry) throws PortalException {
+        return fileEntry.hasLock() && getEditingHash(fileEntry) == null;
+    }
+
+    public String getEditingHash(final long fileEntryId) throws PortalException {
+        FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
+
+        return getEditingHash(fileEntry);
+    }
+
+    public String getEditingHash(final FileEntry fileEntry) throws PortalException {
+        Lock lock = fileEntry.getLock();
+
+        if (lock == null) {
+            return null;
+        }
+
+        if (!lock.getOwner().startsWith(EDITOR_LOCK_OWNER)) {
+            return null;
+        }
+
+        return lock.getOwner().split("\\.")[1];
+    }
+
+    public String generateOwner() {
+        return MessageFormat.format(
+                "{0}.{1}",
+                EDITOR_LOCK_OWNER,
+                SecurityUtils.generateSecret(EDITING_HASH_LENGTH)
+        );
     }
 
     public String formatFileId(final long groupId, final String uuid) {

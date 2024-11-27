@@ -21,18 +21,26 @@ package com.onlyoffice.liferay.docs.portlet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.liferay.document.library.kernel.exception.FileExtensionException;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.onlyoffice.liferay.docs.constants.PortletKeys;
-import com.onlyoffice.liferay.docs.utils.OnlyOfficeUtils;
+import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
 import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.url.UrlManager;
 import com.onlyoffice.model.documenteditor.Config;
@@ -65,10 +73,16 @@ import javax.portlet.RenderResponse;
         service = Portlet.class
 )
 public class EditorPortlet extends MVCPortlet {
+    private static final long LOCKING_TIME = 60 * 1000;
+
     private static final Log log = LogFactoryUtil.getLog(EditorPortlet.class);
 
     @Reference
     private DLAppService dlAppService;
+    @Reference
+    private UserService userService;
+    @Reference
+    private PermissionCheckerFactory permissionCheckerFactory;
     @Reference
     private ConfigService configService;
     @Reference
@@ -76,7 +90,7 @@ public class EditorPortlet extends MVCPortlet {
     @Reference
     private UrlManager urlManager;
     @Reference
-    private OnlyOfficeUtils utils;
+    private FileEntryUtils fileEntryUtils;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -90,13 +104,27 @@ public class EditorPortlet extends MVCPortlet {
         try {
             FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
 
-            if (fileEntry.isCheckedOut() && utils.getCollaborativeEditingKey(fileEntry) == null) {
+            if (fileEntryUtils.isLockedNotInEditor(fileEntry)) {
                 throw new PortletException("Document locked not in ONLYOFFICE Docs Editor");
+            }
+
+            User user = userService.getCurrentUser();
+            PermissionChecker checker = permissionCheckerFactory.create(user);
+
+            if (!fileEntryUtils.isLockedInEditor(fileEntry)
+                    && fileEntry.containsPermission(checker, ActionKeys.UPDATE)) {
+                ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
+                DLAppServiceUtil.checkOutFileEntry(
+                        fileEntry.getFileEntryId(),
+                        fileEntryUtils.generateOwner(),
+                        LOCKING_TIME,
+                        serviceContext
+                );
             }
 
             FileVersion fileVersion = fileEntry.getLatestFileVersion();
             String fileName = fileVersion.getFileName();
-
 
             if (documentManager.getDocumentType(fileName) == null) {
                 throw new FileExtensionException(fileName);

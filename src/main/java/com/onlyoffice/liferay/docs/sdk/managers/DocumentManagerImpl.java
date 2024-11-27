@@ -19,21 +19,27 @@
 package com.onlyoffice.liferay.docs.sdk.managers;
 
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
+import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.onlyoffice.liferay.docs.utils.OnlyOfficeUtils;
+import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
 import com.onlyoffice.manager.document.DefaultDocumentManager;
 import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.settings.SettingsManager;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import java.text.MessageFormat;
+
 @Component(
         service = DocumentManager.class
 )
 public class DocumentManagerImpl extends DefaultDocumentManager {
     @Reference
-    private OnlyOfficeUtils utils;
+    private DLAppService dlAppService;
+    @Reference
+    private FileEntryUtils fileEntryUtils;
 
     public DocumentManagerImpl() {
         super(null);
@@ -47,21 +53,30 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
     @Override
     public String getDocumentKey(final String fileId, final boolean embedded) {
         try {
-            FileVersion fileVersion = DLAppLocalServiceUtil.getFileVersion(Long.parseLong(fileId));
+            FileVersion fileVersion = dlAppService.getFileVersion(Long.parseLong(fileId));
+            FileEntry fileEntry = fileVersion.getFileEntry();
 
-            if (embedded && !fileVersion.getVersion().equals("PWC")) {
-                return createDocKey(fileVersion, true);
+            if (embedded) {
+                return MessageFormat.format(
+                        "{0}_{1}",
+                        fileVersion.getUuid(),
+                        String.valueOf(fileVersion.getModifiedDate().getTime())
+                );
             } else {
-                String key = utils.getCollaborativeEditingKey(fileVersion.getFileEntry());
-
-                if (key != null) {
-                    return key;
+                if (fileEntryUtils.isLockedInEditor(fileEntry)) {
+                    return MessageFormat.format(
+                            "{0}_{1}",
+                            fileEntry.getUuid(),
+                            fileEntryUtils.getEditingHash(fileVersion.getFileEntry())
+                    );
                 } else {
-                    return createDocKey(fileVersion, false);
+                    return MessageFormat.format(
+                            "{0}_{1}",
+                            fileVersion.getUuid(),
+                            String.valueOf(fileVersion.getModifiedDate().getTime())
+                    );
                 }
             }
-        } catch (NumberFormatException e) {
-            throw new RuntimeException(e);
         } catch (PortalException e) {
             throw new RuntimeException(e);
         }
