@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@ import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -29,36 +32,34 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 @Component(
-	immediate = true,
-	property = {
-		"javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY,
-		"javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
-		"mvc.command.name=/document_library/create_onlyoffice"
-	},
-	service = {MVCRenderCommand.class}
+        immediate = true,
+        property = {
+                "javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY,
+                "javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
+                "mvc.command.name=/document_library/create_onlyoffice"
+        },
+        service = MVCRenderCommand.class
 )
 public class CreateMVCRenderCommand implements MVCRenderCommand {
+    @Reference(target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)")
+    private ServletContext servletContext;
 
-	@Override
-	public String render(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException {
-		RequestDispatcher requestDispatcher = this.servletContext.getRequestDispatcher("/create.jsp");
+    @Override
+    public String render(final RenderRequest renderRequest, final RenderResponse renderResponse)
+            throws PortletException {
+        RequestDispatcher requestDispatcher = this.servletContext.getRequestDispatcher("/create.jsp");
 
-		try {
-			HttpServletRequest request = PortalUtil.getHttpServletRequest(renderRequest);
-			HttpServletResponse response = PortalUtil.getHttpServletResponse(renderResponse);
-			requestDispatcher.include(request, response);
-			requestDispatcher.toString();
-		} catch (Exception e) {
-			throw new PortletException(e.getMessage(), e);
-		}
+        try {
+            HttpServletRequest request = PortalUtil.getHttpServletRequest(renderRequest);
+            HttpServletResponse response = PortalUtil.getHttpServletResponse(renderResponse);
+            requestDispatcher.include(request, response);
+            requestDispatcher.toString();
+        } catch (Exception e) {
+            throw new PortletException(e.getMessage(), e);
+        }
 
-		return MVCRenderConstants.MVC_PATH_VALUE_SKIP_DISPATCH;
-	}
-
-	@Reference(target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)")
-	protected ServletContext servletContext;
+        return MVCRenderConstants.MVC_PATH_VALUE_SKIP_DISPATCH;
+    }
 }

@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,15 @@
 
 package com.onlyoffice.liferay.docs;
 
+import org.osgi.service.component.annotations.Component;
+
 import java.io.InputStream;
 import java.util.Scanner;
 
-import org.osgi.service.component.annotations.Component;
-
-@Component(
-    service = OnlyOfficeParsingUtils.class
-)
+@Component(service = OnlyOfficeParsingUtils.class)
 public class OnlyOfficeParsingUtils {
 
-    public String getBody(InputStream stream) {
+    public String getBody(final InputStream stream) {
         Scanner scanner = null;
         Scanner scannerUseDelimiter = null;
         try {

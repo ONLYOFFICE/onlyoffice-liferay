@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,12 @@ import org.osgi.service.metatype.annotations.Designate;
 
 @Designate(ocd = OnlyOfficeConfiguration.class)
 @Component(
-    configurationPid = {
-        "com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration"
-    },
-    immediate = true,
-    service = OnlyOfficeConfigManager.class
+        configurationPid = "com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration",
+        immediate = true,
+        service = OnlyOfficeConfigManager.class
 )
 public class OnlyOfficeConfigManager {
+    private OnlyOfficeConfiguration configuration;
 
     public String getDocUrl() {
         return configuration.docServUrl();
@@ -42,7 +41,7 @@ public class OnlyOfficeConfigManager {
         return url == null || url.isEmpty() ? getDocUrl() : url;
     }
 
-    public String getLiferayUrlOrDefault(String def) {
+    public String getLiferayUrlOrDefault(final String def) {
         String url = configuration.liferayUrl();
         return url == null || url.isEmpty() ? def : url;
     }
@@ -66,9 +65,7 @@ public class OnlyOfficeConfigManager {
 
     @Activate
     @Modified
-    protected void readConfig(OnlyOfficeConfiguration config) {
+    protected void readConfig(final OnlyOfficeConfiguration config) {
         this.configuration = config;
     }
-
-    private OnlyOfficeConfiguration configuration;
 }

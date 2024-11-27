@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,36 +20,32 @@ package com.onlyoffice.liferay.docs.api;
 
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import org.osgi.service.component.annotations.Component;
 
 import java.io.IOException;
-
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.osgi.service.component.annotations.Component;
-
 @Component(
-	immediate = true,
-	property = {
-		"osgi.http.whiteboard.context.path=/",
-		"osgi.http.whiteboard.servlet.pattern=/onlyoffice/status/*"
-	},
-	service = Servlet.class
+        immediate = true,
+        property = {
+                "osgi.http.whiteboard.context.path=/",
+                "osgi.http.whiteboard.servlet.pattern=/onlyoffice/status/*"
+        },
+        service = Servlet.class
 )
 public class OnlyOfficeStatus extends HttpServlet {
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void doGet(
-			HttpServletRequest request, HttpServletResponse response)
-		throws IOException, ServletException {
+    @Override
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
+            throws IOException, ServletException {
 
-		JSONObject jsonObj = JSONFactoryUtil.createJSONObject();
-		jsonObj.put("installed", true);
-		response.getWriter().write(jsonObj.toString());
-	}
-
-	private static final long serialVersionUID = 1L;
+        JSONObject jsonObj = JSONFactoryUtil.createJSONObject();
+        jsonObj.put("installed", true);
+        response.getWriter().write(jsonObj.toString());
+    }
 }

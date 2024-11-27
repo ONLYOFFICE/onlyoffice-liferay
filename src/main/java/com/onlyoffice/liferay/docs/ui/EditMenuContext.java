@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,6 @@
  */
 
 package com.onlyoffice.liferay.docs.ui;
-
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
-import javax.portlet.WindowStateException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import com.liferay.document.library.display.context.BaseDLViewFileVersionDisplayContext;
 import com.liferay.document.library.display.context.DLViewFileVersionDisplayContext;
@@ -64,22 +54,38 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.onlyoffice.manager.document.DocumentManager;
 
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletURL;
+import javax.portlet.WindowStateException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 public class EditMenuContext
 extends BaseDLViewFileVersionDisplayContext {
+    private static final Log log = LogFactoryUtil.getLog(EditMenuContext.class);
 
-    public EditMenuContext(
-        UUID uuid, DLViewFileVersionDisplayContext parentDLDisplayContext,
-        HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse, FileVersion fileVersion, DocumentManager documentManager,
-        PermissionCheckerFactory permissionFactory) {
+    private ThemeDisplay themeDisplay;
+    private ResourceBundle resourceBundle;
+    private boolean canEdit;
+    private boolean canFillForm;
+    private boolean canView;
+    private boolean canConvert;
+    private boolean isMasterForm;
+
+    public EditMenuContext(final UUID uuid, final DLViewFileVersionDisplayContext parentDLDisplayContext,
+                           final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse,
+                           final FileVersion fileVersion, final DocumentManager documentManager,
+                           final PermissionCheckerFactory permissionFactory) {
 
         super(
             uuid, parentDLDisplayContext, httpServletRequest,
             httpServletResponse, fileVersion);
 
-        _themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
-            WebKeys.THEME_DISPLAY);
-        _resourceBundle = ResourceBundleUtil.getBundle("content.Language",
+        themeDisplay = (ThemeDisplay) httpServletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+        resourceBundle = ResourceBundleUtil.getBundle("content.Language",
                 httpServletRequest.getLocale(), getClass());
 
         boolean editPerm = false;
@@ -94,14 +100,16 @@ extends BaseDLViewFileVersionDisplayContext {
             editPerm = fe.containsPermission(checker, ActionKeys.UPDATE);
             viewPerm = fe.containsPermission(checker, ActionKeys.VIEW);
             convPerm = folder.containsPermission(checker, ActionKeys.ADD_DOCUMENT) && viewPerm;
-        } catch (PortalException e) { }
+        } catch (PortalException e) {
+            // Do nothing if exception
+        }
 
         String fileName = fileVersion.getFileName();
-        _canEdit = documentManager.isEditable(fileName) && editPerm;
-        _canFillForm = documentManager.isFillable(fileName) && editPerm;
-        _canView = documentManager.isViewable(fileName) && viewPerm;
-        _canConvert = documentManager.getDefaultConvertExtension(fileName) != null && convPerm;
-        _isMasterForm = fileVersion.getExtension().equals("docxf");
+        canEdit = documentManager.isEditable(fileName) && editPerm;
+        canFillForm = documentManager.isFillable(fileName) && editPerm;
+        canView = documentManager.isViewable(fileName) && viewPerm;
+        canConvert = documentManager.getDefaultConvertExtension(fileName) != null && convPerm;
+        isMasterForm = fileVersion.getExtension().equals("docxf");
     }
 
     public Menu getMenu() throws PortalException {
@@ -109,14 +117,14 @@ extends BaseDLViewFileVersionDisplayContext {
         List<MenuItem> list = menu.getMenuItems();
 
         if (showAction()) {
-            if (_canView) {
+            if (canView) {
                 URLMenuItem item = new URLMenuItem();
-                InitViewItem(item);
+                initViewItem(item);
                 list.add(item);
             }
-            if (_canConvert) {
+            if (canConvert) {
                 JavaScriptMenuItem item = new JavaScriptMenuItem();
-                InitConvertItem(item);
+                initConvertItem(item);
                 list.add(item);
             }
         }
@@ -128,39 +136,39 @@ extends BaseDLViewFileVersionDisplayContext {
     public List<ToolbarItem> getToolbarItems() throws PortalException {
         List<ToolbarItem> toolbarItems = super.getToolbarItems();
 
-        if (_canView) {
+        if (canView) {
             URLToolbarItem item = new URLToolbarItem();
-            InitViewItem(item);
+            initViewItem(item);
             toolbarItems.add(item);
         }
-        if (_canConvert) {
+        if (canConvert) {
             JavaScriptToolbarItem item = new JavaScriptToolbarItem();
-            InitConvertItem(item);
+            initConvertItem(item);
             toolbarItems.add(item);
         }
         return toolbarItems;
     }
 
-    private void InitViewItem(URLUIItem item) {
+    private void initViewItem(final URLUIItem item) {
         String labelKey = "onlyoffice-context-action-view";
 
-        if (_canEdit) {
+        if (canEdit) {
             labelKey = "onlyoffice-context-action-edit";
-        } else if (_canFillForm)  {
+        } else if (canFillForm)  {
             labelKey = "onlyoffice-context-action-fillForm";
         }
 
-        item.setLabel(LanguageUtil.get(request, _resourceBundle, labelKey));
+        item.setLabel(LanguageUtil.get(request, resourceBundle, labelKey));
         item.setTarget("_blank");
         item.setURL(getDocUrl());
     }
 
-    private void InitConvertItem(JavaScriptUIItem item) {
+    private void initConvertItem(final JavaScriptUIItem item) {
         String lang = null;
-        if (_isMasterForm) {
-            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-create-form");
+        if (isMasterForm) {
+            lang = LanguageUtil.get(request, resourceBundle, "onlyoffice-context-action-create-form");
         } else {
-            lang = LanguageUtil.get(request, _resourceBundle, "onlyoffice-context-action-convert");
+            lang = LanguageUtil.get(request, resourceBundle, "onlyoffice-context-action-convert");
         }
         item.setLabel(lang);
 
@@ -178,7 +186,7 @@ extends BaseDLViewFileVersionDisplayContext {
     private String getDocUrl() {
         PortletURL portletURL = PortletURLFactoryUtil.create(
             request, "com_onlyoffice_liferay_docs_ui_EditActionPortlet",
-            _themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+            themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 
 //      MutableRenderParameters added in portlet version 3.0
 //      MutableRenderParameters params = portletURL.getRenderParameters();
@@ -188,9 +196,8 @@ extends BaseDLViewFileVersionDisplayContext {
 
         try {
             portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
-        }
-        catch (WindowStateException wse) {
-            _log.error(wse.getMessage(), wse);
+        } catch (WindowStateException wse) {
+            log.error(wse.getMessage(), wse);
         }
 
         return portletURL.toString();
@@ -199,7 +206,7 @@ extends BaseDLViewFileVersionDisplayContext {
     private String getConvertUrl() {
         PortletURL portletURL = PortletURLFactoryUtil.create(
             request, "com_onlyoffice_liferay_docs_ui_ConvertActionPortlet",
-            _themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+            themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 
 //      MutableRenderParameters added in portlet version 3.0
 //      MutableRenderParameters params = portletURL.getRenderParameters();
@@ -209,16 +216,15 @@ extends BaseDLViewFileVersionDisplayContext {
 
         try {
             portletURL.setWindowState(LiferayWindowState.POP_UP);
-        }
-        catch (WindowStateException wse) {
-            _log.error(wse.getMessage(), wse);
+        } catch (WindowStateException wse) {
+            log.error(wse.getMessage(), wse);
         }
 
         return portletURL.toString();
     }
 
     private boolean showAction() throws SettingsException {
-        PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
+        PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
         String portletName = portletDisplay.getPortletName();
 
@@ -228,21 +234,10 @@ extends BaseDLViewFileVersionDisplayContext {
 
         Settings settings = SettingsFactoryUtil.getSettings(
             new PortletInstanceSettingsLocator(
-                _themeDisplay.getLayout(), portletDisplay.getId()));
+                themeDisplay.getLayout(), portletDisplay.getId()));
 
         TypedSettings typedSettings = new TypedSettings(settings);
 
         return typedSettings.getBooleanValue("showActions");
     }
-
-    private static final Log _log = LogFactoryUtil.getLog(
-        EditMenuContext.class);
-
-    private ThemeDisplay _themeDisplay;
-    private ResourceBundle _resourceBundle;
-    boolean _canEdit;
-    boolean _canFillForm;
-    boolean _canView;
-    boolean _canConvert;
-    boolean _isMasterForm;
 }

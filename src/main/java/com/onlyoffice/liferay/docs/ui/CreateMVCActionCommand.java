@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,85 +31,95 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.onlyoffice.manager.document.DocumentManager;
-import com.liferay.portal.kernel.servlet.SessionErrors;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.Locale;
-
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 @Component(
-	immediate = true,
-	property = {
-		"javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY,
-		"javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
-		"mvc.command.name=/document_library/create_onlyoffice"
-	},
-	service = {MVCActionCommand.class}
+        immediate = true,
+        property = {
+                "javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY,
+                "javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
+                "mvc.command.name=/document_library/create_onlyoffice"
+        },
+        service = MVCActionCommand.class
 )
 public class CreateMVCActionCommand extends BaseMVCActionCommand {
+    private static final Log log = LogFactoryUtil.getLog(CreateMVCActionCommand.class);
 
-	@Override
-	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
-		long folderId = ParamUtil.getLong(actionRequest, "folderId");
-		String type = ParamUtil.getString(actionRequest, "type");
-		String title = ParamUtil.getString(actionRequest, "title");	
-		String description = ParamUtil.getString(actionRequest, "description");
-		String redirect = ParamUtil.getString(actionRequest, "redirectUrl");
+    @Reference
+    private DLAppService dlAppService;
+    @Reference
+    private DocumentManager documentManager;
 
-		InputStream streamSourceFile = null;
+    @Override
+    protected void doProcessAction(final ActionRequest actionRequest, final ActionResponse actionResponse)
+            throws Exception {
+        long folderId = ParamUtil.getLong(actionRequest, "folderId");
+        String type = ParamUtil.getString(actionRequest, "type");
+        String title = ParamUtil.getString(actionRequest, "title");
+        String description = ParamUtil.getString(actionRequest, "description");
+        String redirect = ParamUtil.getString(actionRequest, "redirectUrl");
 
-		try {
-			actionResponse.setRenderParameter("folderId", String.valueOf(folderId));
-			actionResponse.setRenderParameter("redirect", redirect);
+        InputStream streamSourceFile = null;
 
-			ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-			Long repositoryId = themeDisplay.getScopeGroupId();
+        try {
+            actionResponse.setRenderParameter("folderId", String.valueOf(folderId));
+            actionResponse.setRenderParameter("redirect", redirect);
 
-			Locale locale = themeDisplay.getLocale();
+            ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+            Long repositoryId = themeDisplay.getScopeGroupId();
 
-			streamSourceFile = documentManager.getNewBlankFile(type, locale);
+            Locale locale = themeDisplay.getLocale();
 
-			File sourceFile = FileUtil.createTempFile(streamSourceFile);
-			String mimeType = MimeTypesUtil.getContentType(sourceFile);
+            streamSourceFile = documentManager.getNewBlankFile(type, locale);
 
-			String uniqueFileName = DLUtil.getUniqueFileName(repositoryId, folderId, title + "." + type);
+            File sourceFile = FileUtil.createTempFile(streamSourceFile);
+            String mimeType = MimeTypesUtil.getContentType(sourceFile);
 
-			ServiceContext serviceContext = ServiceContextFactory.getInstance(DLFileEntry.class.getName(), actionRequest);
+            String uniqueFileName = DLUtil.getUniqueFileName(repositoryId, folderId, title + "." + type);
 
-			FileEntry newFile = _dlAppService.addFileEntry(repositoryId, folderId, uniqueFileName, mimeType,
-					uniqueFileName, description, (String) null, sourceFile,serviceContext);
+            ServiceContext serviceContext = ServiceContextFactory.getInstance(
+                    DLFileEntry.class.getName(),
+                    actionRequest
+            );
 
-			actionResponse.setRenderParameter("fileEntryId", String.valueOf(newFile.getFileEntryId()));
-		} catch (Exception e) {
-			_log.error(e.getMessage(), e);
-			if (e instanceof FileNameException || e instanceof PrincipalException.MustHavePermission) {
-				SessionErrors.add(actionRequest, e.getClass());
-			} else {
-				SessionErrors.add(actionRequest, Exception.class);
-			}
-			return;
-		} finally {
-			streamSourceFile.close();
-		}
-	}
+            FileEntry newFile = dlAppService.addFileEntry(
+                    repositoryId,
+                    folderId,
+                    uniqueFileName,
+                    mimeType,
+                    uniqueFileName,
+                    description,
+                    (String) null,
+                    sourceFile,
+                    serviceContext
+            );
 
-	private static final Log _log = LogFactoryUtil.getLog(CreateMVCActionCommand.class);
-
-	@Reference
-	private DLAppService _dlAppService;
-
-	@Reference
-	private DocumentManager documentManager;
+            actionResponse.setRenderParameter("fileEntryId", String.valueOf(newFile.getFileEntryId()));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            if (e instanceof FileNameException || e instanceof PrincipalException.MustHavePermission) {
+                SessionErrors.add(actionRequest, e.getClass());
+            } else {
+                SessionErrors.add(actionRequest, Exception.class);
+            }
+            return;
+        } finally {
+            streamSourceFile.close();
+        }
+    }
 }

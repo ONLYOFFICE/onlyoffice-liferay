@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,34 +18,31 @@
 
 package com.onlyoffice.liferay.docs.sdk.managers;
 
+import com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration;
 import com.onlyoffice.manager.settings.DefaultSettingsManager;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.model.settings.SettingsConstants;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 
-import com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration;
-
 @Component(
-    configurationPid = {
-            "com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration"
-    },
-    immediate = true,
-    service = SettingsManager.class
+        configurationPid = "com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration",
+        immediate = true,
+        service = SettingsManager.class
 )
 public class SettingsManagerImpl extends DefaultSettingsManager {
+    private OnlyOfficeConfiguration configuration;
 
     @Activate
     @Modified
-    protected void readConfig(OnlyOfficeConfiguration config) {
+    protected void readConfig(final OnlyOfficeConfiguration config) {
         this.configuration = config;
     }
 
     @Override
-    public String getSetting(String name) {
-        switch(name) {
+    public String getSetting(final String name) {
+        switch (name) {
             case SettingsConstants.URL:
                 return configuration.docServUrl();
             case SettingsConstants.INNER_URL:
@@ -60,14 +57,12 @@ public class SettingsManagerImpl extends DefaultSettingsManager {
                 return String.valueOf(configuration.forceSave());
             case "preview":
                 return String.valueOf(configuration.webPreview());
+            default:
+                return null;
         }
-
-        return null;
     }
 
     @Override
-    public void setSetting(String name, String value) {
+    public void setSetting(final String name, final String value) {
     }
-
-    private OnlyOfficeConfiguration configuration;
 }

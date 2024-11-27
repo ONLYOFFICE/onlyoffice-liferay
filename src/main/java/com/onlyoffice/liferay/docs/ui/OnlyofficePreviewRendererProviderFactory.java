@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,6 @@ package com.onlyoffice.liferay.docs.ui;
 import com.liferay.document.library.preview.DLPreviewRendererProvider;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.onlyoffice.manager.settings.SettingsManager;
-
-import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.servlet.ServletContext;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -36,10 +28,27 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.Set;
+import javax.servlet.ServletContext;
+
 @Component(
-        immediate = true, service = OnlyofficePreviewRendererProviderFactory.class
+        immediate = true,
+        service = OnlyofficePreviewRendererProviderFactory.class
 )
 public class OnlyofficePreviewRendererProviderFactory {
+    private static final int OONLYOFFICE_PREVIEW_SERVICE_RANKING = 100;
+
+    private ServiceRegistration<DLPreviewRendererProvider> dlPreviewRendererProviderServiceRegistration;
+
+    @Reference
+    private SettingsManager settingsManager;
+    @Reference(
+            target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)"
+    )
+    private ServletContext servletContext;
 
     public Set<String> getMimeTypes() {
         return new HashSet<>(Arrays.asList(
@@ -61,34 +70,22 @@ public class OnlyofficePreviewRendererProviderFactory {
     }
 
     @Activate
-    protected void activate(BundleContext bundleContext) {
+    protected void activate(final BundleContext bundleContext) {
         Dictionary<String, Object> properties = new HashMapDictionary<>();
 
-        properties.put("service.ranking", 100);
+        properties.put("service.ranking", OONLYOFFICE_PREVIEW_SERVICE_RANKING);
         properties.put("content.type", getMimeTypes().toArray());
 
-        _dlPreviewRendererProviderServiceRegistration =
+        dlPreviewRendererProviderServiceRegistration =
             bundleContext.registerService(
                 DLPreviewRendererProvider.class,
-                new OnlyofficePreviewRendererProvider(_servletContext, settingsManager),
+                new OnlyofficePreviewRendererProvider(servletContext, settingsManager),
                 properties
             );
     }
 
     @Deactivate
     protected void deactivate() {
-        _dlPreviewRendererProviderServiceRegistration.unregister();
+        dlPreviewRendererProviderServiceRegistration.unregister();
     }
-
-    private ServiceRegistration<DLPreviewRendererProvider>
-    _dlPreviewRendererProviderServiceRegistration;
-
-    @Reference
-    private SettingsManager settingsManager;
-
-    @Reference(
-        target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)"
-    )
-    private ServletContext _servletContext;
-
 }

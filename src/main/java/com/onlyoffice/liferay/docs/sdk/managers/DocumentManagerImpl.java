@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,34 +21,38 @@ package com.onlyoffice.liferay.docs.sdk.managers;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.onlyoffice.liferay.docs.utils.OnlyOfficeUtils;
 import com.onlyoffice.manager.document.DefaultDocumentManager;
 import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.settings.SettingsManager;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import com.onlyoffice.liferay.docs.utils.OnlyOfficeUtils;
-
-
-
 @Component(
-    service = DocumentManager.class
+        service = DocumentManager.class
 )
 public class DocumentManagerImpl extends DefaultDocumentManager {
+    @Reference
+    private OnlyOfficeUtils utils;
 
     public DocumentManagerImpl() {
         super(null);
     }
 
+    @Reference(service = SettingsManager.class, unbind = "-")
+    public void setSettingsManager(final SettingsManager settingsManager) {
+        super.setSettingsManager(settingsManager);
+    }
+
     @Override
-    public String getDocumentKey(String fileId, boolean embedded) {
+    public String getDocumentKey(final String fileId, final boolean embedded) {
         try {
             FileVersion fileVersion = DLAppLocalServiceUtil.getFileVersion(Long.parseLong(fileId));
 
             if (embedded && !fileVersion.getVersion().equals("PWC")) {
                 return createDocKey(fileVersion, true);
             } else {
-                String key = _OOUtils.getCollaborativeEditingKey(fileVersion.getFileEntry());
+                String key = utils.getCollaborativeEditingKey(fileVersion.getFileEntry());
 
                 if (key != null) {
                     return key;
@@ -64,7 +68,7 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
     }
 
     @Override
-    public String getDocumentName(String fileId) {
+    public String getDocumentName(final String fileId) {
         FileVersion fileVersion;
         try {
             fileVersion = DLAppLocalServiceUtil.getFileVersion(Long.parseLong(fileId));
@@ -77,7 +81,7 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
         return fileVersion.getFileName();
     }
 
-    private String createDocKey(FileVersion fileVersion, boolean versionSpecific) throws PortalException {
+    private String createDocKey(final FileVersion fileVersion, final boolean versionSpecific) throws PortalException {
         String key = fileVersion.getFileEntry().getUuid() + "_" + fileVersion.getVersion().hashCode();
 
         if (versionSpecific) {
@@ -86,14 +90,4 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
 
         return key;
     }
-
-    @Reference
-    private OnlyOfficeUtils _OOUtils;
-
-    @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(
-            SettingsManager settingsManager) {
-        super.setSettingsManager(settingsManager);
-    }
-
 }

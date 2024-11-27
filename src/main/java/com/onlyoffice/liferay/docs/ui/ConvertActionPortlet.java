@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,25 @@
 
 package com.onlyoffice.liferay.docs.ui;
 
-import javax.portlet.Portlet;
-
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import org.osgi.service.component.annotations.Component;
 
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import javax.portlet.Portlet;
 
 @Component(
-	immediate = true,
-	property = {
-			"com.liferay.portlet.add-default-resource=true",
-			"com.liferay.portlet.display-category=category.hidden",
-			"com.liferay.portlet.header-portlet-css=/css/main.css",
-			"com.liferay.portlet.instanceable=true",
-			"javax.portlet.display-name=OnlyOffice Convert",
-			"javax.portlet.init-param.template-path=/",
-			"javax.portlet.init-param.view-template=/convert.jsp",
-			"javax.portlet.security-role-ref=power-user,user",
-			"javax.portlet.resource-bundle=content.Language"
-	},
-	service = Portlet.class
+        immediate = true,
+        property = {
+                "com.liferay.portlet.add-default-resource=true",
+                "com.liferay.portlet.display-category=category.hidden",
+                "com.liferay.portlet.header-portlet-css=/css/main.css",
+                "com.liferay.portlet.instanceable=true",
+                "javax.portlet.display-name=OnlyOffice Convert",
+                "javax.portlet.init-param.template-path=/",
+                "javax.portlet.init-param.view-template=/convert.jsp",
+                "javax.portlet.security-role-ref=power-user,user",
+                "javax.portlet.resource-bundle=content.Language"
+        },
+        service = Portlet.class
 )
 public class ConvertActionPortlet extends MVCPortlet {
 }

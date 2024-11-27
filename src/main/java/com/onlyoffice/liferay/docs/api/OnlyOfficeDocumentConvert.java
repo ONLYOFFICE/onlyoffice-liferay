@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,6 @@
  */
 
 package com.onlyoffice.liferay.docs.api;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.Locale;
-
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.hc.core5.http.HttpEntity;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
@@ -55,19 +39,47 @@ import com.onlyoffice.manager.request.RequestManager;
 import com.onlyoffice.model.convertservice.ConvertRequest;
 import com.onlyoffice.model.convertservice.ConvertResponse;
 import com.onlyoffice.service.convert.ConvertService;
+import org.apache.hc.core5.http.HttpEntity;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.Locale;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Component(
-    immediate = true,
-    property = {
-        "osgi.http.whiteboard.context.path=/",
-        "osgi.http.whiteboard.servlet.pattern=/onlyoffice/convert/*"
-    },
-    service = Servlet.class
+        immediate = true,
+        property = {
+                "osgi.http.whiteboard.context.path=/",
+                "osgi.http.whiteboard.servlet.pattern=/onlyoffice/convert/*"
+        },
+        service = Servlet.class
 )
 public class OnlyOfficeDocumentConvert extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private static final Log log = LogFactoryUtil.getLog(OnlyOfficeDocumentConvert.class);
+
+    @Reference
+    private DLAppLocalService dlAppLocalService;
+    @Reference
+    private ConvertService convertService;
+    @Reference
+    private RequestManager requestManager;
+    @Reference
+    private DocumentManager documentManger;
+    @Reference
+    private PermissionCheckerFactory permissionCheckerFactory;
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
+            throws IOException, ServletException {
         User user;
 
         try {
@@ -80,9 +92,9 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
             return;
         }
 
-        Long fileEntryId = ParamUtil.getLong(request , "fileId");
-        String key = ParamUtil.getString(request , "key");
-        String fn = ParamUtil.getString(request , "fileName");
+        Long fileEntryId = ParamUtil.getLong(request, "fileId");
+        String key = ParamUtil.getString(request, "key");
+        String fn = ParamUtil.getString(request, "fileName");
         Locale locale = user.getLocale();
 
         response.setContentType("application/json");
@@ -91,8 +103,9 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
         try {
             FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
 
-            PermissionChecker checker = _permissionFactory.create(user);
-            if (!fileEntry.containsPermission(checker, ActionKeys.VIEW) || !fileEntry.getFolder().containsPermission(checker, ActionKeys.ADD_DOCUMENT)) {
+            PermissionChecker checker = permissionCheckerFactory.create(user);
+            if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)
+                    || !fileEntry.getFolder().containsPermission(checker, ActionKeys.ADD_DOCUMENT)) {
                 throw new Exception("User don't have rights");
             }
 
@@ -104,7 +117,10 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
 
             Long fileVersionId = fileEntry.getFileVersion().getFileVersionId();
 
-            ConvertResponse convertResponse = convertService.processConvert(convertRequest, String.valueOf(fileVersionId));
+            ConvertResponse convertResponse = convertService.processConvert(
+                    convertRequest,
+                    String.valueOf(fileVersionId)
+            );
 
             if (convertResponse.getEndConvert() != null && convertResponse.getEndConvert()) {
                 savefile(request, fileEntry, convertResponse.getFileUrl(), fn);
@@ -117,16 +133,17 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
 
             writer.write(objectMapper.writeValueAsString(convertResponse));
         } catch (Exception ex) {
-            _log.error(ex.getMessage(), ex);
+            log.error(ex.getMessage(), ex);
             writer.write("{\"error\":\"" + ex.getMessage() + "\"}");
         }
     }
 
 
-    private void savefile(HttpServletRequest request, FileEntry fileEntry, String url, String filename) throws Exception {
+    private void savefile(final HttpServletRequest request, final FileEntry fileEntry, final String url,
+                          final String filename) throws Exception {
         User user = PortalUtil.getUser(request);
 
-        _log.info("Trying to download file from URL: " + url);
+        log.info("Trying to download file from URL: " + url);
 
         requestManager.executeGetRequest(url, new RequestManager.Callback<Void>() {
             @Override
@@ -134,43 +151,37 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
                 byte[] bytes = FileUtil.getBytes(((HttpEntity) response).getContent());
                 InputStream inputStream = new ByteArrayInputStream(bytes);
 
-                ServiceContext serviceContext = ServiceContextFactory.getInstance(OnlyOfficeDocumentConvert.class.getName(), request);
+                ServiceContext serviceContext = ServiceContextFactory.getInstance(
+                        OnlyOfficeDocumentConvert.class.getName(),
+                        request
+                );
 
                 String defaultConvertExtension = documentManger.getDefaultConvertExtension(fileEntry.getFileName());
                 String mimeType = MimeTypesUtil.getContentType(filename + "." + defaultConvertExtension);
 
-                if (defaultConvertExtension != null && (defaultConvertExtension.equals("docxf") || defaultConvertExtension.equals("oform"))) {
+                if (defaultConvertExtension != null
+                        && (defaultConvertExtension.equals("docxf") || defaultConvertExtension.equals("oform"))) {
                     mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
                 }
 
-                _dlApp.addFileEntry(user.getUserId(), fileEntry.getRepositoryId(), fileEntry.getFolderId(), filename,
-                        mimeType, filename, fileEntry.getDescription(), "ONLYOFFICE Convert",
-                        inputStream, bytes.length, serviceContext);
+                dlAppLocalService.addFileEntry(
+                        user.getUserId(),
+                        fileEntry.getRepositoryId(),
+                        fileEntry.getFolderId(),
+                        filename,
+                        mimeType,
+                        filename,
+                        fileEntry.getDescription(),
+                        "ONLYOFFICE Convert",
+                        inputStream,
+                        bytes.length,
+                        serviceContext
+                );
 
                 return null;
             }
         });
 
-        _log.info("Document saved.");
+        log.info("Document saved.");
     }
-
-    private static final long serialVersionUID = 1L;
-
-    @Reference
-    private DLAppLocalService _dlApp;
-
-    @Reference
-    ConvertService convertService;
-
-    @Reference
-    RequestManager requestManager;
-
-    @Reference
-    DocumentManager documentManger;
-
-    @Reference
-    private PermissionCheckerFactory _permissionFactory;
-
-    private static final Log _log = LogFactoryUtil.getLog(
-            OnlyOfficeDocumentConvert.class);
 }

@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,41 +29,47 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.onlyoffice.liferay.docs.OnlyOfficeHasher;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.manager.url.DefaultUrlManager;
 import com.onlyoffice.manager.url.UrlManager;
 import com.onlyoffice.model.settings.SettingsConstants;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
-import com.onlyoffice.liferay.docs.OnlyOfficeHasher;
-
-
 @Component(
-    service = UrlManager.class
+        service = UrlManager.class
 )
 public class UrlManagerImpl extends DefaultUrlManager {
+    @Reference
+    private OnlyOfficeHasher hasher;
+    @Reference
+    private DLAppService dlAppService;
 
     public UrlManagerImpl() {
         super(null);
     }
 
-    @Override
-    public String getFileUrl(String fileId) {
-        return getLiferayBaseUrl(false) + "/o/onlyoffice/doc?key=" + _hasher.getHash(Long.parseLong(fileId));
+    @Reference(service = SettingsManager.class, unbind = "-")
+    public void setSettingsManager(final SettingsManager settingsManager) {
+        super.setSettingsManager(settingsManager);
     }
 
     @Override
-    public String getCallbackUrl(String fileId) {
+    public String getFileUrl(final String fileId) {
+        return getLiferayBaseUrl(false) + "/o/onlyoffice/doc?key=" + hasher.getHash(Long.parseLong(fileId));
+    }
+
+    @Override
+    public String getCallbackUrl(final String fileId) {
         FileVersion fileVersion;
         Long fileEntryId;
 
         try {
-            fileVersion = _DLAppService.getFileVersion(Long.parseLong(fileId));
+            fileVersion = dlAppService.getFileVersion(Long.parseLong(fileId));
             fileEntryId = fileVersion.getFileEntryId();
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
@@ -71,17 +77,17 @@ public class UrlManagerImpl extends DefaultUrlManager {
             throw new RuntimeException(e);
         }
 
-        return getLiferayBaseUrl(false) + "/o/onlyoffice/doc?key=" + _hasher.getHash(fileEntryId);
+        return getLiferayBaseUrl(false) + "/o/onlyoffice/doc?key=" + hasher.getHash(fileEntryId);
     }
 
     @Override
-    public String getGobackUrl(String fileId) {
+    public String getGobackUrl(final String fileId) {
         ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
         FileVersion fileVersion;
         FileEntry fileEntry;
         try {
-            fileVersion = _DLAppService.getFileVersion(Long.parseLong(fileId));
+            fileVersion = dlAppService.getFileVersion(Long.parseLong(fileId));
             fileEntry = fileVersion.getFileEntry();
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
@@ -107,7 +113,7 @@ public class UrlManagerImpl extends DefaultUrlManager {
         return portletURL.toString();
     }
 
-    private String getLiferayBaseUrl(Boolean inner) {
+    private String getLiferayBaseUrl(final Boolean inner) {
         ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
         String productInnerUrl = getSettingsManager().getSetting(SettingsConstants.PRODUCT_INNER_URL);
@@ -117,17 +123,5 @@ public class UrlManagerImpl extends DefaultUrlManager {
         } else {
             return sanitizeUrl(serviceContext.getPortalURL());
         }
-    }
-
-    @Reference
-    private OnlyOfficeHasher _hasher;
-
-    @Reference
-    private DLAppService _DLAppService;
-
-    @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(
-            SettingsManager settingsManager) {
-        super.setSettingsManager(settingsManager);
     }
 }

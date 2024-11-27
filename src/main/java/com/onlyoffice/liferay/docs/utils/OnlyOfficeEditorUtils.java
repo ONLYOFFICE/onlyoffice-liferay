@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,6 @@
  */
 
 package com.onlyoffice.liferay.docs.utils;
-
-import javax.portlet.RenderRequest;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.liferay.document.library.kernel.service.DLAppService;
@@ -40,30 +35,44 @@ import com.onlyoffice.model.documenteditor.Config;
 import com.onlyoffice.model.documenteditor.config.document.Type;
 import com.onlyoffice.model.documenteditor.config.editorconfig.Mode;
 import com.onlyoffice.service.documenteditor.config.ConfigService;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
-@Component(
-    service = OnlyOfficeEditorUtils.class
-)
+import javax.portlet.RenderRequest;
+
+@Component(service = OnlyOfficeEditorUtils.class)
 public class OnlyOfficeEditorUtils {
+    @Reference
+    private PermissionCheckerFactory permissionFactory;
+    @Reference
+    private DLAppService dlAppService;
+    @Reference
+    private ConfigService configService;
 
-    public String getConfig(Long fileEntryId, RenderRequest req) {
+    public String getConfig(final Long fileEntryId, final RenderRequest req) {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            FileEntry fileEntry = _DLAppService.getFileEntry(fileEntryId);
+            FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
             FileVersion fileVersion = fileEntry.getLatestFileVersion();
             User user = PortalUtil.getUser(req);
 
-            PermissionChecker checker = _permissionFactory.create(user);
+            PermissionChecker checker = permissionFactory.create(user);
 
             if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)) {
                 throw new PrincipalException.MustHavePermission(
                         user.getUserId(), ActionKeys.VIEW);
             }
 
-            Config config = _configService.createConfig(String.valueOf(fileVersion.getFileVersionId()), Mode.EDIT, Type.DESKTOP);
+            Config config = configService.createConfig(
+                    String.valueOf(fileVersion.getFileVersionId()),
+                    Mode.EDIT,
+                    Type.DESKTOP
+            );
 
-            config.getEditorConfig().setLang(LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag());
+            config.getEditorConfig().setLang(
+                    LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag()
+            );
 
             return mapper.writeValueAsString(config);
         } catch (Exception e) {
@@ -71,22 +80,28 @@ public class OnlyOfficeEditorUtils {
         }
     }
 
-    public String getConfigPreview(Long fileEntryId, String version, RenderRequest req) {
+    public String getConfigPreview(final Long fileEntryId, final String version, final RenderRequest req) {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            FileEntry fileEntry = _DLAppService.getFileEntry(fileEntryId);
-            FileVersion fileVersion = Validator.isNull(version) ? fileEntry.getLatestFileVersion() : fileEntry.getFileVersion(version);
+            FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
+            FileVersion fileVersion = Validator.isNull(version)
+                    ? fileEntry.getLatestFileVersion()
+                    : fileEntry.getFileVersion(version);
             User user = PortalUtil.getUser(req);
 
-            PermissionChecker checker = _permissionFactory.create(user);
+            PermissionChecker checker = permissionFactory.create(user);
 
             if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)) {
                 throw new PrincipalException.MustHavePermission(
                         user.getUserId(), ActionKeys.VIEW);
             }
 
-            Config config = _configService.createConfig(String.valueOf(fileVersion.getFileVersionId()), Mode.VIEW, Type.EMBEDDED);
+            Config config = configService.createConfig(
+                    String.valueOf(fileVersion.getFileVersionId()),
+                    Mode.VIEW,
+                    Type.EMBEDDED
+            );
 
             String title = Validator.isNull(version)
                     ? fileVersion.getFileName()
@@ -96,7 +111,9 @@ public class OnlyOfficeEditorUtils {
                             fileVersion.getVersion()
                         );
 
-            config.getEditorConfig().setLang(LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag());
+            config.getEditorConfig().setLang(
+                    LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag()
+            );
 
             config.getDocument().setTitle(title);
 
@@ -105,14 +122,4 @@ public class OnlyOfficeEditorUtils {
             throw new RuntimeException(e);
         }
     }
-
-    @Reference
-    private PermissionCheckerFactory _permissionFactory;
-
-    @Reference
-    private DLAppService _DLAppService;
-
-    @Reference
-    private ConfigService _configService;
-
 }

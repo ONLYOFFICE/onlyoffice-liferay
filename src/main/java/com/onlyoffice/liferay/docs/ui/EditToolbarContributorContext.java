@@ -1,4 +1,6 @@
-/* (c) Copyright Ascensio System SIA 2023
+/**
+ *
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,83 +38,99 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import java.util.List;
+import java.util.ResourceBundle;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
-import java.util.List;
-import java.util.ResourceBundle;
-
-@Component(immediate = true, service = { DLPortletToolbarContributorContext.class })
+@Component(
+        immediate = true,
+        service = DLPortletToolbarContributorContext.class
+)
 public class EditToolbarContributorContext implements DLPortletToolbarContributorContext {
+    private static final Log log = LogFactoryUtil.getLog(EditToolbarContributorContext.class);
 
-	public EditToolbarContributorContext() {}
+    @Reference(target = "(model.class.name=com.liferay.document.library.kernel.model.DLFolder)")
+    private ModelResourcePermission<DLFolder> dlFolderModelResourcePermission;
+    @Reference
+    private Language language;
+    @Reference
+    private Portal portal;
 
-	public void updatePortletTitleMenuItems(List<MenuItem> menuItems, Folder folder, ThemeDisplay themeDisplay,
-			PortletRequest portletRequest, PortletResponse portletResponse) {
-		try {
-			long folderId = folder != null ? folder.getFolderId() : 0L;
-			Boolean hasPermission = ModelResourcePermissionHelper.contains(_dlFolderModelResourcePermission,
-					themeDisplay.getPermissionChecker(), themeDisplay.getScopeGroupId(), folderId, ActionKeys.ADD_DOCUMENT);
+    public EditToolbarContributorContext() {
+    }
 
-			if (hasPermission) {
-				Layout layout = themeDisplay.getLayout();
-				PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+    public void updatePortletTitleMenuItems(final List<MenuItem> menuItems, final Folder folder,
+                                            final ThemeDisplay themeDisplay, final PortletRequest portletRequest,
+                                            final PortletResponse portletResponse
+    ) {
+        try {
+            long folderId = folder != null ? folder.getFolderId() : 0L;
+            Boolean hasPermission = ModelResourcePermissionHelper.contains(
+                    dlFolderModelResourcePermission,
+                    themeDisplay.getPermissionChecker(),
+                    themeDisplay.getScopeGroupId(),
+                    folderId,
+                    ActionKeys.ADD_DOCUMENT
+            );
 
-				LiferayPortletURL portletURL;
-				if (layout != null) {
-					portletURL = PortletURLFactoryUtil.create(portletRequest, portletDisplay.getId(), layout,
-							PortletRequest.RENDER_PHASE);
-				} else {
-					portletURL = PortletURLFactoryUtil.create(portletRequest, portletDisplay.getId(),
-							themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
-				}
+            if (hasPermission) {
+                Layout layout = themeDisplay.getLayout();
+                PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
-				portletURL.setParameter("mvcRenderCommandName", "/document_library/create_onlyoffice");
-				portletURL.setParameter("redirect", PortalUtil.getCurrentURL(portletRequest));
-				
-				if (folder != null) {
-					portletURL.setParameter("folderId", String.valueOf(folder.getFolderId()));
-				}
+                LiferayPortletURL portletURL;
+                if (layout != null) {
+                    portletURL = PortletURLFactoryUtil.create(
+                            portletRequest,
+                            portletDisplay.getId(),
+                            layout,
+                            PortletRequest.RENDER_PHASE
+                    );
+                } else {
+                    portletURL = PortletURLFactoryUtil.create(portletRequest, portletDisplay.getId(),
+                            themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+                }
 
-				String labelMenu = _translate(portletRequest, "onlyoffice-context-action-create");
+                portletURL.setParameter("mvcRenderCommandName", "/document_library/create_onlyoffice");
+                portletURL.setParameter("redirect", PortalUtil.getCurrentURL(portletRequest));
 
-				menuItems.add(this.getNewMenuItem("#create-document-onlyoffice", labelMenu, "documents-and-media", portletURL.toString()));
-			}
-		} catch (PortalException e) {
-			_log.error(e);
-		}
-	}
+                if (folder != null) {
+                    portletURL.setParameter("folderId", String.valueOf(folder.getFolderId()));
+                }
 
-	protected URLMenuItem getNewMenuItem(String key, String labelMenu, String icon, String url) throws PortalException {
-		URLMenuItem menuItem = new URLMenuItem();
-		menuItem.setKey(key);
-		menuItem.setLabel(labelMenu);
-		menuItem.setIcon(icon);
-		menuItem.setURL(url);
-		return menuItem;
-	}
-	
-	private String _translate(PortletRequest portletRequest, String key) {
-		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-			_portal.getLocale(portletRequest),
-			EditToolbarContributorContext.class);
+                String labelMenu = translate(portletRequest, "onlyoffice-context-action-create");
 
-		return _language.get(resourceBundle, key);
-	}
+                menuItems.add(this.getNewMenuItem(
+                        "#create-document-onlyoffice",
+                        labelMenu,
+                        "documents-and-media",
+                        portletURL.toString()
+                ));
+            }
+        } catch (PortalException e) {
+            log.error(e);
+        }
+    }
 
-	private static final Log _log = LogFactoryUtil.getLog(EditToolbarContributorContext.class);
+    protected URLMenuItem getNewMenuItem(final String key, final String labelMenu, final String icon,
+                                         final String url) throws PortalException {
+        URLMenuItem menuItem = new URLMenuItem();
+        menuItem.setKey(key);
+        menuItem.setLabel(labelMenu);
+        menuItem.setIcon(icon);
+        menuItem.setURL(url);
+        return menuItem;
+    }
 
-	@Reference(target = "(model.class.name=com.liferay.document.library.kernel.model.DLFolder)")
-	private ModelResourcePermission<DLFolder> _dlFolderModelResourcePermission;
-	
-	@Reference
-	private Language _language;
+    private String translate(final PortletRequest portletRequest, final String key) {
+        ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+                portal.getLocale(portletRequest),
+                EditToolbarContributorContext.class
+        );
 
-	@Reference
-	private Portal _portal;
-
+        return language.get(resourceBundle, key);
+    }
 }

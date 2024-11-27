@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,18 +36,40 @@ import com.onlyoffice.model.common.User;
 import com.onlyoffice.model.documenteditor.config.document.Permissions;
 import com.onlyoffice.service.documenteditor.config.ConfigService;
 import com.onlyoffice.service.documenteditor.config.DefaultConfigService;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-
 @Component(
-    service = ConfigService.class
+        service = ConfigService.class
 )
 public class ConfigServiceImpl extends DefaultConfigService {
+    @Reference
+    private PermissionCheckerFactory permissionCheckerFactory;
+    @Reference
+    private DLAppService dlAppService;
 
     public ConfigServiceImpl() {
         super(null, null, null, null);
+    }
+
+    @Reference(service = SettingsManager.class, unbind = "-")
+    public void setSettingsManager(final SettingsManager settingsManager) {
+        super.setSettingsManager(settingsManager);
+    }
+
+    @Reference(service = DocumentManager.class, unbind = "-")
+    public void setDocumentManager(final DocumentManager documentManager) {
+        super.setDocumentManager(documentManager);
+    }
+
+    @Reference(service = JwtManager.class, unbind = "-")
+    public void setJwtManager(final JwtManager jwtManager) {
+        super.setJwtManager(jwtManager);
+    }
+
+    @Reference(service = UrlManager.class, unbind = "-")
+    public void setUrlManager(final UrlManager urlManager) {
+        super.setUrlManager(urlManager);
     }
 
     @Override
@@ -57,11 +79,11 @@ public class ConfigServiceImpl extends DefaultConfigService {
 
         try {
             com.liferay.portal.kernel.model.User user = UserLocalServiceUtil.getUserById(userId);
-            FileVersion fileVersion = _DLAppService.getFileVersion(Long.parseLong(fileId));
+            FileVersion fileVersion = dlAppService.getFileVersion(Long.parseLong(fileId));
             FileEntry fileEntry = fileVersion.getFileEntry();
             String fileName = getDocumentManager().getDocumentName(fileId);
 
-            PermissionChecker checker = _permissionFactory.create(user);
+            PermissionChecker checker = permissionCheckerFactory.create(user);
 
             boolean editPermission = fileEntry.containsPermission(checker, ActionKeys.UPDATE);
             Boolean isEditable = super.getDocumentManager().isEditable(fileName)
@@ -92,35 +114,5 @@ public class ConfigServiceImpl extends DefaultConfigService {
                 .id(String.valueOf(user.getUserId()))
                 .name(user.getFullName())
                 .build();
-    }
-
-    @Reference
-    private PermissionCheckerFactory _permissionFactory;
-
-    @Reference
-    private DLAppService _DLAppService;
-
-    @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(
-            SettingsManager settingsManager) {
-        super.setSettingsManager(settingsManager);
-    }
-
-    @Reference(service = DocumentManager.class, unbind = "-")
-    public void setDocumentManager(
-            DocumentManager documentManager) {
-        super.setDocumentManager(documentManager);
-    }
-
-    @Reference(service = JwtManager.class, unbind = "-")
-    public void setJwtManager(
-            JwtManager jwtManager) {
-        super.setJwtManager(jwtManager);
-    }
-
-    @Reference(service = UrlManager.class, unbind = "-")
-    public void setUrlManager(
-            UrlManager urlManager) {
-        super.setUrlManager(urlManager);
     }
 }

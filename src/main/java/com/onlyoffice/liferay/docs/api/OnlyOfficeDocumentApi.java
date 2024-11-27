@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,6 @@
 
 package com.onlyoffice.liferay.docs.api;
 
-import java.io.IOException;
-
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.json.JSONObject;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -38,30 +26,51 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
+import com.onlyoffice.liferay.docs.OnlyOfficeHasher;
+import com.onlyoffice.liferay.docs.OnlyOfficeParsingUtils;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.model.documenteditor.Callback;
 import com.onlyoffice.service.documenteditor.callback.CallbackService;
+import org.json.JSONObject;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
-import com.onlyoffice.liferay.docs.OnlyOfficeHasher;
-import com.onlyoffice.liferay.docs.OnlyOfficeParsingUtils;
+import java.io.IOException;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Component(
-    immediate = true,
-    property = {
-        "osgi.http.whiteboard.context.path=/",
-        "osgi.http.whiteboard.servlet.pattern=/onlyoffice/doc/*"
-    },
-    service = Servlet.class
+        immediate = true,
+        property = {
+                "osgi.http.whiteboard.context.path=/",
+                "osgi.http.whiteboard.servlet.pattern=/onlyoffice/doc/*"
+        },
+        service = Servlet.class
 )
 public class OnlyOfficeDocumentApi extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    private static final Log log = LogFactoryUtil.getLog(OnlyOfficeDocumentApi.class);
+
+    @Reference
+    private OnlyOfficeHasher hasher;
+    @Reference
+    private OnlyOfficeParsingUtils parsingUtils;
+    @Reference
+    private SettingsManager settingsManager;
+    @Reference
+    private CallbackService callbackService;
+
 
     @Override
-    protected void doGet(
-            HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException {
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
+            throws IOException, ServletException {
 
         String key = ParamUtil.getString(request, "key");
-        Long fileVersionId = _hasher.validate(key);
+        Long fileVersionId = hasher.validate(key);
 
         try {
             FileVersion fileVersion = DLAppLocalServiceUtil.getFileVersion(fileVersionId);
@@ -72,23 +81,22 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
 
             StreamUtil.transfer(fileVersion.getContentStream(false), response.getOutputStream());
         } catch (PortalException e) {
-            _log.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
 
     @Override
-    protected void doPost(
-            HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException {
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
+            throws IOException, ServletException {
 
         String error = null;
 
         String key = ParamUtil.getString(request, "key");
-        Long fileEntryId = _hasher.validate(key);
+        Long fileEntryId = hasher.validate(key);
 
         try {
-            String body = _parsingUtils.getBody(request.getInputStream());
+            String body = parsingUtils.getBody(request.getInputStream());
 
             if (body.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -106,13 +114,13 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             }
         } catch (Exception ex) {
             error = "Unable to process ONLYOFFICE response: " + ex.getMessage();
-            _log.error(error, ex);
+            log.error(error, ex);
         }
 
         try {
             JSONObject respBody = new JSONObject();
             if (error != null) {
-                response.setStatus(500);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 respBody.put("error", 1);
                 respBody.put("message", error);
             } else {
@@ -124,20 +132,4 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
-
-    private static final long serialVersionUID = 1L;
-
-    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeDocumentApi.class);
-
-    @Reference
-    private OnlyOfficeHasher _hasher;
-
-    @Reference
-    private OnlyOfficeParsingUtils _parsingUtils;
-
-    @Reference
-    private SettingsManager settingsManager;
-
-    @Reference
-    private CallbackService callbackService;
 }

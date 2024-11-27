@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,55 +18,41 @@
 
 package com.onlyoffice.liferay.docs.sdk.service;
 
-import com.liferay.document.library.kernel.service.DLAppService;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.request.RequestManager;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.manager.url.UrlManager;
 import com.onlyoffice.service.convert.ConvertService;
 import com.onlyoffice.service.convert.DefaultConvertService;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 
 @Component(
-    service = ConvertService.class
+        service = ConvertService.class
 )
 public class ConvertServiceImpl extends DefaultConvertService implements ConvertService {
-
     public ConvertServiceImpl() {
         super(null, null, null, null);
     }
 
-    @Reference
-    private PermissionCheckerFactory _permissionFactory;
-
-    @Reference
-    private DLAppService _DLAppService;
-
     @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(
-            SettingsManager settingsManager) {
+    public void setSettingsManager(final SettingsManager settingsManager) {
         super.setSettingsManager(settingsManager);
     }
 
     @Reference(service = DocumentManager.class, unbind = "-")
-    public void setDocumentManager(
-            DocumentManager documentManager) {
+    public void setDocumentManager(final DocumentManager documentManager) {
         super.setDocumentManager(documentManager);
     }
 
     @Reference(service = RequestManager.class, unbind = "-")
-    public void setRequestManager(
-            RequestManager requestManager) {
+    public void setRequestManager(final RequestManager requestManager) {
         super.setRequestManager(requestManager);
     }
 
     @Reference(service = UrlManager.class, unbind = "-")
-    public void setUrlManager(
-            UrlManager urlManager) {
+    public void setUrlManager(final UrlManager urlManager) {
         super.setUrlManager(urlManager);
     }
 }

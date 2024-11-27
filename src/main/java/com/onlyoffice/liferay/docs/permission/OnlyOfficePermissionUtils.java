@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,19 +27,22 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionHelper;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-@Component(immediate = true, service = {})
+@Component(
+        immediate = true,
+        service = {}
+)
 public class OnlyOfficePermissionUtils {
+    private static ModelResourcePermission<Folder> folderModelResourcePermission;
 
-    public static boolean saveAs(FileEntry file, User user) throws PortalException {
-        PermissionChecker checker = PermissionCheckerFactoryUtil.create(user); 
+    public static boolean saveAs(final FileEntry file, final User user) throws PortalException {
+        PermissionChecker checker = PermissionCheckerFactoryUtil.create(user);
 
-        return file.containsPermission(checker, ActionKeys.VIEW) &&
-                ModelResourcePermissionHelper.contains(
-                        _folderModelResourcePermission, checker, file.getGroupId(),
+        return file.containsPermission(checker, ActionKeys.VIEW)
+                && ModelResourcePermissionHelper.contains(
+                        folderModelResourcePermission, checker, file.getGroupId(),
                         file.getFolderId(), ActionKeys.ADD_DOCUMENT);
     }
 
@@ -47,9 +50,7 @@ public class OnlyOfficePermissionUtils {
         target = "(model.class.name=com.liferay.portal.kernel.repository.model.Folder)",
         unbind = "-"
     )
-    protected void setFolderModelResourcePermission(ModelResourcePermission<Folder> modelResourcePermission) {
-        _folderModelResourcePermission = modelResourcePermission;
+    protected void setFolderModelResourcePermission(final ModelResourcePermission<Folder> modelResourcePermission) {
+        folderModelResourcePermission = modelResourcePermission;
     }
-
-    private static ModelResourcePermission<Folder> _folderModelResourcePermission;
 }

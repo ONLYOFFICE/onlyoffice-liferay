@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,51 +18,46 @@
 
 package com.onlyoffice.liferay.docs;
 
-import java.security.MessageDigest;
-import java.util.Base64;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.onlyoffice.manager.settings.SettingsManager;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
-@Component(
-    service = OnlyOfficeHasher.class
-)
+import java.security.MessageDigest;
+import java.util.Base64;
+
+@Component(service = OnlyOfficeHasher.class)
 public class OnlyOfficeHasher {
-    public String getHash(Long id) {
-        try
-        {
+    private static final Log log = LogFactoryUtil.getLog(OnlyOfficeHasher.class);
+
+    @Reference
+    private SettingsManager settingsManager;
+
+    public String getHash(final Long id) {
+        try {
             String str = Long.toString(id);
 
             String payload = getHashString(str + getSecret()) + "?" + str;
             return Base64.getUrlEncoder().encodeToString(payload.getBytes("UTF-8"));
-        }
-        catch (Exception ex)
-        {
-            _log.error(ex.getMessage(), ex);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
         }
         return "";
     }
 
-    public Long validate(String base64)
-    {
-        try
-        {
+    public Long validate(final String base64) {
+        try {
             String payload = new String(Base64.getUrlDecoder().decode(base64), "UTF-8");
 
             String[] payloadParts = payload.split("\\?");
 
             String hash = getHashString(payloadParts[1] + getSecret());
-            if (hash.equals(payloadParts[0]))
-            {
+            if (hash.equals(payloadParts[0])) {
                 return Long.parseLong(payloadParts[1]);
             }
-        } catch (Exception ex)
-        {
-            _log.error(ex.getMessage(), ex);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
         }
         return (long) 0;
     }
@@ -71,24 +66,16 @@ public class OnlyOfficeHasher {
         return settingsManager.getSecurityKey();
     }
 
-    private String getHashString(String str)
-    {
-        try
-        {
+    private String getHashString(final String str) {
+        try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] digest = md.digest(str.getBytes());
             String b64 = Base64.getEncoder().encodeToString(digest);
 
             return b64;
-        } catch (Exception ex)
-        {
-            _log.error(ex.getMessage(), ex);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
         }
         return "";
     }
-
-    @Reference
-    private SettingsManager settingsManager;
-
-    private static final Log _log = LogFactoryUtil.getLog(OnlyOfficeHasher.class);
 }

@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,11 @@ import com.onlyoffice.manager.request.RequestManager;
 import com.onlyoffice.manager.security.JwtManager;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.manager.url.UrlManager;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-
 @Component(
-    service = RequestManager.class
+        service = RequestManager.class
 )
 public class RequestManagerImpl extends DefaultRequestManager {
 
@@ -38,20 +36,17 @@ public class RequestManagerImpl extends DefaultRequestManager {
     }
 
     @Reference(service = SettingsManager.class, unbind = "-")
-    public void setSettingsManager(
-            SettingsManager settingsManager) {
+    public void setSettingsManager(final SettingsManager settingsManager) {
         super.setSettingsManager(settingsManager);
     }
 
     @Reference(service = JwtManager.class, unbind = "-")
-    public void setJwtManager(
-            JwtManager jwtManager) {
+    public void setJwtManager(final JwtManager jwtManager) {
         super.setJwtManager(jwtManager);
     }
 
     @Reference(service = UrlManager.class, unbind = "-")
-    public void setUrlManager(
-            UrlManager urlManager) {
+    public void setUrlManager(final UrlManager urlManager) {
         super.setUrlManager(urlManager);
     }
 }

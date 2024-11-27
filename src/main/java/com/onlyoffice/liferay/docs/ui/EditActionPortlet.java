@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@
 
 package com.onlyoffice.liferay.docs.ui;
 
-import javax.portlet.Portlet;
-
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import org.osgi.service.component.annotations.Component;
 
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import javax.portlet.Portlet;
 
 @Component(
     immediate = true,
