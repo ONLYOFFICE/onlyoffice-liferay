@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.onlyoffice.liferay.docs.OnlyOfficeHasher;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.manager.url.DefaultUrlManager;
 import com.onlyoffice.manager.url.UrlManager;
@@ -49,8 +48,6 @@ import javax.ws.rs.core.UriBuilder;
 public class UrlManagerImpl extends DefaultUrlManager {
     @Reference
     private UserService userService;
-    @Reference
-    private OnlyOfficeHasher hasher;
     @Reference
     private DLAppService dlAppService;
 
