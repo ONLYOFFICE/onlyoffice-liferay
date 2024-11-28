@@ -64,11 +64,7 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
                 );
             } else {
                 if (fileEntryUtils.isLockedInEditor(fileEntry)) {
-                    return MessageFormat.format(
-                            "{0}_{1}",
-                            fileEntry.getUuid(),
-                            fileEntryUtils.getEditingHash(fileVersion.getFileEntry())
-                    );
+                    return fileEntryUtils.getEditingKey(fileVersion.getFileEntry());
                 } else {
                     return MessageFormat.format(
                             "{0}_{1}",
@@ -94,15 +90,5 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
         }
 
         return fileVersion.getFileName();
-    }
-
-    private String createDocKey(final FileVersion fileVersion, final boolean versionSpecific) throws PortalException {
-        String key = fileVersion.getFileEntry().getUuid() + "_" + fileVersion.getVersion().hashCode();
-
-        if (versionSpecific) {
-            key = key + "_version";
-        }
-
-        return key;
     }
 }

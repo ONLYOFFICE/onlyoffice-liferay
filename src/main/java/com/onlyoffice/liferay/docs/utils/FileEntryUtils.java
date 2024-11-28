@@ -18,12 +18,15 @@
 
 package com.onlyoffice.liferay.docs.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.onlyoffice.liferay.docs.model.EditingMeta;
 import com.onlyoffice.manager.request.RequestManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.hc.core5.http.HttpEntity;
@@ -43,6 +46,8 @@ public final class FileEntryUtils {
     private DLAppService dlAppService;
     @Reference
     private RequestManager requestManager;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public FileEntry updateFileEntryFromUrl(final FileEntry fileEntry, final String fileUrl,
                                        final DLVersionNumberIncrease dlVersionNumberIncrease) throws Exception {
@@ -69,37 +74,59 @@ public final class FileEntryUtils {
     }
 
     public boolean isLockedInEditor(final FileEntry fileEntry) throws PortalException {
-        return fileEntry.isCheckedOut() && getEditingHash(fileEntry) != null;
+        Lock lock = fileEntry.getLock();
+
+        return lock != null && lock.getOwner().startsWith(EDITOR_LOCK_OWNER);
     }
 
     public boolean isLockedNotInEditor(final FileEntry fileEntry) throws PortalException {
-        return fileEntry.hasLock() && getEditingHash(fileEntry) == null;
+        Lock lock = fileEntry.getLock();
+
+        return lock != null && !lock.getOwner().startsWith(EDITOR_LOCK_OWNER);
     }
 
-    public String getEditingHash(final long fileEntryId) throws PortalException {
-        FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
+    public EditingMeta getEditingMeta(final String owner) {
+        if (owner == null) {
+            return null;
+        }
 
-        return getEditingHash(fileEntry);
+        if (!owner.startsWith(EDITOR_LOCK_OWNER)) {
+            return null;
+        }
+
+        String metaString = owner.substring(EDITOR_LOCK_OWNER.length() + 1);
+
+        try {
+            return objectMapper.readValue(metaString, EditingMeta.class);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
     }
 
-    public String getEditingHash(final FileEntry fileEntry) throws PortalException {
+    public String createEditorLockOwner(final String editingKey) throws JsonProcessingException {
+        return MessageFormat.format(
+                "{0}.{1}",
+                EDITOR_LOCK_OWNER,
+                objectMapper.writeValueAsString(
+                        new EditingMeta(editingKey)
+                )
+        );
+    }
+
+    public String getEditingKey(final FileEntry fileEntry) {
         Lock lock = fileEntry.getLock();
 
         if (lock == null) {
             return null;
         }
 
-        if (!lock.getOwner().startsWith(EDITOR_LOCK_OWNER)) {
-            return null;
-        }
-
-        return lock.getOwner().split("\\.")[1];
+        return getEditingMeta(lock.getOwner()).getEditingKey();
     }
 
-    public String generateOwner() {
+    public String generateEditingKey(final FileEntry fileEntry) {
         return MessageFormat.format(
-                "{0}.{1}",
-                EDITOR_LOCK_OWNER,
+                "{0}_{1}",
+                fileEntry.getUuid(),
                 SecurityUtils.generateSecret(EDITING_HASH_LENGTH)
         );
     }

@@ -115,9 +115,11 @@ public class EditorPortlet extends MVCPortlet {
                     && fileEntry.containsPermission(checker, ActionKeys.UPDATE)) {
                 ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
+                String editingKey = fileEntryUtils.generateEditingKey(fileEntry);
+
                 DLAppServiceUtil.checkOutFileEntry(
                         fileEntry.getFileEntryId(),
-                        fileEntryUtils.generateOwner(),
+                        fileEntryUtils.createEditorLockOwner(editingKey),
                         LOCKING_TIME,
                         serviceContext
                 );
