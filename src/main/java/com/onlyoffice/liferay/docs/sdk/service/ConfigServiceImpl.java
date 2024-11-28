@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
 import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.security.JwtManager;
 import com.onlyoffice.manager.settings.SettingsManager;
@@ -47,6 +48,8 @@ public class ConfigServiceImpl extends DefaultConfigService {
     private PermissionCheckerFactory permissionCheckerFactory;
     @Reference
     private DLAppService dlAppService;
+    @Reference
+    private FileEntryUtils fileEntryUtils;
 
     public ConfigServiceImpl() {
         super(null, null, null, null);
@@ -88,9 +91,10 @@ public class ConfigServiceImpl extends DefaultConfigService {
             boolean editPermission = fileEntry.containsPermission(checker, ActionKeys.UPDATE);
             Boolean isEditable = super.getDocumentManager().isEditable(fileName)
                     || super.getDocumentManager().isFillable(fileName);
+            boolean isLockedNotInEditor = fileEntryUtils.isLockedNotInEditor(fileEntry);
 
             return Permissions.builder()
-                    .edit(editPermission && isEditable)
+                    .edit(editPermission && isEditable && !isLockedNotInEditor)
                     .build();
         } catch (PortalException e) {
             throw new RuntimeException(e);

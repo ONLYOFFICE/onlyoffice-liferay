@@ -103,10 +103,6 @@ public class EditorPortlet extends MVCPortlet {
         try {
             FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
 
-            if (fileEntryUtils.isLockedNotInEditor(fileEntry)) {
-                throw new PortletException("Document locked not in ONLYOFFICE Docs Editor");
-            }
-
             User user = userService.getCurrentUser();
             PermissionChecker checker = permissionCheckerFactory.create(user);
 

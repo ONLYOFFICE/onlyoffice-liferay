@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
+import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
 import com.onlyoffice.manager.document.DocumentManager;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -39,9 +40,11 @@ import javax.servlet.http.HttpServletResponse;
 )
 public class EditMenuContextFactory implements DLDisplayContextFactory {
     @Reference
+    private PermissionCheckerFactory permissionCheckerFactory;
+    @Reference
     private DocumentManager documentManager;
     @Reference
-    private PermissionCheckerFactory permissionCheckerFactory;
+    private FileEntryUtils fileEntryUtils;
 
     public DLEditFileEntryDisplayContext getDLEditFileEntryDisplayContext(
             final DLEditFileEntryDisplayContext parentDLEditFileEntryDisplayContext,
@@ -75,6 +78,6 @@ public class EditMenuContextFactory implements DLDisplayContextFactory {
         return new EditMenuContext(
             parentDLViewFileVersionDisplayContext.getUuid(),
             parentDLViewFileVersionDisplayContext, httpServletRequest,
-            httpServletResponse, fileVersion, documentManager, permissionCheckerFactory);
+            httpServletResponse, fileVersion, documentManager, fileEntryUtils, permissionCheckerFactory);
     }
 }
