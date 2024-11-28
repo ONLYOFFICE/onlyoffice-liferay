@@ -70,7 +70,6 @@ extends BaseDLViewFileVersionDisplayContext {
     private ThemeDisplay themeDisplay;
     private ResourceBundle resourceBundle;
     private boolean canEdit;
-    private boolean canFillForm;
     private boolean canView;
     private boolean canConvert;
 
@@ -105,7 +104,6 @@ extends BaseDLViewFileVersionDisplayContext {
 
         String fileName = fileVersion.getFileName();
         canEdit = documentManager.isEditable(fileName) && editPerm;
-        canFillForm = documentManager.isFillable(fileName) && editPerm;
         canView = documentManager.isViewable(fileName) && viewPerm;
         canConvert = documentManager.getDefaultConvertExtension(fileName) != null && convPerm;
     }
@@ -152,8 +150,6 @@ extends BaseDLViewFileVersionDisplayContext {
 
         if (canEdit) {
             labelKey = "onlyoffice-context-action-edit";
-        } else if (canFillForm)  {
-            labelKey = "onlyoffice-context-action-fillForm";
         }
 
         item.setLabel(LanguageUtil.get(request, resourceBundle, labelKey));
