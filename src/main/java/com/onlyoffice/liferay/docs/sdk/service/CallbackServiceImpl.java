@@ -41,6 +41,8 @@ import org.osgi.service.component.annotations.Reference;
 import java.text.MessageFormat;
 import java.util.List;
 
+import static com.onlyoffice.liferay.docs.utils.FileEntryUtils.LOCKING_TIME;
+
 @Component(
         service = CallbackService.class
 )
@@ -81,15 +83,6 @@ public class CallbackServiceImpl extends DefaultCallbackService {
                             fileEntryKeys.getUuid(),
                             fileEntryKeys.getGroupId()
                     );
-
-                    if (!fileEntryUtils.isLockedInEditor(fileEntry)) {
-                        throw new RuntimeException(
-                                MessageFormat.format(
-                                        "FileEntry with ID ({0}) not locked in ONLYOFFICE Docs Editor",
-                                        String.valueOf(fileEntry.getFileEntryId())
-                                )
-                        );
-                    }
 
                     switch (action.getType()) {
                         case CONNECTED:
@@ -269,8 +262,17 @@ public class CallbackServiceImpl extends DefaultCallbackService {
 
     private void handlerConnecting(final Callback callback, final FileEntry fileEntry, final Long userId)
             throws Exception {
-        Lock lock = fileEntry.getLock();
+        FileEntry thisFileEntry = fileEntry;
+        if (!fileEntryUtils.isLockedInEditor(thisFileEntry)) {
+            thisFileEntry = dlAppService.checkOutFileEntry(
+                    fileEntry.getFileEntryId(),
+                    fileEntryUtils.createEditorLockOwner(callback.getKey()),
+                    LOCKING_TIME,
+                    ServiceContextThreadLocal.getServiceContext()
+            );
+        }
 
+        Lock lock = thisFileEntry.getLock();
         if (lock.getExpirationTime() > 0) {
             SecurityUtils.runAs(new SecurityUtils.RunAsWork<Void>() {
                 public Void doWork() throws PortalException {
@@ -289,6 +291,15 @@ public class CallbackServiceImpl extends DefaultCallbackService {
             throws Exception {
         Lock lock = fileEntry.getLock();
         List<String> users = callback.getUsers();
+
+        if (!fileEntryUtils.isLockedInEditor(fileEntry)) {
+            throw new RuntimeException(
+                    MessageFormat.format(
+                            "FileEntry with ID ({0}) not locked in ONLYOFFICE Docs Editor",
+                            String.valueOf(fileEntry.getFileEntryId())
+                    )
+            );
+        }
 
         if (!users.contains(String.valueOf(userId)) && lock.getUserId() == userId) {
             dlAppService.cancelCheckOut(fileEntry.getFileEntryId());

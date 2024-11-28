@@ -39,8 +39,9 @@ import java.text.MessageFormat;
 
 @Component(service = FileEntryUtils.class)
 public final class FileEntryUtils {
-    private static final String EDITOR_LOCK_OWNER = "onlyoffice-docs";
-    private static final int EDITING_HASH_LENGTH = 16;
+    public static final long LOCKING_TIME = 60 * 1000;
+    public static final String EDITOR_LOCK_OWNER = "onlyoffice-docs";
+    public static final int EDITING_HASH_LENGTH = 16;
 
     @Reference
     private DLAppService dlAppService;

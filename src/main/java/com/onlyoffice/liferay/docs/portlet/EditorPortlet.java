@@ -21,7 +21,6 @@ package com.onlyoffice.liferay.docs.portlet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.liferay.document.library.kernel.exception.FileExtensionException;
 import com.liferay.document.library.kernel.service.DLAppService;
-import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -56,6 +55,8 @@ import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
+import static com.onlyoffice.liferay.docs.utils.FileEntryUtils.LOCKING_TIME;
+
 @Component(
         immediate = true,
         property = {
@@ -73,8 +74,6 @@ import javax.portlet.RenderResponse;
         service = Portlet.class
 )
 public class EditorPortlet extends MVCPortlet {
-    private static final long LOCKING_TIME = 60 * 1000;
-
     private static final Log log = LogFactoryUtil.getLog(EditorPortlet.class);
 
     @Reference
@@ -117,7 +116,7 @@ public class EditorPortlet extends MVCPortlet {
 
                 String editingKey = fileEntryUtils.generateEditingKey(fileEntry);
 
-                DLAppServiceUtil.checkOutFileEntry(
+                dlAppService.checkOutFileEntry(
                         fileEntry.getFileEntryId(),
                         fileEntryUtils.createEditorLockOwner(editingKey),
                         LOCKING_TIME,
