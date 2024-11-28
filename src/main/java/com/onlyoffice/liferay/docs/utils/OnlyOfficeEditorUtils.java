@@ -18,8 +18,8 @@
 
 package com.onlyoffice.liferay.docs.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -49,77 +49,66 @@ public class OnlyOfficeEditorUtils {
     @Reference
     private ConfigService configService;
 
-    public String getConfig(final Long fileEntryId, final RenderRequest req) {
-        ObjectMapper mapper = new ObjectMapper();
+    public Config getConfig(final Long fileEntryId, final RenderRequest req) throws PortalException {
+        FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
+        FileVersion fileVersion = fileEntry.getLatestFileVersion();
+        User user = PortalUtil.getUser(req);
 
-        try {
-            FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
-            FileVersion fileVersion = fileEntry.getLatestFileVersion();
-            User user = PortalUtil.getUser(req);
+        PermissionChecker checker = permissionFactory.create(user);
 
-            PermissionChecker checker = permissionFactory.create(user);
-
-            if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)) {
-                throw new PrincipalException.MustHavePermission(
-                        user.getUserId(), ActionKeys.VIEW);
-            }
-
-            Config config = configService.createConfig(
-                    String.valueOf(fileVersion.getFileVersionId()),
-                    Mode.EDIT,
-                    Type.DESKTOP
-            );
-
-            config.getEditorConfig().setLang(
-                    LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag()
-            );
-
-            return mapper.writeValueAsString(config);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)) {
+            throw new PrincipalException.MustHavePermission(
+                    user.getUserId(), ActionKeys.VIEW);
         }
+
+        Config config = configService.createConfig(
+                String.valueOf(fileVersion.getFileVersionId()),
+                Mode.EDIT,
+                Type.DESKTOP
+        );
+
+        config.getEditorConfig().setLang(
+                LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag()
+        );
+
+        return config;
     }
 
-    public String getConfigPreview(final Long fileEntryId, final String version, final RenderRequest req) {
-        ObjectMapper mapper = new ObjectMapper();
+    public Config getPreviewConfig(final Long fileEntryId, final String version, final RenderRequest req)
+            throws PortalException {
+        FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
+        FileVersion fileVersion = Validator.isNull(version)
+                ? fileEntry.getLatestFileVersion()
+                : fileEntry.getFileVersion(version);
+        User user = PortalUtil.getUser(req);
 
-        try {
-            FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
-            FileVersion fileVersion = Validator.isNull(version)
-                    ? fileEntry.getLatestFileVersion()
-                    : fileEntry.getFileVersion(version);
-            User user = PortalUtil.getUser(req);
+        PermissionChecker checker = permissionFactory.create(user);
 
-            PermissionChecker checker = permissionFactory.create(user);
-
-            if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)) {
-                throw new PrincipalException.MustHavePermission(
-                        user.getUserId(), ActionKeys.VIEW);
-            }
-
-            Config config = configService.createConfig(
-                    String.valueOf(fileVersion.getFileVersionId()),
-                    Mode.VIEW,
-                    Type.EMBEDDED
-            );
-
-            String title = Validator.isNull(version)
-                    ? fileVersion.getFileName()
-                    : String.format("%s (%s %s)",
-                        fileVersion.getFileName(),
-                        LanguageUtil.get(req.getLocale(), "version"),
-                            fileVersion.getVersion()
-                        );
-
-            config.getEditorConfig().setLang(
-                    LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag()
-            );
-
-            config.getDocument().setTitle(title);
-
-            return mapper.writeValueAsString(config);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (!fileEntry.containsPermission(checker, ActionKeys.VIEW)) {
+            throw new PrincipalException.MustHavePermission(
+                    user.getUserId(), ActionKeys.VIEW);
         }
+
+        Config config = configService.createConfig(
+                String.valueOf(fileVersion.getFileVersionId()),
+                Mode.VIEW,
+                Type.EMBEDDED
+        );
+
+        String title = Validator.isNull(version)
+                ? fileVersion.getFileName()
+                : String.format("%s (%s %s)",
+                    fileVersion.getFileName(),
+                    LanguageUtil.get(req.getLocale(), "version"),
+                        fileVersion.getVersion()
+                    );
+
+        config.getEditorConfig().setLang(
+                LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(req)).toLanguageTag()
+        );
+
+        config.getDocument().setTitle(title);
+
+        return config;
     }
 }

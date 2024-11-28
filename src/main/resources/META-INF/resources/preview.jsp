@@ -30,6 +30,8 @@
 
 <%@ page import="com.onlyoffice.liferay.docs.utils.OnlyOfficeEditorUtils" %>
 <%@ page import="com.onlyoffice.manager.url.UrlManager" %>
+<%@ page import="com.onlyoffice.model.documenteditor.Config" %>
+<%@ page import="com.fasterxml.jackson.databind.ObjectMapper" %>
 
 <liferay-theme:defineObjects />
 
@@ -37,6 +39,7 @@
 
 
 <%
+    ObjectMapper objectMapper = new ObjectMapper();
     BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeEditorUtils.class).getBundleContext();
 
     Long fileEntryId = (Long)request.getAttribute("fileEntryId");
@@ -44,6 +47,9 @@
     FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
     OnlyOfficeEditorUtils editorUtils = bc.getService(bc.getServiceReference(OnlyOfficeEditorUtils.class));
     UrlManager urlManager = bc.getService(bc.getServiceReference(UrlManager.class));
+
+    Config previewDocsConfig = editorUtils.getPreviewConfig(fileEntryId, version, renderRequest);
+    String documentKey = previewDocsConfig.getDocument().getKey();
 %>
 
 <div id="onlyoffice-preview">
@@ -63,7 +69,7 @@
             var scriptApi = document.createElement("script");
 
             scriptApi.setAttribute("type", "text/javascript");
-            scriptApi.setAttribute("src", "<%= urlManager.getDocumentServerApiUrl() %>");
+            scriptApi.setAttribute("src", "<%= urlManager.getDocumentServerApiUrl(documentKey) %>");
 
             scriptApi.onload = scriptApi.onerror = function() {
                 if (typeof DocsAPI === "undefined") {
@@ -71,7 +77,7 @@
                     divOnlyofficePreview.querySelector("div.preview-file-error-container").style.display = "block";
                     divOnlyofficePreview.querySelector("div.preview-file").style.display = "none";
                 } else {
-                    var config = JSON.parse('<%= editorUtils.getConfigPreview(fileEntryId, version, renderRequest) %>');
+                    var config = JSON.parse('<%= objectMapper.writeValueAsString(previewDocsConfig) %>');
                     docEditor = new DocsAPI.DocEditor("placeholder", config);
                 }
             };
