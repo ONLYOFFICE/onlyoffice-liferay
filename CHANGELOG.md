@@ -6,6 +6,7 @@
 - shardkey parameter
 
 ## Changed
+- migrate to maven build
 - create pdf instead docxf
 - delete create oform from docxf
 - com.onlyofficce:docs-integration-sdk:1.3.0

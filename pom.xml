@@ -225,10 +225,4 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>ossrh</id>
-            <url>http://192.168.56.1:8081/repository/maven-public/</url>
-        </repository>
-    </repositories>
 </project>
