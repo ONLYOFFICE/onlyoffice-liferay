@@ -70,10 +70,8 @@ extends BaseDLViewFileVersionDisplayContext {
     private ThemeDisplay themeDisplay;
     private ResourceBundle resourceBundle;
     private boolean canEdit;
-    private boolean canFillForm;
     private boolean canView;
     private boolean canConvert;
-    private boolean isMasterForm;
 
     public EditMenuContext(final UUID uuid, final DLViewFileVersionDisplayContext parentDLDisplayContext,
                            final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse,
@@ -106,10 +104,8 @@ extends BaseDLViewFileVersionDisplayContext {
 
         String fileName = fileVersion.getFileName();
         canEdit = documentManager.isEditable(fileName) && editPerm;
-        canFillForm = documentManager.isFillable(fileName) && editPerm;
         canView = documentManager.isViewable(fileName) && viewPerm;
         canConvert = documentManager.getDefaultConvertExtension(fileName) != null && convPerm;
-        isMasterForm = fileVersion.getExtension().equals("docxf");
     }
 
     public Menu getMenu() throws PortalException {
@@ -154,8 +150,6 @@ extends BaseDLViewFileVersionDisplayContext {
 
         if (canEdit) {
             labelKey = "onlyoffice-context-action-edit";
-        } else if (canFillForm)  {
-            labelKey = "onlyoffice-context-action-fillForm";
         }
 
         item.setLabel(LanguageUtil.get(request, resourceBundle, labelKey));
@@ -164,22 +158,17 @@ extends BaseDLViewFileVersionDisplayContext {
     }
 
     private void initConvertItem(final JavaScriptUIItem item) {
-        String lang = null;
-        if (isMasterForm) {
-            lang = LanguageUtil.get(request, resourceBundle, "onlyoffice-context-action-create-form");
-        } else {
-            lang = LanguageUtil.get(request, resourceBundle, "onlyoffice-context-action-convert");
-        }
-        item.setLabel(lang);
+        String label = LanguageUtil.get(request, resourceBundle, "onlyoffice-context-action-convert");
 
         StringBuilder sb = new StringBuilder();
 
         sb.append("Liferay.Util.openWindow({");
         sb.append("dialog: {destroyOnHide:true,cache:false,width:500,height:200,modal:true,resizable: false},");
-        sb.append("title: '" + lang + "',id: ");
+        sb.append("title: '" + label + "',id: ");
         sb.append("'onlyofficeConvertPopup',uri:'");
         sb.append(getConvertUrl() + "'});");
 
+        item.setLabel(label);
         item.setOnClick(sb.toString());
     }
 

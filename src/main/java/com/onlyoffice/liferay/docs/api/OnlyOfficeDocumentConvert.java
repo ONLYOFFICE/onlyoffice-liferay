@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.request.RequestManager;
 import com.onlyoffice.model.convertservice.ConvertRequest;
 import com.onlyoffice.model.convertservice.ConvertResponse;
@@ -73,8 +72,6 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
     @Reference
     private RequestManager requestManager;
     @Reference
-    private DocumentManager documentManger;
-    @Reference
     private PermissionCheckerFactory permissionCheckerFactory;
 
     @Override
@@ -94,7 +91,7 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
 
         Long fileEntryId = ParamUtil.getLong(request, "fileId");
         String key = ParamUtil.getString(request, "key");
-        String fn = ParamUtil.getString(request, "fileName");
+        String fileName = ParamUtil.getString(request, "fileName");
         Locale locale = user.getLocale();
 
         response.setContentType("application/json");
@@ -123,7 +120,7 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
             );
 
             if (convertResponse.getEndConvert() != null && convertResponse.getEndConvert()) {
-                savefile(request, fileEntry, convertResponse.getFileUrl(), fn);
+                saveFile(request, fileEntry, convertResponse.getFileUrl(), fileName);
             } else if (convertResponse.getError() != null) {
                 writer.write("{\"error\":\"Unknown conversion error\"}");
                 return;
@@ -138,9 +135,8 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
         }
     }
 
-
-    private void savefile(final HttpServletRequest request, final FileEntry fileEntry, final String url,
-                          final String filename) throws Exception {
+    private void saveFile(final HttpServletRequest request, final FileEntry fileEntry, final String url,
+                          final String fileName) throws Exception {
         User user = PortalUtil.getUser(request);
 
         log.info("Trying to download file from URL: " + url);
@@ -156,21 +152,15 @@ public class OnlyOfficeDocumentConvert extends HttpServlet {
                         request
                 );
 
-                String defaultConvertExtension = documentManger.getDefaultConvertExtension(fileEntry.getFileName());
-                String mimeType = MimeTypesUtil.getContentType(filename + "." + defaultConvertExtension);
-
-                if (defaultConvertExtension != null
-                        && (defaultConvertExtension.equals("docxf") || defaultConvertExtension.equals("oform"))) {
-                    mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-                }
+                String mimeType = MimeTypesUtil.getContentType(fileName);
 
                 dlAppLocalService.addFileEntry(
                         user.getUserId(),
                         fileEntry.getRepositoryId(),
                         fileEntry.getFolderId(),
-                        filename,
+                        fileName,
                         mimeType,
-                        filename,
+                        fileName,
                         fileEntry.getDescription(),
                         "ONLYOFFICE Convert",
                         inputStream,

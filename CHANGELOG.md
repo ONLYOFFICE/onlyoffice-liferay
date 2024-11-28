@@ -2,10 +2,13 @@
 
 ##
 ## Added
+- editing pdf
 - shardkey parameter
 
 ## Changed
 - migrate to maven build
+- create pdf instead docxf
+- delete create oform from docxf
 - com.onlyofficce:docs-integration-sdk:1.3.0
 - address of the convert service, /converter instead /ConvertService.ashx
 - default token lifetime is 5 minutes
