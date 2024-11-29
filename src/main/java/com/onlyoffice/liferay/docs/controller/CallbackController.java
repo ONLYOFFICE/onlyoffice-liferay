@@ -67,7 +67,7 @@ public class CallbackController {
         } catch (Exception e) {
             log.error(e, e);
 
-            return Response.status(Response.Status.FORBIDDEN).build();
+            return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
         try {
