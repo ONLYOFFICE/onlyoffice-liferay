@@ -19,13 +19,9 @@
 package com.onlyoffice.liferay.docs.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.StreamUtil;
 import com.onlyoffice.liferay.docs.OnlyOfficeHasher;
 import com.onlyoffice.liferay.docs.OnlyOfficeParsingUtils;
 import com.onlyoffice.manager.settings.SettingsManager;
@@ -63,28 +59,6 @@ public class OnlyOfficeDocumentApi extends HttpServlet {
     private SettingsManager settingsManager;
     @Reference
     private CallbackService callbackService;
-
-
-    @Override
-    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
-            throws IOException, ServletException {
-
-        String key = ParamUtil.getString(request, "key");
-        Long fileVersionId = hasher.validate(key);
-
-        try {
-            FileVersion fileVersion = DLAppLocalServiceUtil.getFileVersion(fileVersionId);
-
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileVersion.getFileName() + "\"");
-            response.setHeader("Content-Length", Long.toString(fileVersion.getSize()));
-            response.setContentType(fileVersion.getMimeType());
-
-            StreamUtil.transfer(fileVersion.getContentStream(false), response.getOutputStream());
-        } catch (PortalException e) {
-            log.error(e.getMessage(), e);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        }
-    }
 
     @Override
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
