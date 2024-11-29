@@ -63,8 +63,7 @@ import javax.portlet.WindowStateException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class EditMenuContext
-extends BaseDLViewFileVersionDisplayContext {
+public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
     private static final Log log = LogFactoryUtil.getLog(EditMenuContext.class);
 
     private ThemeDisplay themeDisplay;
@@ -174,14 +173,17 @@ extends BaseDLViewFileVersionDisplayContext {
 
     private String getDocUrl() {
         PortletURL portletURL = PortletURLFactoryUtil.create(
-            request, "com_onlyoffice_liferay_docs_ui_EditActionPortlet",
-            themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+                request,
+                com.onlyoffice.liferay.docs.constants.PortletKeys.EDITOR,
+                themeDisplay.getPlid(),
+                PortletRequest.RENDER_PHASE
+        );
 
 //      MutableRenderParameters added in portlet version 3.0
 //      MutableRenderParameters params = portletURL.getRenderParameters();
 //      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
 
-        portletURL.setParameter("fileId", Long.toString(fileVersion.getFileEntryId()));
+        portletURL.setParameter("fileEntryId", Long.toString(fileVersion.getFileEntryId()));
 
         try {
             portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);

@@ -31,6 +31,7 @@
 <%@ page import="com.liferay.portal.kernel.security.auth.PrincipalException" %>
 <%@ page import="com.liferay.portal.kernel.portlet.LiferayWindowState"%>
 <%@ page import="com.liferay.portal.kernel.util.ResourceBundleUtil" %>
+<%@ page import="com.onlyoffice.liferay.docs.constants.PortletKeys" %>
 
 <%@ page import="java.util.ResourceBundle" %>
 
@@ -92,8 +93,8 @@ renderResponse.setTitle(headerTitle);
 </div>
 
 <c:if test="<%= (fileEntryId != 0) %>">	
-	<liferay-portlet:renderURL portletName="com_onlyoffice_liferay_docs_ui_EditActionPortlet" var="editURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
-		<portlet:param name="fileId" value="<%= String.valueOf(fileEntryId) %>" />
+	<liferay-portlet:renderURL portletName="<%= PortletKeys.EDITOR %>" var="editURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
+		<portlet:param name="fileEntryId" value="<%= String.valueOf(fileEntryId) %>" />
 	</liferay-portlet:renderURL>
 	<aui:script>
 		document.location.href = "<%= editURL %>";
