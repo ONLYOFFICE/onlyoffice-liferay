@@ -23,48 +23,23 @@
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 <%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
-<%@ page import="com.liferay.document.library.kernel.service.DLAppLocalServiceUtil" %>
-<%@ page import="com.liferay.portal.kernel.repository.model.FileEntry" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
-<%@ page import="com.liferay.portal.kernel.portlet.PortletURLFactoryUtil" %>
-<%@ page import="com.liferay.portal.kernel.util.WebKeys" %>
-
-<%@ page import="javax.portlet.MutableRenderParameters" %>
-<%@ page import="javax.portlet.PortletURL" %>
-<%@ page import="javax.portlet.PortletRequest" %>
-
-<%@ page import="org.json.JSONObject" %>
-
-<%@ page import="org.osgi.framework.BundleContext" %>
-<%@ page import="org.osgi.framework.FrameworkUtil" %>
-
-<%@ page import="com.onlyoffice.manager.document.DocumentManager" %>
 
 <portlet:defineObjects />
 
 <%
-	BundleContext bc = FrameworkUtil.getBundle(DocumentManager.class).getBundleContext();
-
-	Long fileEntryId = ParamUtil.getLong(renderRequest, "fileId");
-	FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
-	DocumentManager documentManger = bc.getService(bc.getServiceReference(DocumentManager.class));
-
-	String originalFileName = fileEntry.getFileName();
-	String newFileName = originalFileName.substring(0, originalFileName.lastIndexOf('.')) + "." + documentManger.getDefaultConvertExtension(fileEntry.getFileName()); 
-	
-	String convertText = String.format(LanguageUtil.get(request, "onlyoffice-convert-process"),
-			"<b>" + originalFileName + "</b>", "<b>" + newFileName + "</b>");
-	String doneText = LanguageUtil.get(request, "onlyoffice-convert-done");
-	String errorText = LanguageUtil.get(request, "onlyoffice-convert-error");
-
-	String apiurl = PortalUtil.getPortalURL(request) + "/o/onlyoffice/convert?key=" + Long.toString(new Date().getTime())
-		+ "&fileId=" + Long.toString(fileEntryId)
-		+ "&fileName=" + newFileName;
-	
+	String apiurl = "/o/onlyoffice/convert?key=" + Long.toString(new Date().getTime())
+		+ "&fileId=" + request.getAttribute("fileEntryId")
+		+ "&fileName=" + request.getAttribute("newFileName");
 %>
 
 <div style="padding: 20px 10px;">
-	<span id="ooConvertText"><%= convertText %></span>
+	<span id="ooConvertText">
+        <liferay-ui:message
+            key="onlyoffice-convert-process"
+            arguments='<%=  new Object[] {request.getAttribute("fileName"), request.getAttribute("newFileName")} %>'
+        />
+	</span>
 	<div class="progress">
 		<span id="ooProgressThumb" style="padding: 5px;" class="progress-bar"></span>
 	</div>
@@ -76,7 +51,7 @@
 		var timeOut = null;
 
 		function onError(error) {
-			text.innerHTML = "<%= errorText %>" + error;
+			text.innerHTML = '<%= LanguageUtil.get(request, "onlyoffice-convert-error") %>' + error;
 		}
 		
 		function _callAjax() {
@@ -107,7 +82,7 @@
 				if (!data.endConvert) {
 					setTimeout(_callAjax, 1000);
 				} else {
-					text.innerHTML = "<%= doneText %>";
+					text.innerHTML = '<%= LanguageUtil.get(request, "onlyoffice-convert-done") %>';
 					window.top.location.reload();
 				}
 			}
