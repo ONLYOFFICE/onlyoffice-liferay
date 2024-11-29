@@ -65,7 +65,7 @@ public class DownloadController {
                              final @QueryParam("userId") long userId
     ) {
         if (settingsManager.isSecurityEnabled() && !verifyJwtAuthorization(headers)) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
         try {
