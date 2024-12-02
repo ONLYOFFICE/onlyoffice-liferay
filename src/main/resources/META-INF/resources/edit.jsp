@@ -20,20 +20,12 @@
 <%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
 
 <%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
-<%@ page import="com.liferay.document.library.kernel.service.DLAppLocalServiceUtil" %>
-<%@ page import="com.liferay.portal.kernel.repository.model.FileEntry" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.ResourceBundleUtil" %>
 <%@ page import="com.liferay.portal.kernel.servlet.HttpHeaders" %>
 <%@ page import="com.liferay.portal.kernel.util.PortalUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %>
-
 <%@ page import="java.util.ResourceBundle" %>
-
-<%@ page import="org.osgi.framework.BundleContext" %>
-<%@ page import="org.osgi.framework.FrameworkUtil" %>
-
-<%@ page import="com.onlyoffice.liferay.docs.permission.OnlyOfficePermissionUtils" %>
 
 <liferay-theme:defineObjects />
 
@@ -41,15 +33,12 @@
 
 <%
     ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(locale, getClass());
-
-    Long fileEntryId = ParamUtil.getLong(renderRequest, "fileEntryId");
-    FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
 %>
 
 <html>
 <head>
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-    <title><%= fileEntry.getFileName() %> - <%= LanguageUtil.get(resourceBundle, "onlyoffice-edit-title") %></title>
+    <title><%= request.getAttribute("title") %> - <%= LanguageUtil.get(request, "onlyoffice-edit-title") %></title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css" />
     <script id="scriptApi" type="text/javascript" src='<%= request.getAttribute("documentServerApiUrl") %>"'></script>
 
@@ -114,7 +103,7 @@
 
         config.events = {};
 
-        <% if (OnlyOfficePermissionUtils.saveAs(fileEntry, themeDisplay.getUser())) { %>
+        <% if ((Boolean)request.getAttribute("canCreateDocument")) { %>
             config.events.onRequestSaveAs = onRequestSaveAs;
         <% } %>
 

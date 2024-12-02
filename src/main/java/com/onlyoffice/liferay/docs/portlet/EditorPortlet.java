@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
@@ -40,6 +41,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.onlyoffice.liferay.docs.constants.PortletKeys;
 import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
+import com.onlyoffice.liferay.docs.utils.PermissionUtils;
 import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.url.UrlManager;
 import com.onlyoffice.model.documenteditor.Config;
@@ -102,6 +104,7 @@ public class EditorPortlet extends MVCPortlet {
 
         try {
             FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
+            Folder folder = fileEntry.getFolder();
 
             User user = userService.getCurrentUser();
             PermissionChecker checker = permissionCheckerFactory.create(user);
@@ -136,8 +139,12 @@ public class EditorPortlet extends MVCPortlet {
             config.getEditorConfig().setLang(lang);
 
             String shardkey = config.getDocument().getKey();
+            String title = config.getDocument().getTitle();
+            boolean canCreateDocument = PermissionUtils.checkFolderPermission(folder, ActionKeys.ADD_DOCUMENT);
 
             renderRequest.setAttribute("config", objectMapper.writeValueAsString(config));
+            renderRequest.setAttribute("title", title);
+            renderRequest.setAttribute("canCreateDocument", canCreateDocument);
             renderRequest.setAttribute("documentServerApiUrl", urlManager.getDocumentServerApiUrl(shardkey));
 
             super.doView(renderRequest, renderResponse);
