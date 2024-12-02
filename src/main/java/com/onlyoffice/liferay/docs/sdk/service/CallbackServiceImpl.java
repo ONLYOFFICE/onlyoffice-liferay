@@ -19,36 +19,26 @@
 package com.onlyoffice.liferay.docs.sdk.service;
 
 import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
-import com.liferay.document.library.kernel.service.DLAppLocalService;
-import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.service.UserLocalServiceUtil;
-import com.onlyoffice.liferay.docs.utils.OnlyOfficeUtils;
+import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
+import com.onlyoffice.liferay.docs.utils.SecurityUtils;
 import com.onlyoffice.manager.security.JwtManager;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.manager.url.UrlManager;
 import com.onlyoffice.model.documenteditor.Callback;
 import com.onlyoffice.model.documenteditor.callback.Action;
-import com.onlyoffice.model.documenteditor.callback.action.Type;
 import com.onlyoffice.service.documenteditor.callback.CallbackService;
 import com.onlyoffice.service.documenteditor.callback.DefaultCallbackService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
+import java.text.MessageFormat;
 import java.util.List;
 
 @Component(
@@ -60,11 +50,9 @@ public class CallbackServiceImpl extends DefaultCallbackService {
     @Reference
     private DLAppService dlAppService;
     @Reference
-    private DLAppLocalService dlAppLocalService;
-    @Reference
-    private OnlyOfficeUtils utils;
-    @Reference
     private UrlManager urlManager;
+    @Reference
+    private FileEntryUtils fileEntryUtils;
 
     public CallbackServiceImpl() {
         super(null, null);
@@ -81,159 +69,246 @@ public class CallbackServiceImpl extends DefaultCallbackService {
     }
 
     public void handlerEditing(final Callback callback, final String fileId) throws Exception {
-        Long userId = (long) -1;
+        List<Action> actions = callback.getActions();
+        FileEntryUtils.FileEntryKeys fileEntryKeys = fileEntryUtils.deformatFileId(fileId);
 
-        if (callback.getUsers() != null && !callback.getUsers().isEmpty()) {
-            List<String> users = callback.getUsers();
-            userId = Long.parseLong(users.get(0));
-        }
+        for (Action action : actions) {
+            long userId = Long.parseLong(action.getUserid());
 
-        if (callback.getActions() != null) {
-            List<Action> actions = callback.getActions();
-            if (actions.size() > 0) {
-                Action action = actions.get(0);
-                if (Type.CONNECTED.equals(action.getType())) {
-                    FileEntry fileEntry = dlAppLocalService.getFileEntry(Long.parseLong(fileId));
+            SecurityUtils.runAs(new SecurityUtils.RunAsWork<Void>() {
+                public Void doWork() throws Exception {
+                    FileEntry fileEntry = dlAppService.getFileEntryByUuidAndGroupId(
+                            fileEntryKeys.getUuid(),
+                            fileEntryKeys.getGroupId()
+                    );
 
-                    if (!fileEntry.isCheckedOut()) {
-                        setUserThreadLocal(userId);
-                        ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
-
-                        if (utils.getCollaborativeEditingKey(fileEntry) == null) {
-                            String key = callback.getKey();
-                            utils.setCollaborativeEditingKey(fileEntry, key);
-                        }
-
-                        dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
-
-                        log.info("Document opened for editing, locking document");
-                    } else {
-                        log.info("Document already locked, another user has entered");
+                    if (!fileEntryUtils.isLockedInEditor(fileEntry)) {
+                        throw new RuntimeException(
+                                MessageFormat.format(
+                                        "FileEntry with ID ({0}) not locked in ONLYOFFICE Docs Editor",
+                                        String.valueOf(fileEntry.getFileEntryId())
+                                )
+                        );
                     }
+
+                    switch (action.getType()) {
+                        case CONNECTED:
+                            handlerConnecting(callback, fileEntry, userId);
+                            break;
+                        case DISCONNECTED:
+                            handlerDisconnecting(callback, fileEntry, userId);
+                            break;
+                        default:
+                    }
+                    return null;
                 }
-            }
+            }, userId);
         }
     }
 
     public void handlerSave(final Callback callback, final String fileId) throws Exception {
         log.info("Document updated, changing content");
+        List<Action> actions = callback.getActions();
+        FileEntryUtils.FileEntryKeys fileEntryKeys = fileEntryUtils.deformatFileId(fileId);
 
-        Long userId = (long) -1;
+        for (Action action : actions) {
+            long userId = Long.parseLong(action.getUserid());
 
-        if (callback.getUsers() != null && !callback.getUsers().isEmpty()) {
-            List<String> users = callback.getUsers();
-            userId = Long.parseLong(users.get(0));
+            final FileEntry fileEntry = SecurityUtils.runAs(new SecurityUtils.RunAsWork<FileEntry>() {
+                public FileEntry doWork() throws PortalException {
+                    FileEntry fileEntry = dlAppService.getFileEntryByUuidAndGroupId(
+                            fileEntryKeys.getUuid(),
+                            fileEntryKeys.getGroupId()
+                    );
+
+                    if (!fileEntryUtils.isLockedInEditor(fileEntry)) {
+                        throw new RuntimeException(
+                                MessageFormat.format(
+                                        "FileEntry with ID ({0}) not locked in ONLYOFFICE Docs Editor",
+                                        String.valueOf(fileEntry.getFileEntryId())
+                                )
+                        );
+                    }
+
+                    return fileEntry;
+                }
+            }, userId);
+
+            userId = fileEntry.getLock().getUserId();
+
+            SecurityUtils.runAs(new SecurityUtils.RunAsWork<Void>() {
+                public Void doWork() throws Exception {
+                    String fileUrl = urlManager.replaceToInnerDocumentServerUrl(callback.getUrl());
+                    fileEntryUtils.updateFileEntryFromUrl(
+                            fileEntry,
+                            fileUrl,
+                            DLVersionNumberIncrease.MAJOR
+                    );
+
+                    dlAppService.checkInFileEntry(
+                            fileEntry.getFileEntryId(),
+                            DLVersionNumberIncrease.MAJOR,
+                            "ONLYOFFICE Edit",
+                            ServiceContextThreadLocal.getServiceContext()
+                    );
+                    return null;
+                }
+            }, userId);
         }
-
-        FileEntry fileEntry = dlAppLocalService.getFileEntry(Long.parseLong(fileId));
-        ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
-        String url = urlManager.replaceToInnerDocumentServerUrl(callback.getUrl());
-
-        checkLockFileEntry(fileEntry, userId, serviceContext);
-
-        updateFile(fileEntry, userId, url, DLVersionNumberIncrease.MAJOR, serviceContext);
-
-        fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntry.getFileEntryId());
-
-        utils.setCollaborativeEditingKey(fileEntry, null);
 
         log.info("Document saved.");
     }
 
     public void handlerClosed(final Callback callback, final String fileId) throws Exception {
         log.info("No document updates, unlocking document");
+        List<Action> actions = callback.getActions();
+        FileEntryUtils.FileEntryKeys fileEntryKeys = fileEntryUtils.deformatFileId(fileId);
 
-        FileEntry fileEntry = dlAppLocalService.getFileEntry(Long.parseLong(fileId));
+        for (Action action : actions) {
+            long userId = Long.parseLong(action.getUserid());
 
-        if (fileEntry.isCheckedOut()) {
-            setUserThreadLocal(fileEntry.getLock().getUserId());
-            dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
+            final FileEntry fileEntry = SecurityUtils.runAs(new SecurityUtils.RunAsWork<FileEntry>() {
+                public FileEntry doWork() throws PortalException {
+                    FileEntry fileEntry = dlAppService.getFileEntryByUuidAndGroupId(
+                            fileEntryKeys.getUuid(),
+                            fileEntryKeys.getGroupId()
+                    );
+
+                    if (!fileEntryUtils.isLockedInEditor(fileEntry)) {
+                        throw new RuntimeException(
+                                MessageFormat.format(
+                                        "FileEntry with ID ({0}) not locked in ONLYOFFICE Docs Editor",
+                                        String.valueOf(fileEntry.getFileEntryId())
+                                )
+                        );
+                    }
+
+                    return fileEntry;
+                }
+            }, userId);
+
+            Lock lock = fileEntry.getLock();
+
+            SecurityUtils.runAs(new SecurityUtils.RunAsWork<Void>() {
+                public Void doWork() throws PortalException {
+                    dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
+                    return null;
+                }
+            }, lock.getUserId());
         }
-        utils.setCollaborativeEditingKey(fileEntry, null);
     }
 
     public void handlerForcesave(final Callback callback, final String fileId) throws Exception {
-        if (getSettingsManager().getSettingBoolean("customization.forcesave", false)) {
-            Long userId = (long) -1;
-
-            if (callback.getUsers() != null && !callback.getUsers().isEmpty()) {
-                List<String> users = callback.getUsers();
-                userId = Long.parseLong(users.get(0));
-            }
-
-            FileEntry fileEntry = dlAppLocalService.getFileEntry(Long.parseLong(fileId));
-            ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
-            String url = urlManager.replaceToInnerDocumentServerUrl(callback.getUrl());
-
-            checkLockFileEntry(fileEntry, userId, serviceContext);
-
-            updateFile(fileEntry, userId, url, DLVersionNumberIncrease.MINOR, serviceContext);
-
-            fileEntry = dlAppLocalService.getFileEntry(fileEntry.getFileEntryId());
-
-            dlAppService.checkOutFileEntry(fileEntry.getFileEntryId(), serviceContext);
-
-            log.info("Document saved (forcesave).");
-        } else {
+        if (!getSettingsManager().getSettingBoolean("customization.forcesave", false)) {
             log.info("Forcesave is disabled, ignoring forcesave request");
+            return;
         }
+
+        List<Action> actions = callback.getActions();
+        FileEntryUtils.FileEntryKeys fileEntryKeys = fileEntryUtils.deformatFileId(fileId);
+
+        for (Action action : actions) {
+            long userId = Long.parseLong(action.getUserid());
+
+            final FileEntry fileEntry = SecurityUtils.runAs(new SecurityUtils.RunAsWork<FileEntry>() {
+                public FileEntry doWork() throws PortalException {
+                    FileEntry fileEntry = dlAppService.getFileEntryByUuidAndGroupId(
+                            fileEntryKeys.getUuid(),
+                            fileEntryKeys.getGroupId()
+                    );
+
+                    if (!fileEntryUtils.isLockedInEditor(fileEntry)) {
+                        throw new RuntimeException(
+                                MessageFormat.format(
+                                        "FileEntry with ID ({0}) not locked in ONLYOFFICE Docs Editor",
+                                        String.valueOf(fileEntry.getFileEntryId())
+                                )
+                        );
+                    }
+
+                    return fileEntry;
+                }
+            }, userId);
+
+            Lock lock = fileEntry.getLock();
+
+            SecurityUtils.runAs(new SecurityUtils.RunAsWork<Void>() {
+                public Void doWork() throws Exception {
+                    String fileUrl = urlManager.replaceToInnerDocumentServerUrl(callback.getUrl());
+                    fileEntryUtils.updateFileEntryFromUrl(
+                            fileEntry,
+                            fileUrl,
+                            DLVersionNumberIncrease.MINOR
+                    );
+
+                    dlAppService.checkInFileEntry(
+                            fileEntry.getFileEntryId(),
+                            DLVersionNumberIncrease.MINOR,
+                            "ONLYOFFICE Edit",
+                            ServiceContextThreadLocal.getServiceContext()
+                    );
+
+                    FileEntry checkOutFileEntry = dlAppService.checkOutFileEntry(
+                            fileEntry.getFileEntryId(),
+                            lock.getOwner(),
+                            0,
+                            ServiceContextThreadLocal.getServiceContext()
+                    );
+                    dlAppService.refreshFileEntryLock(
+                            checkOutFileEntry.getLock().getUuid(),
+                            checkOutFileEntry.getLock().getCompanyId(),
+                            0
+                    );
+                    return null;
+                }
+            }, lock.getUserId());
+        }
+
+        log.info("Document saved (forcesave).");
     }
 
-    private void updateFile(final FileEntry fileEntry, final  Long userId, final String url,
-                            final DLVersionNumberIncrease dlVersionNumberIncrease, final ServiceContext serviceContext)
+    private void handlerConnecting(final Callback callback, final FileEntry fileEntry, final Long userId)
             throws Exception {
-        log.info("Trying to download file from URL: " + url);
+        Lock lock = fileEntry.getLock();
 
-        try {
-            URLConnection con = new URL(url).openConnection();
-            InputStream in = con.getInputStream();
-
-            dlAppLocalService.updateFileEntry(
-                    userId,
-                    fileEntry.getFileEntryId(),
-                    fileEntry.getFileName(),
-                    fileEntry.getMimeType(),
-                    fileEntry.getTitle(),
-                    fileEntry.getDescription(),
-                    "ONLYOFFICE Edit",
-                    dlVersionNumberIncrease,
-                    in,
-                    con.getContentLength(),
-                    serviceContext
-            );
-
-            dlAppService.checkInFileEntry(
-                    fileEntry.getFileEntryId(),
-                    dlVersionNumberIncrease,
-                    "ONLYOFFICE Edit",
-                    serviceContext
-            );
-        } catch (Exception e) {
-            String msg = "Couldn't download or save file: " + e.getMessage();
-            log.error(msg, e);
-            throw e;
+        if (lock.getExpirationTime() > 0) {
+            SecurityUtils.runAs(new SecurityUtils.RunAsWork<Void>() {
+                public Void doWork() throws PortalException {
+                    dlAppService.refreshFileEntryLock(
+                            lock.getUuid(),
+                            lock.getCompanyId(),
+                            0
+                    );
+                    return null;
+                }
+            }, lock.getUserId());
         }
     }
 
-    private void checkLockFileEntry(final FileEntry fileEntry, final Long userId, final ServiceContext serviceContext)
-            throws PortalException {
-        if (fileEntry.isCheckedOut() && userId.longValue() != fileEntry.getLock().getUserId()) {
-            setUserThreadLocal(fileEntry.getLock().getUserId());
+    private void handlerDisconnecting(final Callback callback, final FileEntry fileEntry, final long userId)
+            throws Exception {
+        Lock lock = fileEntry.getLock();
+        List<String> users = callback.getUsers();
+
+        if (!users.contains(String.valueOf(userId)) && lock.getUserId() == userId) {
             dlAppService.cancelCheckOut(fileEntry.getFileEntryId());
 
-            setUserThreadLocal(userId);
-        } else {
-            setUserThreadLocal(userId);
+            SecurityUtils.runAs(new SecurityUtils.RunAsWork<Void>() {
+                public Void doWork() throws PortalException {
+                    FileEntry checkOutFileEntry = dlAppService.checkOutFileEntry(
+                            fileEntry.getFileEntryId(),
+                            lock.getOwner(),
+                            0,
+                            ServiceContextThreadLocal.getServiceContext()
+                    );
+                    dlAppService.refreshFileEntryLock(
+                            checkOutFileEntry.getLock().getUuid(),
+                            checkOutFileEntry.getLock().getCompanyId(),
+                            0
+                    );
+                    return null;
+                }
+            }, Long.parseLong(users.get(0)));
         }
-    }
-
-    private void setUserThreadLocal(final Long userId) throws PortalException {
-        User user = UserLocalServiceUtil.getUser(userId);
-
-        PermissionChecker permissionChecker;
-        permissionChecker = PermissionCheckerFactoryUtil.create(user);
-
-        PrincipalThreadLocal.setName(userId);
-        PermissionThreadLocal.setPermissionChecker(permissionChecker);
     }
 }

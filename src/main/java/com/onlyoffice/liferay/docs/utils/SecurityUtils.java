@@ -19,6 +19,7 @@
 package com.onlyoffice.liferay.docs.utils;
 
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.SecureRandom;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
@@ -31,8 +32,22 @@ import org.osgi.service.component.annotations.Component;
         service = SecurityUtils.class
 )
 public final class SecurityUtils {
+    public static final String NAME_ALLOWED_CHARACTERS
+            = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     private SecurityUtils() {
+    }
+
+    public static String generateSecret(final int length) {
+        SecureRandom random = new SecureRandom();
+        StringBuilder key = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(NAME_ALLOWED_CHARACTERS.length());
+            key.append(NAME_ALLOWED_CHARACTERS.charAt(index));
+        }
+
+        return key.toString();
     }
 
     public static <R> R runAs(final RunAsWork<R> runAsWork, final long userId) throws Exception {

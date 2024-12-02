@@ -39,11 +39,15 @@ import javax.ws.rs.core.Application;
 )
 public class OnlyofficeDocsRESTApplication extends Application {
         @Reference
+        private CallbackController callbackController;
+        @Reference
         private DownloadController downloadController;
 
         public Set<Object> getSingletons() {
                 Set<Object> singletons = new HashSet<>();
 
+                singletons.add(new CallbackMessageReader());
+                singletons.add(callbackController);
                 singletons.add(downloadController);
 
                 return singletons;
