@@ -44,6 +44,8 @@ public class OnlyofficeDocsRESTApplication extends Application {
         @Reference
         private DownloadController downloadController;
         @Reference
+        private ConvertController convertController;
+        @Reference
         private FeatureController featureController;
 
         public Set<Object> getSingletons() {
@@ -51,6 +53,7 @@ public class OnlyofficeDocsRESTApplication extends Application {
 
                 singletons.add(callbackController);
                 singletons.add(downloadController);
+                singletons.add(convertController);
                 singletons.add(featureController);
 
                 return singletons;
