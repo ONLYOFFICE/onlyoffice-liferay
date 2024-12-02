@@ -4,6 +4,7 @@
 ## Added
 - editing pdf
 - shardkey parameter
+- drop users from editor on unlock document
 
 ## Changed
 - migrate to maven build
