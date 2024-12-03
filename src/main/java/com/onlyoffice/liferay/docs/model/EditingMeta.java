@@ -18,21 +18,13 @@
 
 package com.onlyoffice.liferay.docs.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@Data
+@NoArgsConstructor
 public class EditingMeta {
     private String editingKey;
-
-    public EditingMeta() {
-    }
-
-    public EditingMeta(final String editingKey) {
-        this.editingKey = editingKey;
-    }
-
-    public String getEditingKey() {
-        return editingKey;
-    }
-
-    public void setEditingKey(final String editingKey) {
-        this.editingKey = editingKey;
-    }
 }

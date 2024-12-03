@@ -18,32 +18,15 @@
 
 package com.onlyoffice.liferay.docs.controller.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@Data
+@NoArgsConstructor
 public class ConvertRequest {
     private long fileEntryId;
     private String version;
     private String time;
-
-    public long getFileEntryId() {
-        return fileEntryId;
-    }
-
-    public void setFileEntryId(final long fileEntryId) {
-        this.fileEntryId = fileEntryId;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(final String time) {
-        this.time = time;
-    }
 }

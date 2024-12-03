@@ -18,32 +18,15 @@
 
 package com.onlyoffice.liferay.docs.controller.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@Data
+@NoArgsConstructor
 public class SaveAsRequest {
     private long fileEntryId;
     private String fileUrl;
     private String fileType;
-
-    public long getFileEntryId() {
-        return fileEntryId;
-    }
-
-    public void setFileEntryId(final long fileEntryId) {
-        this.fileEntryId = fileEntryId;
-    }
-
-    public String getFileUrl() {
-        return fileUrl;
-    }
-
-    public void setFileUrl(final String fileUrl) {
-        this.fileUrl = fileUrl;
-    }
-
-    public String getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(final String fileType) {
-        this.fileType = fileType;
-    }
 }
