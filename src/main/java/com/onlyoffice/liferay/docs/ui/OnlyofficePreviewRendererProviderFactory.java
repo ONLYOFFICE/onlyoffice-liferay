@@ -21,6 +21,8 @@ package com.onlyoffice.liferay.docs.ui;
 import com.liferay.document.library.preview.DLPreviewRendererProvider;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.onlyoffice.manager.settings.SettingsManager;
+import com.onlyoffice.manager.url.UrlManager;
+import com.onlyoffice.service.documenteditor.config.ConfigService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -39,16 +41,20 @@ import javax.servlet.ServletContext;
         service = OnlyofficePreviewRendererProviderFactory.class
 )
 public class OnlyofficePreviewRendererProviderFactory {
-    private static final int OONLYOFFICE_PREVIEW_SERVICE_RANKING = 100;
+    private static final int ONLYOFFICE_PREVIEW_SERVICE_RANKING = 100;
 
     private ServiceRegistration<DLPreviewRendererProvider> dlPreviewRendererProviderServiceRegistration;
 
-    @Reference
-    private SettingsManager settingsManager;
     @Reference(
             target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)"
     )
     private ServletContext servletContext;
+    @Reference
+    private ConfigService configService;
+    @Reference
+    private SettingsManager settingsManager;
+    @Reference
+    private UrlManager urlManager;
 
     public Set<String> getMimeTypes() {
         return new HashSet<>(Arrays.asList(
@@ -73,13 +79,13 @@ public class OnlyofficePreviewRendererProviderFactory {
     protected void activate(final BundleContext bundleContext) {
         Dictionary<String, Object> properties = new HashMapDictionary<>();
 
-        properties.put("service.ranking", OONLYOFFICE_PREVIEW_SERVICE_RANKING);
+        properties.put("service.ranking", ONLYOFFICE_PREVIEW_SERVICE_RANKING);
         properties.put("content.type", getMimeTypes().toArray());
 
         dlPreviewRendererProviderServiceRegistration =
             bundleContext.registerService(
                 DLPreviewRendererProvider.class,
-                new OnlyofficePreviewRendererProvider(servletContext, settingsManager),
+                new OnlyofficePreviewRendererProvider(servletContext, configService, settingsManager, urlManager),
                 properties
             );
     }
