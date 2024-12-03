@@ -18,6 +18,7 @@
 
 package com.onlyoffice.liferay.docs.utils;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.SecureRandom;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -25,7 +26,10 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import org.osgi.service.component.annotations.Component;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 @Component(
@@ -48,6 +52,21 @@ public final class SecurityUtils {
         }
 
         return key.toString();
+    }
+
+    public static void setUserAuthentication(final HttpServletRequest httpServletRequest) throws PortalException {
+        User user = PortalUtil.getUser(httpServletRequest);
+
+        setUserAuthentication(user);
+    }
+
+    public static void setUserAuthentication(final User user) throws PortalException {
+        if (user == null) {
+            throw new PortalException();
+        }
+
+        PrincipalThreadLocal.setName(user.getUserId());
+        PermissionThreadLocal.setPermissionChecker(PermissionCheckerFactoryUtil.create(user));
     }
 
     public static <R> R runAs(final RunAsWork<R> runAsWork, final long userId) throws Exception {

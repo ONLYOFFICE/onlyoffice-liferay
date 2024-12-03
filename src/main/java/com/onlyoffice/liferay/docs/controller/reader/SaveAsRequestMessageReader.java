@@ -16,10 +16,10 @@
  *
  */
 
-package com.onlyoffice.liferay.docs.controller;
+package com.onlyoffice.liferay.docs.controller.reader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onlyoffice.model.documenteditor.Callback;
+import com.onlyoffice.liferay.docs.controller.dto.SaveAsRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +32,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 
 @Consumes(MediaType.APPLICATION_JSON)
-public class CallbackMessageReader implements MessageBodyReader<Callback> {
+public class SaveAsRequestMessageReader implements MessageBodyReader<SaveAsRequest> {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -42,10 +42,10 @@ public class CallbackMessageReader implements MessageBodyReader<Callback> {
     }
 
     @Override
-    public Callback readFrom(final Class<Callback> aClass, final Type type, final Annotation[] annotations,
+    public SaveAsRequest readFrom(final Class<SaveAsRequest> aClass, final Type type, final Annotation[] annotations,
                              final MediaType mediaType, final MultivaluedMap<String, String> multivaluedMap,
                              final InputStream inputStream)
             throws IOException, WebApplicationException {
-        return objectMapper.readValue(inputStream, Callback.class);
+        return objectMapper.readValue(inputStream, SaveAsRequest.class);
     }
 }
