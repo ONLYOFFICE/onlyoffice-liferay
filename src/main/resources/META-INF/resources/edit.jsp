@@ -87,13 +87,14 @@
     var config = JSON.parse('<%= request.getAttribute("config") %>');
 
         var onRequestSaveAs = function (event) {
-            var url = event.data.url;
+            var fileUrl = event.data.url;
             var fileType = event.data.fileType ? event.data.fileType : event.data.title.split(".").pop();
 
             var request = new XMLHttpRequest();
-            request.open("POST", '<%= PortalUtil.getPortalURL(request) + "/o/onlyoffice/api?type=save-as" %>', true);
+            request.open("POST", '<%= PortalUtil.getPortalURL(request) + "/o/onlyoffice-docs/feature/save-as" %>', true);
+            request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             request.send(JSON.stringify({
-                url: url,
+                fileUrl: fileUrl,
                 fileType: fileType,
                 fileEntryId: '<%= ParamUtil.getLong(renderRequest, "fileEntryId") %>'
             }));

@@ -18,6 +18,8 @@
 
 package com.onlyoffice.liferay.docs.controller;
 
+import com.onlyoffice.liferay.docs.controller.reader.CallbackMessageReader;
+import com.onlyoffice.liferay.docs.controller.reader.SaveAsRequestMessageReader;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
@@ -42,13 +44,17 @@ public class OnlyofficeDocsRESTApplication extends Application {
         private CallbackController callbackController;
         @Reference
         private DownloadController downloadController;
+        @Reference
+        private FeatureController featureController;
 
         public Set<Object> getSingletons() {
                 Set<Object> singletons = new HashSet<>();
 
                 singletons.add(new CallbackMessageReader());
+                singletons.add(new SaveAsRequestMessageReader());
                 singletons.add(callbackController);
                 singletons.add(downloadController);
+                singletons.add(featureController);
 
                 return singletons;
         }
