@@ -19,11 +19,14 @@
 package com.onlyoffice.liferay.docs.listener;
 
 import com.liferay.portal.kernel.exception.ModelListenerException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.lock.model.Lock;
 import com.onlyoffice.liferay.docs.model.EditingMeta;
 import com.onlyoffice.liferay.docs.sdk.service.CallbackServiceImpl;
+import com.onlyoffice.liferay.docs.ui.EditMenuContext;
 import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
 import com.onlyoffice.model.commandservice.CommandRequest;
 import com.onlyoffice.model.commandservice.CommandResponse;
@@ -37,6 +40,8 @@ import java.util.List;
 
 @Component(service = ModelListener.class)
 public class LockModelListener extends BaseModelListener<Lock> {
+    private static final Log log = LogFactoryUtil.getLog(EditMenuContext.class);
+
     @Reference
     private CommandService commandService;
     @Reference
@@ -72,7 +77,9 @@ public class LockModelListener extends BaseModelListener<Lock> {
             infoResponse = commandService.processCommand(infoRequest, null);
             users = infoResponse.getUsers();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error(e, e);
+
+            return;
         }
 
         try {
@@ -84,7 +91,7 @@ public class LockModelListener extends BaseModelListener<Lock> {
 
             commandService.processCommand(dropRequest, null);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error(e, e);
         }
     }
 }
