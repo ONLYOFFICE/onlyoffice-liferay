@@ -20,6 +20,7 @@ package com.onlyoffice.liferay.docs.constants;
 
 public final class PortletKeys {
     public static final String EDITOR = "com_onlyoffice_liferay_docs_portlet_EditorPortlet";
+    public static final String CONVERT = "com_onlyoffice_liferay_docs_portlet_ConvertPortlet";
 
     private PortletKeys() {
     }

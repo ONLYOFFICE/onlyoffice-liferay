@@ -20,12 +20,16 @@ package com.onlyoffice.liferay.docs.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.liferay.document.library.kernel.exception.NoSuchFileVersionException;
 import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.util.MimeTypesUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.onlyoffice.liferay.docs.model.EditingMeta;
 import com.onlyoffice.manager.request.RequestManager;
 import org.apache.commons.io.IOUtils;
@@ -36,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.List;
 
 @Component(service = FileEntryUtils.class)
 public final class FileEntryUtils {
@@ -49,6 +54,30 @@ public final class FileEntryUtils {
     private RequestManager requestManager;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public FileEntry createFileEntryFromUrl(final String fileName, final long repositoryId, final long folderId,
+                                            final String fileUrl) throws Exception {
+        return requestManager.executeGetRequest(fileUrl, new RequestManager.Callback<FileEntry>() {
+            @Override
+            public FileEntry doWork(final Object response) throws Exception {
+                byte[] bytes = IOUtils.toByteArray(((HttpEntity) response).getContent());
+                InputStream inputStream = new ByteArrayInputStream(bytes);
+
+                return dlAppService.addFileEntry(
+                        repositoryId,
+                        folderId,
+                        fileName,
+                        MimeTypesUtil.getContentType(fileName),
+                        fileName,
+                        "",
+                        "ONLYOFFICE Convert",
+                        inputStream,
+                        bytes.length,
+                        ServiceContextThreadLocal.getServiceContext()
+                );
+            }
+        });
+    }
 
     public FileEntry updateFileEntryFromUrl(final FileEntry fileEntry, final String fileUrl,
                                        final DLVersionNumberIncrease dlVersionNumberIncrease) throws Exception {
@@ -72,6 +101,20 @@ public final class FileEntryUtils {
                 );
             }
         });
+    }
+
+    public FileVersion getFileVersion(final FileEntry fileEntry, final String version)
+            throws NoSuchFileVersionException {
+        List<FileVersion> fileVersions = fileEntry.getFileVersions(WorkflowConstants.STATUS_ANY);
+        return fileVersions.stream()
+                .filter(value -> value.getVersion().equals(version))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchFileVersionException(
+                        MessageFormat.format(
+                                "No FileVersion exists with the key (version={0})",
+                                version
+                        )
+                ));
     }
 
     public boolean isLockedInEditor(final FileEntry fileEntry) throws PortalException {

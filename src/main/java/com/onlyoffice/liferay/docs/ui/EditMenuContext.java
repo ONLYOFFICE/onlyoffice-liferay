@@ -198,14 +198,17 @@ public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
 
     private String getConvertUrl() {
         PortletURL portletURL = PortletURLFactoryUtil.create(
-            request, "com_onlyoffice_liferay_docs_ui_ConvertActionPortlet",
-            themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+                request,
+                com.onlyoffice.liferay.docs.constants.PortletKeys.CONVERT,
+                themeDisplay.getPlid(),
+                PortletRequest.RENDER_PHASE
+        );
 
 //      MutableRenderParameters added in portlet version 3.0
 //      MutableRenderParameters params = portletURL.getRenderParameters();
 //      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
 
-        portletURL.setParameter("fileId", String.valueOf(fileVersion.getFileEntryId()));
+        portletURL.setParameter("fileEntryId", String.valueOf(fileVersion.getFileEntryId()));
 
         try {
             portletURL.setWindowState(LiferayWindowState.POP_UP);

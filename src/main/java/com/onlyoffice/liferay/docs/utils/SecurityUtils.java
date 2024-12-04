@@ -54,19 +54,21 @@ public final class SecurityUtils {
         return key.toString();
     }
 
-    public static void setUserAuthentication(final HttpServletRequest httpServletRequest) throws PortalException {
+    public static User setUserAuthentication(final HttpServletRequest httpServletRequest) throws PortalException {
         User user = PortalUtil.getUser(httpServletRequest);
 
-        setUserAuthentication(user);
+        return setUserAuthentication(user);
     }
 
-    public static void setUserAuthentication(final User user) throws PortalException {
+    public static User setUserAuthentication(final User user) throws PortalException {
         if (user == null) {
             throw new PortalException();
         }
 
         PrincipalThreadLocal.setName(user.getUserId());
         PermissionThreadLocal.setPermissionChecker(PermissionCheckerFactoryUtil.create(user));
+
+        return user;
     }
 
     public static <R> R runAs(final RunAsWork<R> runAsWork, final long userId) throws Exception {

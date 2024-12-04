@@ -18,14 +18,13 @@
 
 package com.onlyoffice.liferay.docs.controller;
 
-import com.liferay.document.library.kernel.exception.NoSuchFileVersionException;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
 import com.onlyoffice.liferay.docs.utils.SecurityUtils;
 import com.onlyoffice.manager.security.JwtManager;
 import com.onlyoffice.manager.settings.SettingsManager;
@@ -33,8 +32,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.io.InputStream;
-import java.text.MessageFormat;
-import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -51,6 +48,8 @@ public class DownloadController {
 
     @Reference
     private DLAppService dlAppService;
+    @Reference
+    private FileEntryUtils fileEntryUtils;
     @Reference
     private SettingsManager settingsManager;
     @Reference
@@ -73,30 +72,7 @@ public class DownloadController {
                 public Response doWork() throws Exception {
 
                     FileEntry fileEntry = dlAppService.getFileEntryByUuidAndGroupId(uuid, groupId);
-
-                    FileVersion fileVersion;
-                    if (version.equals("PWC")) {
-                        fileVersion = fileEntry.getLatestFileVersion();
-                    } else {
-                        List<FileVersion> fileVersions = fileEntry.getFileVersions(WorkflowConstants.STATUS_ANY);
-                        fileVersion = fileVersions.stream()
-                                .filter(value -> {
-                                    return value.getVersion().equals(version);
-                                })
-                                .findFirst()
-                                .orElse(null);
-                    }
-
-                    if (fileVersion == null) {
-                        throw new NoSuchFileVersionException(
-                                MessageFormat.format(
-                                        "No FileVersion exists with the key (uuid={0}, groupId={1}, version={2})",
-                                        uuid,
-                                        groupId,
-                                        version
-                                )
-                        );
-                    }
+                    FileVersion fileVersion = fileEntryUtils.getFileVersion(fileEntry, version);
 
                     InputStream inputStream = fileVersion.getContentStream(false);
 

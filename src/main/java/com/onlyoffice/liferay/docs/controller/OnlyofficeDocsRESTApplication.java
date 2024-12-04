@@ -18,8 +18,7 @@
 
 package com.onlyoffice.liferay.docs.controller;
 
-import com.onlyoffice.liferay.docs.controller.reader.CallbackMessageReader;
-import com.onlyoffice.liferay.docs.controller.reader.SaveAsRequestMessageReader;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
@@ -50,12 +49,16 @@ public class OnlyofficeDocsRESTApplication extends Application {
         public Set<Object> getSingletons() {
                 Set<Object> singletons = new HashSet<>();
 
-                singletons.add(new CallbackMessageReader());
-                singletons.add(new SaveAsRequestMessageReader());
                 singletons.add(callbackController);
                 singletons.add(downloadController);
                 singletons.add(featureController);
 
                 return singletons;
+        }
+
+        public Set<Class<?>> getClasses() {
+                Set<Class<?>> classes = new HashSet<>();
+                classes.add(JacksonJsonProvider.class); // Register the Jackson provider
+                return classes;
         }
 }
