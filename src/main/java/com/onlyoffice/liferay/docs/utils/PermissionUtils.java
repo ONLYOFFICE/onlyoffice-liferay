@@ -44,15 +44,16 @@ public final class PermissionUtils {
         folderModelResourcePermission = modelResourcePermission;
     }
 
-    public static boolean checkFolderPermission(final Folder folder, final String actionId) throws PortalException {
+    public static boolean checkFolderPermission(final long groupId, final long folderId,
+                                                final String actionId) throws PortalException {
         User user = UserServiceUtil.getCurrentUser();
         PermissionChecker permissionChecker = PermissionCheckerFactoryUtil.create(user);
 
         return ModelResourcePermissionHelper.contains(
                 folderModelResourcePermission,
                 permissionChecker,
-                folder.getGroupId(),
-                folder.getFolderId(),
+                groupId,
+                folderId,
                 actionId
         );
     }

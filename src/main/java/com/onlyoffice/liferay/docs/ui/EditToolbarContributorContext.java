@@ -18,7 +18,6 @@
 
 package com.onlyoffice.liferay.docs.ui;
 
-import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.portlet.toolbar.contributor.DLPortletToolbarContributorContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
@@ -29,8 +28,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionHelper;
 import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -38,6 +35,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.onlyoffice.liferay.docs.utils.PermissionUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -53,8 +51,6 @@ import javax.portlet.PortletResponse;
 public class EditToolbarContributorContext implements DLPortletToolbarContributorContext {
     private static final Log log = LogFactoryUtil.getLog(EditToolbarContributorContext.class);
 
-    @Reference(target = "(model.class.name=com.liferay.document.library.kernel.model.DLFolder)")
-    private ModelResourcePermission<DLFolder> dlFolderModelResourcePermission;
     @Reference
     private Language language;
     @Reference
@@ -68,48 +64,44 @@ public class EditToolbarContributorContext implements DLPortletToolbarContributo
                                             final PortletResponse portletResponse
     ) {
         try {
+            long groupId = themeDisplay.getScopeGroupId();
             long folderId = folder != null ? folder.getFolderId() : 0L;
-            Boolean hasPermission = ModelResourcePermissionHelper.contains(
-                    dlFolderModelResourcePermission,
-                    themeDisplay.getPermissionChecker(),
-                    themeDisplay.getScopeGroupId(),
-                    folderId,
-                    ActionKeys.ADD_DOCUMENT
-            );
 
-            if (hasPermission) {
-                Layout layout = themeDisplay.getLayout();
-                PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
-
-                LiferayPortletURL portletURL;
-                if (layout != null) {
-                    portletURL = PortletURLFactoryUtil.create(
-                            portletRequest,
-                            portletDisplay.getId(),
-                            layout,
-                            PortletRequest.RENDER_PHASE
-                    );
-                } else {
-                    portletURL = PortletURLFactoryUtil.create(portletRequest, portletDisplay.getId(),
-                            themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
-                }
-
-                portletURL.setParameter("mvcRenderCommandName", "/document_library/create_onlyoffice");
-                portletURL.setParameter("redirect", PortalUtil.getCurrentURL(portletRequest));
-
-                if (folder != null) {
-                    portletURL.setParameter("folderId", String.valueOf(folder.getFolderId()));
-                }
-
-                String labelMenu = translate(portletRequest, "onlyoffice-context-action-create");
-
-                menuItems.add(this.getNewMenuItem(
-                        "#create-document-onlyoffice",
-                        labelMenu,
-                        "documents-and-media",
-                        portletURL.toString()
-                ));
+            if (!PermissionUtils.checkFolderPermission(groupId, folderId, ActionKeys.ADD_DOCUMENT)) {
+                return;
             }
+
+            Layout layout = themeDisplay.getLayout();
+            PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+            LiferayPortletURL portletURL;
+            if (layout != null) {
+                portletURL = PortletURLFactoryUtil.create(
+                        portletRequest,
+                        portletDisplay.getId(),
+                        layout,
+                        PortletRequest.RENDER_PHASE
+                );
+            } else {
+                portletURL = PortletURLFactoryUtil.create(portletRequest, portletDisplay.getId(),
+                        themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+            }
+
+            portletURL.setParameter("mvcRenderCommandName", "/document_library/create_onlyoffice");
+            portletURL.setParameter("redirect", PortalUtil.getCurrentURL(portletRequest));
+
+            if (folder != null) {
+                portletURL.setParameter("folderId", String.valueOf(folder.getFolderId()));
+            }
+
+            String labelMenu = translate(portletRequest, "onlyoffice-context-action-create");
+
+            menuItems.add(this.getNewMenuItem(
+                    "#create-document-onlyoffice",
+                    labelMenu,
+                    "documents-and-media",
+                    portletURL.toString()
+            ));
         } catch (PortalException e) {
             log.error(e);
         }

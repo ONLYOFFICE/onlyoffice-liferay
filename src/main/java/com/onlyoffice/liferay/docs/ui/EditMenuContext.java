@@ -53,6 +53,7 @@ import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
+import com.onlyoffice.liferay.docs.utils.PermissionUtils;
 import com.onlyoffice.manager.document.DocumentManager;
 
 import java.util.List;
@@ -98,7 +99,11 @@ public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
             editPerm = fileEntry.containsPermission(checker, ActionKeys.UPDATE)
                     && !fileEntryUtils.isLockedNotInEditor(fileEntry);
             viewPerm = fileEntry.containsPermission(checker, ActionKeys.VIEW);
-            convPerm = folder.containsPermission(checker, ActionKeys.ADD_DOCUMENT) && viewPerm;
+            convPerm = PermissionUtils.checkFolderPermission(
+                    themeDisplay.getScopeGroupId(),
+                    folder.getFolderId(),
+                    ActionKeys.ADD_DOCUMENT
+            ) && viewPerm;
         } catch (PortalException e) {
             // Do nothing if exception
         }

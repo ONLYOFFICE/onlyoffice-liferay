@@ -140,7 +140,11 @@ public class EditorPortlet extends MVCPortlet {
 
             String shardkey = config.getDocument().getKey();
             String title = config.getDocument().getTitle();
-            boolean canCreateDocument = PermissionUtils.checkFolderPermission(folder, ActionKeys.ADD_DOCUMENT);
+            boolean canCreateDocument = PermissionUtils.checkFolderPermission(
+                    fileEntry.getGroupId(),
+                    folder.getFolderId(),
+                    ActionKeys.ADD_DOCUMENT
+            );
 
             renderRequest.setAttribute("config", objectMapper.writeValueAsString(config));
             renderRequest.setAttribute("title", title);
