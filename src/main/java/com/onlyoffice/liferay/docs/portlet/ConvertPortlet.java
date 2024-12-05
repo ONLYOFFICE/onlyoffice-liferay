@@ -99,7 +99,8 @@ public class ConvertPortlet extends MVCPortlet {
 
             String newFileName = baseFileName + "." + defaultConvertExtension;
 
-            renderRequest.setAttribute("fileEntryId", fileEntryId);
+            renderRequest.setAttribute("fileEntryId", fileEntry.getFileEntryId());
+            renderRequest.setAttribute("version", fileVersion.getVersion());
             renderRequest.setAttribute("fileName", fileName);
             renderRequest.setAttribute("newFileName", newFileName);
 

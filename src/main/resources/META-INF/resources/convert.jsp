@@ -16,79 +16,80 @@
  *
  --%>
 
-<%@page import="com.liferay.portal.kernel.util.PortalUtil"%>
-<%@page import="java.util.Date"%>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
-<%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 
 <portlet:defineObjects />
 
-<%
-	String apiurl = "/o/onlyoffice/convert?key=" + Long.toString(new Date().getTime())
-		+ "&fileId=" + request.getAttribute("fileEntryId")
-		+ "&fileName=" + request.getAttribute("newFileName");
-%>
-
 <div style="padding: 20px 10px;">
-	<span id="ooConvertText">
+    <span id="ooConvertText">
         <liferay-ui:message
             key="onlyoffice-convert-process"
             arguments='<%=  new Object[] {request.getAttribute("fileName"), request.getAttribute("newFileName")} %>'
         />
-	</span>
-	<div class="progress">
-		<span id="ooProgressThumb" style="padding: 5px;" class="progress-bar"></span>
-	</div>
-	
-	<script type="text/javascript">
-	(function() {
-		var text = document.getElementById("ooConvertText");
-		var thumb = document.getElementById("ooProgressThumb");
-		var timeOut = null;
+    </span>
+    <div class="progress">
+        <span id="ooProgressThumb" style="padding: 5px;" class="progress-bar"></span>
+    </div>
 
-		function onError(error) {
-			text.innerHTML = '<%= LanguageUtil.get(request, "onlyoffice-convert-error") %>' + error;
-		}
-		
-		function _callAjax() {
-			var url = "<%= apiurl %>";
+    <script type="text/javascript">
+    (function() {
+        var text = document.getElementById("ooConvertText");
+        var thumb = document.getElementById("ooProgressThumb");
 
-			var xhr = new XMLHttpRequest();
-			xhr.open("POST", url, false);
-			xhr.send();
+        const onSuccess = () => {
+            text.innerHTML = '<%= LanguageUtil.get(request, "onlyoffice-convert-done") %>';
+            window.top.location.reload();
+        }
 
-			if (xhr.status != 200) {
-				onError( xhr.status + " " + xhr.statusText );
-			} else {
-				var data = JSON.parse(xhr.responseText);
+        const onError = (message) => {
+            text.innerHTML = '<%= LanguageUtil.get(request, "onlyoffice-convert-error") %>' + message;
+        }
 
-				if (data.error) {
-					onError(data.error);
-					return;
-				}
+        const convert = (fileEntryId, version, time) => {
+            fetch("/o/onlyoffice-docs/convert",
+                {
+                    headers: {
+                      'Accept': 'application/json',
+                      'Content-Type': 'application/json'
+                    },
+                    method: "POST",
+                    body: JSON.stringify({
+                        fileEntryId: fileEntryId,
+                        version: version,
+                        time: time,
+                    })
+            })
+            .then(async (response) => {
+                const data = await response.json();
+                if (!response.ok) {
+                     onError(data.error);
+                     return;
+                }
 
-				if (data.percent != null) {
-					var perc = data.percent / 100;
-					if (perc > 0) {
-						thumb.style.flex = data.percent / 100;
-					}
-					thumb.innerHTML = data.percent + "%";
-				}
+                if (data.percent != null) {
+                    thumb.style.flex = data.percent / 100;
+                    thumb.innerHTML = data.percent + "%";
+                }
 
-				if (!data.endConvert) {
-					setTimeout(_callAjax, 1000);
-				} else {
-					text.innerHTML = '<%= LanguageUtil.get(request, "onlyoffice-convert-done") %>';
-					window.top.location.reload();
-				}
-			}
-		}
+                if (!data.endConvert) {
+                    setTimeout(() => convert(fileEntryId, version, time), 1000);
+                } else {
+                    onSuccess();
+                }
+            }).catch(e => {
+                console.error('Error converting fileEntry:', error);
+            })
+        }
 
-		_callAjax();
-	})();
-	</script>
+        convert(
+            '<%= request.getAttribute("fileEntryId") %>',
+            '<%= request.getAttribute("version") %>',
+            Date.now(),
+        );
+    })();
+    </script>
 </div>
