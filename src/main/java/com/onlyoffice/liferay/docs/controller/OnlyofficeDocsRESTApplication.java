@@ -34,7 +34,8 @@ import javax.ws.rs.core.Application;
                 "liferay.access.control.disable=true",
                 "auth.verifier.guest.allowed=true",
                 "liferay.auth.verifier=false",
-                "liferay.oauth2=false"
+                "liferay.oauth2=false",
+                "liferay.jackson=false"
         },
         service = Application.class
 )

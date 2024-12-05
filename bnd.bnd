@@ -8,6 +8,7 @@ Import-Package: \
     !org.conscrypt,\
     !org.slf4j.impl,\
     !org.glassfish.hk2.osgiresourcelocator,\
+    !com.liferay.portal.kernel.resource.bundle,\
     *
 
 -consumer-policy: ${replacestring;${range;[==,==]};.*,(.*)];$1}
