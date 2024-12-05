@@ -1,50 +1,50 @@
 Liferay ONLYOFFICE Connector uses code from the following 3rd party projects:
 
 
-avalon-framework-api - Avalon Framework API (https://www.apache.org/licenses/LICENSE-2.0)
-License:               Apache 2.0
-License File:          avalon-framework-api.license
-
-biz.aQute.bndlib     - bndlib: A Swiss Army Knife for OSGi (https://www.apache.org/licenses/LICENSE-2.0)
-License:               Apache 2.0
-License File:          biz.aQute.bndlib.license
-
-com.liferay.document.library.api - Liferay Document Library API (https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+com.liferay.portal.release.portal.bom - Release Portal BOM (http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)
 License:               LGPL 2.1
-License File:          com.liferay.document.library.api.license
+License File:          com.liferay.portal.release.portal.bom.license
 
-com.liferay.dynamic.data.mapping.api - Liferay Dynamic Data Mapping API (https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+com.liferay.portal.release.portal.bom.compile.only - Release Portal BOM Compile Only (http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)
 License:               LGPL 2.1
-License File:          com.liferay.dynamic.data.mapping.api.license
+License File:          com.liferay.portal.release.portal.bom.compile.only.license
 
-com.liferay.portal.configuration.metatype - Liferay Portal Configuration Metatype (https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+com.liferay.portal.release.portal.bom.third.party - Release Portal BOM Third Party (http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)
 License:               LGPL 2.1
-License File:          com.liferay.portal.configuration.metatype.license
+License File:          com.liferay.portal.release.portal.bom.third.party.license
 
-com.liferay.portal.kernel - Contains interfaces for the portal services. Interfaces are only loaded by the global class loader and are shared by all plugins. (https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+com.liferay.portal.release.portal.api - Release Portal API (http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)
 License:               LGPL 2.1
-License File:          com.liferay.portal.kernel.license
+License File:          com.liferay.portal.release.portal.api.license
 
-httpclient           - Apache HttpComponents Client (https://www.apache.org/licenses/LICENSE-2.0)
+javax.portlet.portlet-api - The Java Portlet API version 3.0 developed by the Java Community Process JSR-362 Expert Group (http://www.apache.org/licenses/LICENSE-2.0.txt)
 License:               Apache 2.0
-License File:          httpclient.license
+License File:          javax.portlet.portlet-api.license
 
-javax.servlet-api    - Java Servlet API (https://opensource.org/licenses/CDDL-1.0 https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
-License:               CDDL, GPL 2.0
-License File:          javax.servlet-api.license
+javax.ws.rs.javax.ws.rs-api - Java API for RESTful Web Services (http://www.eclipse.org/legal/epl-2.0)
+License:               EPL 2.0
+License File:          javax.ws.rs.javax.ws.rs-api.license
 
-JSON                 - JSON is a light-weight, language independent, data interchange format. See http://www.JSON.org/ The files in this package implement JSON encoders/decoders in Java. It also includes the capability to convert between JSON and XML, HTTP headers, Cookies, and CDL. This is a reference implementation. (http://json.org/license.html)
-License:               JSON
-License File:          JSON.license
+javax.servlet.javax.servlet-api - Java Servlet is the foundation web specification in the Java Enterprise Platform. (https://javaee.github.io/servlet-spec/LICENSE)
+License:               CDDL 1.1
+License File:          javax.servlet.javax.servlet-api.license
 
-org.osgi.service.component.annotations - OSGi Companion Code for org.osgi.service.component.annotations Version 1.4.0 (https://www.apache.org/licenses/LICENSE-2.0)
+org.osgi.osgi.cmpn   - OSGi Compendium Release 7, Interfaces and Classes for use in compiling bundles (http://www.apache.org/licenses/LICENSE-2.0)
 License:               Apache 2.0
-License File:          org.osgi.service.component.annotations.license
+License File:          org.osgi.osgi.cmpn.license
 
-osgi.core            - OSGi Core Release 7, Interfaces and Classes for use in compiling bundles (https://www.apache.org/licenses/LICENSE-2.0)
+org.osgi.org.osgi.service.jaxrs - OSGi Companion Code for org.osgi.service.jaxrs (http://www.apache.org/licenses/LICENSE-2.0)
 License:               Apache 2.0
-License File:          osgi.core.license
+License File:          org.osgi.org.osgi.service.jaxrs.license
 
-portlet-api          - The Java Portlet API version 3.0 developed by the Java Community Process JSR-362 Expert Group. (https://www.apache.org/licenses/LICENSE-2.0)
+org.osgi.org.osgi.framework - OSGi Companion Code for org.osgi.framework (http://www.apache.org/licenses/LICENSE-2.0)
 License:               Apache 2.0
-License File:          portlet-api.license
+License File:          org.osgi.org.osgi.framework.license
+
+org.projectlombok.lombok - Lombok is a Java library that provides annotations to simplify Java development by automating the generation of boilerplate code (https://projectlombok.org/LICENSE)
+License:               MIT
+License File:          org.projectlombok.lombok.license
+
+com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider - unctionality to handle JSON input/output for JAX-RS implementations (like Jersey and RESTeasy) using standard Jackson data binding ()
+License:               Apache 2.0
+License File:          com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider.license
