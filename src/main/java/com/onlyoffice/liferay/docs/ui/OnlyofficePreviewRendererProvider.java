@@ -31,18 +31,31 @@ import com.onlyoffice.model.documenteditor.Config;
 import com.onlyoffice.model.documenteditor.config.document.Type;
 import com.onlyoffice.model.documenteditor.config.editorconfig.Mode;
 import com.onlyoffice.service.documenteditor.config.ConfigService;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Locale;
-import java.util.Optional;
+import java.util.Set;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 
+@Component(
+        property = "service.ranking:Integer=100",
+        service = DLPreviewRendererProvider.class
+)
 public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvider {
-    private final ServletContext servletContext;
-    private final ConfigService configService;
-    private final SettingsManager settingsManager;
-    private final UrlManager urlManager;
+    @Reference(target = "(osgi.web.symbolicname=onlyoffice.integration.web)")
+    private ServletContext servletContext;
+    @Reference
+    private ConfigService configService;
+    @Reference
+    private SettingsManager settingsManager;
+    @Reference
+    private UrlManager urlManager;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public OnlyofficePreviewRendererProvider(final ServletContext servletContext, final ConfigService configService,
@@ -54,12 +67,32 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
     }
 
     @Override
-    public Optional<DLPreviewRenderer> getPreviewDLPreviewRendererOptional(final FileVersion fileVersion) {
+    public Set<String> getMimeTypes() {
+        return new HashSet<>(Arrays.asList(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "application/vnd.oasis.opendocument.text",
+                "application/vnd.oasis.opendocument.spreadsheet",
+                "application/vnd.oasis.opendocument.presentation",
+                "application/msword",
+                "application/vnd.ms-excel",
+                "application/vnd.ms-powerpoint",
+                "text/csv",
+                "text/rtf",
+                "application/rtf",
+                "text/plain",
+                "application/pdf"
+        ));
+    }
+
+    @Override
+    public DLPreviewRenderer getPreviewDLPreviewRenderer(final FileVersion fileVersion) {
         if (!settingsManager.getSettingBoolean("preview", false)) {
-            return Optional.empty();
+            return null;
         }
 
-        return Optional.of((request, response) -> {
+        return (request, response) -> {
             String languageId = LanguageUtil.getLanguageId(request);
             Locale locale = LocaleUtil.fromLanguageId(languageId);
             boolean version = request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_VERSION) != null;
@@ -73,13 +106,13 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
             RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher("/preview.jsp");
 
             requestDispatcher.include(request, response);
-        });
+        };
     }
 
     @Override
-    public Optional<DLPreviewRenderer> getThumbnailDLPreviewRendererOptional(final FileVersion fileVersion) {
+    public DLPreviewRenderer getThumbnailDLPreviewRenderer(final FileVersion fileVersion) {
         // TODO Auto-generated method stub
-        return Optional.empty();
+        return null;
     }
 
     private Config getPreviewConfig(final FileVersion fileVersion, final Locale locale, final boolean version) {
