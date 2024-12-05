@@ -28,9 +28,8 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
+import com.onlyoffice.liferay.docs.utils.PermissionUtils;
 import com.onlyoffice.liferay.docs.utils.SecurityUtils;
 import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.model.convertservice.ConvertRequest;
@@ -57,8 +56,6 @@ public class ConvertController {
 
     @Context
     private HttpServletRequest httpServletRequest;
-    @Reference
-    private PermissionCheckerFactory permissionCheckerFactory;
     @Reference
     private DLAppService dlAppService;
     @Reference
@@ -101,9 +98,9 @@ public class ConvertController {
         String newFileName = baseFileName + "." + defaultConvertExtension;
         Locale locale = user.getLocale();
 
-        PermissionChecker permissionChecker = permissionCheckerFactory.create(user);
         try {
-            if (!folder.containsPermission(permissionChecker, ActionKeys.ADD_DOCUMENT)) {
+            if (!PermissionUtils.checkFolderPermission(fileEntry.getGroupId(), folder.getFolderId(),
+                    ActionKeys.ADD_DOCUMENT)) {
                 throw new PrincipalException.MustHavePermission(
                         user.getUserId(),
                         folder.getClass().getName(),

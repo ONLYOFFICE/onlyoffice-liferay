@@ -29,12 +29,11 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.onlyoffice.liferay.docs.constants.PortletKeys;
+import com.onlyoffice.liferay.docs.utils.PermissionUtils;
 import com.onlyoffice.manager.document.DocumentManager;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -66,8 +65,6 @@ public class ConvertPortlet extends MVCPortlet {
     @Reference
     private UserService userService;
     @Reference
-    private PermissionCheckerFactory permissionCheckerFactory;
-    @Reference
     private DLAppService dlAppService;
     @Reference
     private DocumentManager documentManager;
@@ -86,9 +83,9 @@ public class ConvertPortlet extends MVCPortlet {
             Folder folder = fileEntry.getFolder();
 
             User user = userService.getCurrentUser();
-            PermissionChecker permissionChecker = permissionCheckerFactory.create(user);
 
-            if (!folder.containsPermission(permissionChecker, ActionKeys.ADD_DOCUMENT)) {
+            if (!PermissionUtils.checkFolderPermission(fileEntry.getGroupId(), folder.getFolderId(),
+                    ActionKeys.ADD_DOCUMENT)) {
                 throw new PrincipalException.MustHavePermission(
                         user.getUserId(),
                         folder.getClass().getName(),
