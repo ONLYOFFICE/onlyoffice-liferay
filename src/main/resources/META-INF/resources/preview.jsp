@@ -21,36 +21,9 @@
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
-
-<%@ page import="com.liferay.document.library.kernel.service.DLAppLocalServiceUtil" %>
-<%@ page import="com.liferay.portal.kernel.repository.model.FileEntry" %>
-
-<%@ page import="org.osgi.framework.BundleContext" %>
-<%@ page import="org.osgi.framework.FrameworkUtil" %>
-
-<%@ page import="com.onlyoffice.liferay.docs.utils.OnlyOfficeEditorUtils" %>
-<%@ page import="com.onlyoffice.manager.url.UrlManager" %>
-<%@ page import="com.onlyoffice.model.documenteditor.Config" %>
-<%@ page import="com.fasterxml.jackson.databind.ObjectMapper" %>
-
 <liferay-theme:defineObjects />
 
 <portlet:defineObjects />
-
-
-<%
-    ObjectMapper objectMapper = new ObjectMapper();
-    BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeEditorUtils.class).getBundleContext();
-
-    Long fileEntryId = (Long)request.getAttribute("fileEntryId");
-    String version = (String)request.getAttribute("version");
-    FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
-    OnlyOfficeEditorUtils editorUtils = bc.getService(bc.getServiceReference(OnlyOfficeEditorUtils.class));
-    UrlManager urlManager = bc.getService(bc.getServiceReference(UrlManager.class));
-
-    Config previewDocsConfig = editorUtils.getPreviewConfig(fileEntryId, version, renderRequest);
-    String documentKey = previewDocsConfig.getDocument().getKey();
-%>
 
 <div id="onlyoffice-preview">
     <div class="preview-file-error-container" style="display: none">
@@ -69,7 +42,7 @@
             var scriptApi = document.createElement("script");
 
             scriptApi.setAttribute("type", "text/javascript");
-            scriptApi.setAttribute("src", "<%= urlManager.getDocumentServerApiUrl(documentKey) %>");
+            scriptApi.setAttribute("src", '<%= request.getAttribute("documentServerApiUrl") %>"');
 
             scriptApi.onload = scriptApi.onerror = function() {
                 if (typeof DocsAPI === "undefined") {
@@ -77,7 +50,7 @@
                     divOnlyofficePreview.querySelector("div.preview-file-error-container").style.display = "block";
                     divOnlyofficePreview.querySelector("div.preview-file").style.display = "none";
                 } else {
-                    var config = JSON.parse('<%= objectMapper.writeValueAsString(previewDocsConfig) %>');
+                    var config = JSON.parse('<%= request.getAttribute("config") %>');
                     docEditor = new DocsAPI.DocEditor("placeholder", config);
                 }
             };

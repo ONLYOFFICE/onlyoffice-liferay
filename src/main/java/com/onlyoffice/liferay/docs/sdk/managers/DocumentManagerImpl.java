@@ -18,7 +18,6 @@
 
 package com.onlyoffice.liferay.docs.sdk.managers;
 
-import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -82,7 +81,7 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
     public String getDocumentName(final String fileId) {
         FileVersion fileVersion;
         try {
-            fileVersion = DLAppLocalServiceUtil.getFileVersion(Long.parseLong(fileId));
+            fileVersion = dlAppService.getFileVersion(Long.parseLong(fileId));
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
         } catch (PortalException e) {

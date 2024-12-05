@@ -18,24 +18,39 @@
 
 package com.onlyoffice.liferay.docs.ui;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.liferay.document.library.preview.DLPreviewRenderer;
 import com.liferay.document.library.preview.DLPreviewRendererProvider;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.onlyoffice.manager.settings.SettingsManager;
+import com.onlyoffice.manager.url.UrlManager;
+import com.onlyoffice.model.documenteditor.Config;
+import com.onlyoffice.model.documenteditor.config.document.Type;
+import com.onlyoffice.model.documenteditor.config.editorconfig.Mode;
+import com.onlyoffice.service.documenteditor.config.ConfigService;
 
+import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.Optional;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 
 public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvider {
-    private final SettingsManager settingsManager;
     private final ServletContext servletContext;
+    private final ConfigService configService;
+    private final SettingsManager settingsManager;
+    private final UrlManager urlManager;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public OnlyofficePreviewRendererProvider(final ServletContext servletContext,
-                                             final SettingsManager settingsManager) {
+    public OnlyofficePreviewRendererProvider(final ServletContext servletContext, final ConfigService configService,
+                                             final SettingsManager settingsManager, final UrlManager urlManager) {
         this.servletContext = servletContext;
+        this.configService = configService;
         this.settingsManager = settingsManager;
+        this.urlManager = urlManager;
     }
 
     @Override
@@ -45,13 +60,17 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
         }
 
         return Optional.of((request, response) -> {
+            String languageId = LanguageUtil.getLanguageId(request);
+            Locale locale = LocaleUtil.fromLanguageId(languageId);
+            boolean version = request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_VERSION) != null;
+
+            Config config = getPreviewConfig(fileVersion, locale, version);
+            String shardkey = config.getDocument().getKey();
+
+            request.setAttribute("config", objectMapper.writeValueAsString(config));
+            request.setAttribute("documentServerApiUrl", urlManager.getDocumentServerApiUrl(shardkey));
+
             RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher("/preview.jsp");
-
-            request.setAttribute("fileEntryId", fileVersion.getFileEntryId());
-
-            if (request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_VERSION) != null) {
-                request.setAttribute("version", fileVersion.getVersion());
-            }
 
             requestDispatcher.include(request, response);
         });
@@ -61,5 +80,28 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
     public Optional<DLPreviewRenderer> getThumbnailDLPreviewRendererOptional(final FileVersion fileVersion) {
         // TODO Auto-generated method stub
         return Optional.empty();
+    }
+
+    private Config getPreviewConfig(final FileVersion fileVersion, final Locale locale, final boolean version) {
+        String title = fileVersion.getFileName();
+        if (version) {
+            title = MessageFormat.format(
+                    "{0} ({1} {2})",
+                    fileVersion.getFileName(),
+                    LanguageUtil.get(locale, "version"),
+                    fileVersion.getVersion()
+            );
+        }
+
+        Config config = configService.createConfig(
+                String.valueOf(fileVersion.getFileVersionId()),
+                Mode.VIEW,
+                Type.EMBEDDED
+        );
+
+        config.getEditorConfig().setLang(locale.toLanguageTag());
+        config.getDocument().setTitle(title);
+
+        return config;
     }
 }
