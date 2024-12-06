@@ -21,19 +21,13 @@
 
 <%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
-<%@ page import="com.liferay.portal.kernel.util.ResourceBundleUtil" %>
 <%@ page import="com.liferay.portal.kernel.servlet.HttpHeaders" %>
 <%@ page import="com.liferay.portal.kernel.util.PortalUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %>
-<%@ page import="java.util.ResourceBundle" %>
 
 <liferay-theme:defineObjects />
 
 <portlet:defineObjects />
-
-<%
-    ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(locale, getClass());
-%>
 
 <html>
 <head>

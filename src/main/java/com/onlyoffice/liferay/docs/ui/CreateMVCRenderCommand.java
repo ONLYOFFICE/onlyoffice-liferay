@@ -19,12 +19,16 @@
 package com.onlyoffice.liferay.docs.ui;
 
 import com.liferay.document.library.constants.DLPortletKeys;
+import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderConstants;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.onlyoffice.liferay.docs.portlet.ResourceBundlePortletConfigWrapper;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import javax.portlet.PortletConfig;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -50,6 +54,12 @@ public class CreateMVCRenderCommand implements MVCRenderCommand {
     public String render(final RenderRequest renderRequest, final RenderResponse renderResponse)
             throws PortletException {
         RequestDispatcher requestDispatcher = this.servletContext.getRequestDispatcher("/create.jsp");
+
+        LiferayPortletConfig portletConfig = (LiferayPortletConfig) renderRequest.getAttribute(
+                JavaConstants.JAVAX_PORTLET_CONFIG);
+
+        PortletConfig resourceBundlePortletConfigWrapper = new ResourceBundlePortletConfigWrapper(portletConfig);
+        renderRequest.setAttribute(JavaConstants.JAVAX_PORTLET_CONFIG, resourceBundlePortletConfigWrapper);
 
         try {
             HttpServletRequest request = PortalUtil.getHttpServletRequest(renderRequest);

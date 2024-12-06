@@ -30,10 +30,7 @@
 <%@ page import="com.liferay.document.library.kernel.exception.FileNameException" %>
 <%@ page import="com.liferay.portal.kernel.security.auth.PrincipalException" %>
 <%@ page import="com.liferay.portal.kernel.portlet.LiferayWindowState"%>
-<%@ page import="com.liferay.portal.kernel.util.ResourceBundleUtil" %>
 <%@ page import="com.onlyoffice.liferay.docs.constants.PortletKeys" %>
-
-<%@ page import="java.util.ResourceBundle" %>
 
 <liferay-theme:defineObjects />
 
@@ -44,8 +41,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 long folderId = ParamUtil.getLong(request, "folderId");
 long fileEntryId = ParamUtil.getLong(request, "fileEntryId");
 
-ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(locale, getClass());
-String headerTitle = LanguageUtil.get(resourceBundle, "onlyoffice-context-create-name");
+String headerTitle = LanguageUtil.get(request, "onlyoffice-context-create-name");
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
