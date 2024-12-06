@@ -37,9 +37,9 @@ org.osgi.org.osgi.service.jaxrs - OSGi Companion Code for org.osgi.service.jaxrs
 License:               Apache 2.0
 License File:          org.osgi.org.osgi.service.jaxrs.license
 
-org.osgi.org.osgi.framework - OSGi Companion Code for org.osgi.framework (http://www.apache.org/licenses/LICENSE-2.0)
+org.osgi.org.osgi.core - OSGi Core, Interfaces and Classes for use in compiling bundles. (http://www.apache.org/licenses/LICENSE-2.0)
 License:               Apache 2.0
-License File:          org.osgi.org.osgi.framework.license
+License File:          org.osgi.org.osgi.core.license
 
 org.projectlombok.lombok - Lombok is a Java library that provides annotations to simplify Java development by automating the generation of boilerplate code (https://projectlombok.org/LICENSE)
 License:               MIT
