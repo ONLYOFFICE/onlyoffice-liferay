@@ -10,7 +10,7 @@
 - migrate to maven build
 - create pdf instead docxf
 - delete create oform from docxf
-- com.onlyofficce:docs-integration-sdk:1.3.0
+- core of the plugin has been moved to com.onlyoffice.docs-integration-sdk (https://github.com/ONLYOFFICE/docs-integration-sdk-java)
 - address of the convert service, /converter instead /ConvertService.ashx
 - default token lifetime is 5 minutes
 - default empty file templates
