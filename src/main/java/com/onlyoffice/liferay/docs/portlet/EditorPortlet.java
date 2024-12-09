@@ -70,7 +70,8 @@ import static com.onlyoffice.liferay.docs.utils.FileEntryUtils.LOCKING_TIME;
                 "javax.portlet.init-param.view-template=/edit.jsp",
                 "javax.portlet.name=" + PortletKeys.EDITOR,
                 "javax.portlet.security-role-ref=power-user,user",
-                "javax.portlet.resource-bundle=content.Language"
+                "javax.portlet.resource-bundle=content.Language",
+                "javax.portlet.version=3.0"
         },
         service = Portlet.class
 )
@@ -126,7 +127,7 @@ public class EditorPortlet extends AbstractDefaultPortlet {
             String fileName = fileVersion.getFileName();
 
             if (documentManager.getDocumentType(fileName) == null) {
-                throw new FileExtensionException(fileName);
+                throw new FileExtensionException.InvalidExtension(fileName);
             }
 
             Config config = configService.createConfig(

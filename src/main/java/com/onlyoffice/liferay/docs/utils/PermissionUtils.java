@@ -24,7 +24,7 @@ import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionHelper;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionUtil;
 import com.liferay.portal.kernel.service.UserServiceUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -49,7 +49,7 @@ public final class PermissionUtils {
         User user = UserServiceUtil.getCurrentUser();
         PermissionChecker permissionChecker = PermissionCheckerFactoryUtil.create(user);
 
-        return ModelResourcePermissionHelper.contains(
+        return ModelResourcePermissionUtil.contains(
                 folderModelResourcePermission,
                 permissionChecker,
                 groupId,

@@ -20,10 +20,13 @@ package com.onlyoffice.liferay.docs.ui;
 
 import com.liferay.document.library.display.context.BaseDLViewFileVersionDisplayContext;
 import com.liferay.document.library.display.context.DLViewFileVersionDisplayContext;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -32,19 +35,10 @@ import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
-import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptMenuItem;
-import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptToolbarItem;
-import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptUIItem;
-import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
-import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
-import com.liferay.portal.kernel.servlet.taglib.ui.ToolbarItem;
-import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
-import com.liferay.portal.kernel.servlet.taglib.ui.URLToolbarItem;
-import com.liferay.portal.kernel.servlet.taglib.ui.URLUIItem;
+import com.liferay.portal.kernel.settings.FallbackKeysSettingsUtil;
 import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsException;
-import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.settings.TypedSettings;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -59,6 +53,7 @@ import com.onlyoffice.manager.document.DocumentManager;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import javax.portlet.MutableRenderParameters;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.WindowStateException;
@@ -84,15 +79,19 @@ public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
             httpServletResponse, fileVersion);
 
         themeDisplay = (ThemeDisplay) httpServletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-        resourceBundle = ResourceBundleUtil.getBundle("content.Language",
-                httpServletRequest.getLocale(), getClass());
+        resourceBundle = ResourceBundleUtil.getBundle(
+                "content.Language",
+                themeDisplay.getLocale(),
+                getClass()
+        );
 
         boolean editPerm = false;
         boolean viewPerm = false;
         boolean convPerm = false;
 
         try {
-            PermissionChecker checker = permissionFactory.create(PortalUtil.getUser(httpServletRequest));
+            User user = PortalUtil.getUser(httpServletRequest);
+            PermissionChecker checker = permissionFactory.create(user);
             FileEntry fileEntry = fileVersion.getFileEntry();
             Folder folder = fileEntry.getFolder();
 
@@ -114,56 +113,36 @@ public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
         canConvert = documentManager.getDefaultConvertExtension(fileName) != null && convPerm;
     }
 
-    public Menu getMenu() throws PortalException {
-        Menu menu = super.getMenu();
-        List<MenuItem> list = menu.getMenuItems();
+    public List<DropdownItem> getActionDropdownItems() throws PortalException {
+        List<DropdownItem> dropdownItems = super.getActionDropdownItems();
 
         if (showAction()) {
             if (canView) {
-                URLMenuItem item = new URLMenuItem();
-                initViewItem(item);
-                list.add(item);
+                dropdownItems.add(createViewDropdownItem());
             }
             if (canConvert) {
-                JavaScriptMenuItem item = new JavaScriptMenuItem();
-                initConvertItem(item);
-                list.add(item);
+                dropdownItems.add(createConvertDropdownItem());
             }
         }
 
-        return menu;
+        return dropdownItems;
     }
 
-    @Override
-    public List<ToolbarItem> getToolbarItems() throws PortalException {
-        List<ToolbarItem> toolbarItems = super.getToolbarItems();
 
-        if (canView) {
-            URLToolbarItem item = new URLToolbarItem();
-            initViewItem(item);
-            toolbarItems.add(item);
-        }
-        if (canConvert) {
-            JavaScriptToolbarItem item = new JavaScriptToolbarItem();
-            initConvertItem(item);
-            toolbarItems.add(item);
-        }
-        return toolbarItems;
-    }
-
-    private void initViewItem(final URLUIItem item) {
+    private DropdownItem createViewDropdownItem() {
         String labelKey = "onlyoffice-context-action-view";
 
         if (canEdit) {
             labelKey = "onlyoffice-context-action-edit";
         }
 
-        item.setLabel(LanguageUtil.get(request, resourceBundle, labelKey));
-        item.setTarget("_blank");
-        item.setURL(getDocUrl());
+        return DropdownItemBuilder.setHref(getDocUrl())
+                .setLabel(LanguageUtil.get(request, resourceBundle, labelKey))
+                .setTarget("_blank")
+                .build();
     }
 
-    private void initConvertItem(final JavaScriptUIItem item) {
+    private DropdownItem createConvertDropdownItem() {
         String label = LanguageUtil.get(request, resourceBundle, "onlyoffice-context-action-convert");
 
         StringBuilder sb = new StringBuilder();
@@ -174,8 +153,9 @@ public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
         sb.append("'onlyofficeConvertPopup',uri:'");
         sb.append(getConvertUrl() + "'});");
 
-        item.setLabel(label);
-        item.setOnClick(sb.toString());
+        return DropdownItemBuilder.setHref("javascript:" + sb)
+                .setLabel(label)
+                .build();
     }
 
     private String getDocUrl() {
@@ -186,11 +166,8 @@ public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
                 PortletRequest.RENDER_PHASE
         );
 
-//      MutableRenderParameters added in portlet version 3.0
-//      MutableRenderParameters params = portletURL.getRenderParameters();
-//      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
-
-        portletURL.setParameter("fileEntryId", Long.toString(fileVersion.getFileEntryId()));
+        MutableRenderParameters params = portletURL.getRenderParameters();
+        params.setValue("fileEntryId", Long.toString(fileVersion.getFileEntryId()));
 
         try {
             portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
@@ -209,11 +186,8 @@ public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
                 PortletRequest.RENDER_PHASE
         );
 
-//      MutableRenderParameters added in portlet version 3.0
-//      MutableRenderParameters params = portletURL.getRenderParameters();
-//      params.setValue("fileId", Long.toString(fileVersion.getFileVersionId()));
-
-        portletURL.setParameter("fileEntryId", String.valueOf(fileVersion.getFileEntryId()));
+        MutableRenderParameters params = portletURL.getRenderParameters();
+        params.setValue("fileEntryId", Long.toString(fileVersion.getFileEntryId()));
 
         try {
             portletURL.setWindowState(LiferayWindowState.POP_UP);
@@ -233,7 +207,7 @@ public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
             return true;
         }
 
-        Settings settings = SettingsFactoryUtil.getSettings(
+        Settings settings = FallbackKeysSettingsUtil.getSettings(
             new PortletInstanceSettingsLocator(
                 themeDisplay.getLayout(), portletDisplay.getId()));
 

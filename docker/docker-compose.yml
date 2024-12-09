@@ -2,7 +2,7 @@ version: '3'
 
 services:
     liferay:
-        image: liferay/portal:7.3.0-ga1
+        image: liferay/portal:7.4.3.125-ga125
         ports:
             - "8080:8080"
         volumes:

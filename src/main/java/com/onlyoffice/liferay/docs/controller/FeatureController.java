@@ -84,7 +84,8 @@ public class FeatureController {
         String uniqueFileName = DLUtil.getUniqueFileName(
                 fileEntry.getRepositoryId(),
                 fileEntry.getFolderId(),
-                fileName.substring(0, fileName.lastIndexOf(".") + 1) + request.getFileType()
+                fileName.substring(0, fileName.lastIndexOf(".") + 1) + request.getFileType(),
+                false
         );
 
         File sourceFile = null;

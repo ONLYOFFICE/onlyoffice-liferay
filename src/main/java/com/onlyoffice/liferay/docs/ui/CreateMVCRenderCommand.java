@@ -21,7 +21,7 @@ package com.onlyoffice.liferay.docs.ui;
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderConstants;
+import com.liferay.portal.kernel.portlet.bridges.mvc.constants.MVCRenderConstants;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.onlyoffice.liferay.docs.portlet.ResourceBundlePortletConfigWrapper;
