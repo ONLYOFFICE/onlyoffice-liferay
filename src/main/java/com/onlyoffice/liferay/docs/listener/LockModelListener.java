@@ -40,7 +40,7 @@ import java.util.List;
 
 @Component(service = ModelListener.class)
 public class LockModelListener extends BaseModelListener<Lock> {
-    private static final Log log = LogFactoryUtil.getLog(EditMenuContext.class);
+    private static final Log log = LogFactoryUtil.getLog(LockModelListener.class);
 
     @Reference
     private CommandService commandService;
