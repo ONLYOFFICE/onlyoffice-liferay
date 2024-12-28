@@ -103,13 +103,21 @@ public class EditorPortlet extends AbstractDefaultPortlet {
 
         try {
             FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
+            FileVersion fileVersion = fileEntry.getLatestFileVersion();
+            String fileName = fileVersion.getFileName();
             Folder folder = fileEntry.getFolder();
+
+            if (documentManager.getDocumentType(fileName) == null) {
+                throw new FileExtensionException(fileName);
+            }
 
             User user = userService.getCurrentUser();
             PermissionChecker checker = permissionCheckerFactory.create(user);
 
-            if (!fileEntryUtils.isLockedInEditor(fileEntry)
-                    && fileEntry.containsPermission(checker, ActionKeys.UPDATE)) {
+            if (documentManager.isEditable(fileName)
+                    && fileEntry.containsPermission(checker, ActionKeys.UPDATE)
+                    && !fileEntry.hasLock()
+            ) {
                 ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
                 String editingKey = fileEntryUtils.generateEditingKey(fileEntry);
@@ -120,13 +128,6 @@ public class EditorPortlet extends AbstractDefaultPortlet {
                         LOCKING_TIME,
                         serviceContext
                 );
-            }
-
-            FileVersion fileVersion = fileEntry.getLatestFileVersion();
-            String fileName = fileVersion.getFileName();
-
-            if (documentManager.getDocumentType(fileName) == null) {
-                throw new FileExtensionException(fileName);
             }
 
             Config config = configService.createConfig(
