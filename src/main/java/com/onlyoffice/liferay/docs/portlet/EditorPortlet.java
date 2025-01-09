@@ -113,7 +113,7 @@ public class EditorPortlet extends AbstractDefaultPortlet {
 
             if (documentManager.isEditable(fileName)
                     && fileEntry.containsPermission(checker, ActionKeys.UPDATE)
-                    && !fileEntry.hasLock()
+                    && fileEntry.getLock() == null
             ) {
                 editorLockManager.lockInEditor(fileEntry, EditorLockManager.TIMEOUT_CONNECTING_EDITOR);
             }
