@@ -20,8 +20,10 @@ package com.onlyoffice.liferay.docs.ui;
 
 import com.liferay.document.library.preview.DLPreviewRendererProvider;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.manager.url.UrlManager;
+import com.onlyoffice.model.common.Format;
 import com.onlyoffice.service.documenteditor.config.ConfigService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -30,7 +32,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
-import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Set;
@@ -55,24 +56,19 @@ public class OnlyofficePreviewRendererProviderFactory {
     private SettingsManager settingsManager;
     @Reference
     private UrlManager urlManager;
+    @Reference
+    private DocumentManager documentManager;
 
     public Set<String> getMimeTypes() {
-        return new HashSet<>(Arrays.asList(
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            "application/vnd.oasis.opendocument.text",
-            "application/vnd.oasis.opendocument.spreadsheet",
-            "application/vnd.oasis.opendocument.presentation",
-            "application/msword",
-            "application/vnd.ms-excel",
-            "application/vnd.ms-powerpoint",
-            "text/csv",
-            "text/rtf",
-            "application/rtf",
-            "text/plain",
-            "application/pdf"
-        ));
+       Set<String> mimeTypes = new HashSet<>();
+
+       for (Format format : documentManager.getFormats()) {
+           if (format.getActions().contains("view")) {
+               mimeTypes.addAll(format.getMime());
+           }
+       }
+
+       return mimeTypes;
     }
 
     @Activate

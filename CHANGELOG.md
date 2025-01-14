@@ -5,6 +5,7 @@
 - editing pdf
 - shardkey parameter
 - drop users from editor on unlock document
+- preview for all types supported for viewing
 
 ## Changed
 - migrate to maven build
