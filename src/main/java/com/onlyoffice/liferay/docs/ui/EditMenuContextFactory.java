@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2024
+ * (c) Copyright Ascensio System SIA 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
-import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
+import com.onlyoffice.liferay.docs.utils.EditorLockManager;
 import com.onlyoffice.manager.document.DocumentManager;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -44,7 +44,7 @@ public class EditMenuContextFactory implements DLDisplayContextFactory {
     @Reference
     private DocumentManager documentManager;
     @Reference
-    private FileEntryUtils fileEntryUtils;
+    private EditorLockManager editorLockManager;
 
     public DLEditFileEntryDisplayContext getDLEditFileEntryDisplayContext(
             final DLEditFileEntryDisplayContext parentDLEditFileEntryDisplayContext,
@@ -78,6 +78,6 @@ public class EditMenuContextFactory implements DLDisplayContextFactory {
         return new EditMenuContext(
             parentDLViewFileVersionDisplayContext.getUuid(),
             parentDLViewFileVersionDisplayContext, httpServletRequest,
-            httpServletResponse, fileVersion, documentManager, fileEntryUtils, permissionCheckerFactory);
+            httpServletResponse, fileVersion, documentManager, editorLockManager, permissionCheckerFactory);
     }
 }

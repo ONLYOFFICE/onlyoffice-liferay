@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2024
+ * (c) Copyright Ascensio System SIA 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,14 +32,12 @@ import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.onlyoffice.liferay.docs.constants.PortletKeys;
-import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
+import com.onlyoffice.liferay.docs.utils.EditorLockManager;
 import com.onlyoffice.liferay.docs.utils.PermissionUtils;
 import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.url.UrlManager;
@@ -56,7 +54,6 @@ import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
-import static com.onlyoffice.liferay.docs.utils.FileEntryUtils.LOCKING_TIME;
 
 @Component(
         immediate = true,
@@ -90,7 +87,7 @@ public class EditorPortlet extends AbstractDefaultPortlet {
     @Reference
     private UrlManager urlManager;
     @Reference
-    private FileEntryUtils fileEntryUtils;
+    private EditorLockManager editorLockManager;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -103,30 +100,22 @@ public class EditorPortlet extends AbstractDefaultPortlet {
 
         try {
             FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
+            FileVersion fileVersion = fileEntry.getLatestFileVersion();
+            String fileName = fileVersion.getFileName();
             Folder folder = fileEntry.getFolder();
+
+            if (documentManager.getDocumentType(fileName) == null) {
+                throw new FileExtensionException(fileName);
+            }
 
             User user = userService.getCurrentUser();
             PermissionChecker checker = permissionCheckerFactory.create(user);
 
-            if (!fileEntryUtils.isLockedInEditor(fileEntry)
-                    && fileEntry.containsPermission(checker, ActionKeys.UPDATE)) {
-                ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
-
-                String editingKey = fileEntryUtils.generateEditingKey(fileEntry);
-
-                dlAppService.checkOutFileEntry(
-                        fileEntry.getFileEntryId(),
-                        fileEntryUtils.createEditorLockOwner(editingKey),
-                        LOCKING_TIME,
-                        serviceContext
-                );
-            }
-
-            FileVersion fileVersion = fileEntry.getLatestFileVersion();
-            String fileName = fileVersion.getFileName();
-
-            if (documentManager.getDocumentType(fileName) == null) {
-                throw new FileExtensionException(fileName);
+            if (documentManager.isEditable(fileName)
+                    && fileEntry.containsPermission(checker, ActionKeys.UPDATE)
+                    && fileEntry.getLock() == null
+            ) {
+                editorLockManager.lockInEditor(fileEntry, EditorLockManager.TIMEOUT_CONNECTING_EDITOR);
             }
 
             Config config = configService.createConfig(

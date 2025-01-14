@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2024
+ * (c) Copyright Ascensio System SIA 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
-import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
+import com.onlyoffice.liferay.docs.utils.EditorLockManager;
 import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.security.JwtManager;
 import com.onlyoffice.manager.settings.SettingsManager;
@@ -49,7 +49,7 @@ public class ConfigServiceImpl extends DefaultConfigService {
     @Reference
     private DLAppService dlAppService;
     @Reference
-    private FileEntryUtils fileEntryUtils;
+    private EditorLockManager editorLockManager;
 
     public ConfigServiceImpl() {
         super(null, null, null, null);
@@ -91,7 +91,7 @@ public class ConfigServiceImpl extends DefaultConfigService {
             boolean editPermission = fileEntry.containsPermission(checker, ActionKeys.UPDATE);
             Boolean isEditable = super.getDocumentManager().isEditable(fileName)
                     || super.getDocumentManager().isFillable(fileName);
-            boolean isLockedNotInEditor = fileEntryUtils.isLockedNotInEditor(fileEntry);
+            boolean isLockedNotInEditor = editorLockManager.isLockedNotInEditor(fileEntry);
 
             return Permissions.builder()
                     .edit(editPermission && isEditable && !isLockedNotInEditor)

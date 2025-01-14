@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2024
+ * (c) Copyright Ascensio System SIA 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,31 +60,39 @@ public final class SecurityUtils {
         return setUserAuthentication(user);
     }
 
-    public static User setUserAuthentication(final User user) throws PortalException {
-        if (user == null) {
-            throw new PortalException();
-        }
+    public static User setUserAuthentication(final long userId) throws PortalException {
+        User user = UserLocalServiceUtil.getUser(userId);
 
+        return setUserAuthentication(user);
+    }
+
+    public static User setUserAuthentication(final User user) {
         PrincipalThreadLocal.setName(user.getUserId());
         PermissionThreadLocal.setPermissionChecker(PermissionCheckerFactoryUtil.create(user));
 
         return user;
     }
 
-    public static <R> R runAs(final RunAsWork<R> runAsWork, final long userId) throws Exception {
-        User user = UserLocalServiceUtil.getUser(userId);
+    public static <R> R runAs(final RunAsWork<R> runAsWork, final long userId) throws PortalException {
+        String currentName = PrincipalThreadLocal.getName();
+        PermissionChecker currentPermissionChecker = PermissionThreadLocal.getPermissionChecker();
 
-        String name = PrincipalThreadLocal.getName();
-        PermissionChecker permissionChecker = PermissionThreadLocal.getPermissionChecker();
+        User user = UserLocalServiceUtil.getUser(userId);
 
         try {
             PrincipalThreadLocal.setName(userId);
             PermissionThreadLocal.setPermissionChecker(PermissionCheckerFactoryUtil.create(user));
 
             return runAsWork.doWork();
+        } catch (Throwable e) {
+            if (e instanceof PortalException) {
+                throw (PortalException) e;
+            }
+
+            throw new RuntimeException("Error during run as.", e);
         } finally {
-            PrincipalThreadLocal.setName(name);
-            PermissionThreadLocal.setPermissionChecker(permissionChecker);
+            PrincipalThreadLocal.setName(currentName);
+            PermissionThreadLocal.setPermissionChecker(currentPermissionChecker);
         }
     }
 
