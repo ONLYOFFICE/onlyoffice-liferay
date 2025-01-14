@@ -28,6 +28,9 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.transaction.TransactionConfig;
+import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.onlyoffice.liferay.docs.model.EditingMeta;
 import com.onlyoffice.liferay.docs.utils.EditorLockManager;
 import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
@@ -104,6 +107,7 @@ public class CallbackServiceImpl extends DefaultCallbackService {
 
     public void handlerSave(final Callback callback, final String fileId) throws Exception {
         String key = callback.getKey();
+        String fileUrl = callback.getUrl();
         List<Action> actions = callback.getActions();
         FileEntryUtils.FileEntryKeys fileEntryKeys = fileEntryUtils.deformatFileId(fileId);
 
@@ -138,26 +142,11 @@ public class CallbackServiceImpl extends DefaultCallbackService {
                 );
             }
 
-            Lock lock = fileEntry.getLock();
-            long lockOwner = lock.getUserId();
-            String fileUrl = callback.getUrl();
-            fileUrl = urlManager.replaceToInnerDocumentServerUrl(fileUrl);
-
-            if (userId != lockOwner) {
-                editorLockManager.changeLockOwner(fileEntry, userId);
-            }
-
-            fileEntryUtils.updateFileEntryFromUrl(
+            saveFileEntry(
                     fileEntry,
-                    fileUrl,
-                    DLVersionNumberIncrease.MAJOR
-            );
-
-            dlAppService.checkInFileEntry(
-                    fileEntry.getFileEntryId(),
+                    urlManager.replaceToInnerDocumentServerUrl(fileUrl),
                     DLVersionNumberIncrease.MAJOR,
-                    "ONLYOFFICE Edit",
-                    ServiceContextThreadLocal.getServiceContext()
+                    false
             );
         }
     }
@@ -209,6 +198,7 @@ public class CallbackServiceImpl extends DefaultCallbackService {
         }
 
         String key = callback.getKey();
+        String fileUrl = callback.getUrl();
         List<Action> actions = callback.getActions();
         FileEntryUtils.FileEntryKeys fileEntryKeys = fileEntryUtils.deformatFileId(fileId);
 
@@ -243,31 +233,12 @@ public class CallbackServiceImpl extends DefaultCallbackService {
                 );
             }
 
-
-            Lock lock = fileEntry.getLock();
-            long lockOwner = lock.getUserId();
-            String fileUrl = callback.getUrl();
-            fileUrl = urlManager.replaceToInnerDocumentServerUrl(fileUrl);
-
-            if (userId != lockOwner) {
-                editorLockManager.changeLockOwner(fileEntry, userId);
-            }
-
-            fileEntryUtils.updateFileEntryFromUrl(
+            saveFileEntry(
                     fileEntry,
-                    fileUrl,
-                    DLVersionNumberIncrease.MINOR
-            );
-
-            dlAppService.checkInFileEntry(
-                    fileEntry.getFileEntryId(),
+                    urlManager.replaceToInnerDocumentServerUrl(fileUrl),
                     DLVersionNumberIncrease.MINOR,
-                    "ONLYOFFICE Edit",
-                    ServiceContextThreadLocal.getServiceContext()
+                    true
             );
-
-            EditingMeta editingMeta = new EditingMeta(key);
-            editorLockManager.lockInEditor(fileEntry, editingMeta, EditorLockManager.TIMEOUT_INFINITY);
         }
     }
 
@@ -365,6 +336,54 @@ public class CallbackServiceImpl extends DefaultCallbackService {
                             String.valueOf(fileEntry.getFileEntryId())
                     )
             );
+        }
+    }
+
+    private void saveFileEntry(final FileEntry fileEntry, final String fileUrl,
+                               final DLVersionNumberIncrease numberIncrease, final boolean keepLock) {
+        Lock lock = fileEntry.getLock();
+        long lockOwnerUserId = lock.getUserId();
+        String editingMetaAsString = lock.getOwner();
+
+        EditingMeta editingMeta = editorLockManager.parserEditingMeta(editingMetaAsString);
+
+        try {
+            TransactionInvokerUtil.invoke(
+                    TransactionConfig.Factory.create(
+                            Propagation.REQUIRED, new Class<?>[] {Exception.class}),
+                    () -> {
+                        long currentUserId = PrincipalThreadLocal.getUserId();
+
+                        if (currentUserId != lockOwnerUserId) {
+                            editorLockManager.changeLockOwner(fileEntry, currentUserId);
+                        }
+
+                        fileEntryUtils.updateFileEntryFromUrl(
+                                fileEntry,
+                                fileUrl,
+                                numberIncrease
+                        );
+
+                        dlAppService.checkInFileEntry(
+                                fileEntry.getFileEntryId(),
+                                numberIncrease,
+                                "ONLYOFFICE Edit",
+                                ServiceContextThreadLocal.getServiceContext()
+                        );
+
+                        if (keepLock) {
+                            editorLockManager.lockInEditor(
+                                    fileEntry,
+                                    editingMeta,
+                                    EditorLockManager.TIMEOUT_INFINITY
+                            );
+                        }
+
+                        return null;
+                    }
+            );
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
         }
     }
 }

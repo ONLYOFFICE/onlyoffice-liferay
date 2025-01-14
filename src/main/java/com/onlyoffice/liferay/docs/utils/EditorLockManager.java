@@ -26,7 +26,11 @@ import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.transaction.TransactionConfig;
+import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.onlyoffice.liferay.docs.model.EditingMeta;
+import lombok.SneakyThrows;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -47,20 +51,18 @@ public class EditorLockManager {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
 
-    public void lockInEditor(final FileEntry fileEntry, final int expirationTime) throws PortalException {
+    public void lockInEditor(final FileEntry fileEntry, final int expirationTime) {
         String editingKey = generateEditingKey(fileEntry);
         EditingMeta editingMeta = new EditingMeta(editingKey);
 
         lockInEditor(fileEntry, editingMeta, expirationTime);
     }
 
-    public void lockInEditor(final FileEntry fileEntry, final String editingMetaAsString)
-            throws PortalException {
+    public void lockInEditor(final FileEntry fileEntry, final String editingMetaAsString) {
         lockInEditor(fileEntry, editingMetaAsString, TIMEOUT_INFINITY);
     }
 
-    public void lockInEditor(final FileEntry fileEntry, final EditingMeta editingMeta, final int expirationTime)
-            throws PortalException {
+    public void lockInEditor(final FileEntry fileEntry, final EditingMeta editingMeta, final int expirationTime) {
         try {
             String editingMetaAsString = MessageFormat.format(
                     "{0}.{1}",
@@ -74,25 +76,34 @@ public class EditorLockManager {
         }
     }
 
-    public void lockInEditor(final FileEntry fileEntry, final String editingMetaAsString, final int expirationTime)
-            throws PortalException {
-        ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+    @SneakyThrows
+    public void lockInEditor(final FileEntry fileEntry, final String editingMetaAsString, final int expirationTime) {
+        TransactionInvokerUtil.invoke(
+                TransactionConfig.Factory.create(
+                        Propagation.REQUIRED,
+                        new Class<?>[] {Exception.class}
+                ),
+                () -> {
+                    ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
-        FileEntry checkOutFileEntry = dlAppService.checkOutFileEntry(
-                fileEntry.getFileEntryId(),
-                editingMetaAsString,
-                expirationTime,
-                serviceContext
-        );
+                    FileEntry checkOutFileEntry = dlAppService.checkOutFileEntry(
+                            fileEntry.getFileEntryId(),
+                            editingMetaAsString,
+                            expirationTime,
+                            serviceContext
+                    );
 
-        // dlAppService.checkOutFileEntry with expirationTime equals 0, lock file entry only on 1 hour
-        if (expirationTime == TIMEOUT_INFINITY) {
-            dlAppService.refreshFileEntryLock(
-                    checkOutFileEntry.getLock().getUuid(),
-                    checkOutFileEntry.getLock().getCompanyId(),
-                    TIMEOUT_INFINITY
-            );
-        }
+                    // dlAppService.checkOutFileEntry with expirationTime equals 0, lock file entry only on 1 hour
+                    if (expirationTime == TIMEOUT_INFINITY) {
+                        dlAppService.refreshFileEntryLock(
+                                checkOutFileEntry.getLock().getUuid(),
+                                checkOutFileEntry.getLock().getCompanyId(),
+                                TIMEOUT_INFINITY
+                        );
+                    }
+
+                    return null;
+                });
     }
 
     public void unlockFromEditor(final FileEntry fileEntry) throws PortalException {
@@ -145,28 +156,48 @@ public class EditorLockManager {
         return currentKey.equals(key);
     }
 
+    @SneakyThrows
     public void changeLockOwner(final FileEntry fileEntry, final long newLockOwner) throws PortalException {
         Lock lock = fileEntry.getLock();
         String editingMetaAsString = lock.getOwner();
 
-        unlockFromEditor(fileEntry);
+        TransactionInvokerUtil.invoke(
+                TransactionConfig.Factory.create(
+                        Propagation.REQUIRED,
+                        new Class<?>[] {Exception.class}
+                ),
+                () -> {
+                    unlockFromEditor(fileEntry);
 
-        SecurityUtils.runAs(new SecurityUtils.RunAsWork<Void>() {
-            public Void doWork() throws PortalException {
-                lockInEditor(fileEntry, editingMetaAsString);
-                return null;
-            }
-        }, newLockOwner);
+                    SecurityUtils.runAs(new SecurityUtils.RunAsWork<Void>() {
+                        public Void doWork() throws PortalException {
+                            lockInEditor(fileEntry, editingMetaAsString);
+                            return null;
+                        }
+                    }, newLockOwner);
+
+                    return null;
+                });
     }
 
-
+    @SneakyThrows
     public void refreshTimeToExpireLock(final FileEntry fileEntry, final int expirationTime) throws PortalException {
         Lock lock = fileEntry.getLock();
         String editingMetaAsString = lock.getOwner();
 
-        unlockFromEditor(fileEntry);
+        TransactionInvokerUtil.invoke(
+                TransactionConfig.Factory.create(
+                        Propagation.REQUIRED,
+                        new Class<?>[] {Exception.class}
+                ),
+                () -> {
 
-        lockInEditor(fileEntry, editingMetaAsString, expirationTime);
+                    unlockFromEditor(fileEntry);
+
+                    lockInEditor(fileEntry, editingMetaAsString, expirationTime);
+
+                    return null;
+                });
     }
 
     public EditingMeta parserEditingMeta(final String editingMetaAsString) {
