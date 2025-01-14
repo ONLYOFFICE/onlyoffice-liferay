@@ -27,7 +27,7 @@ import com.liferay.portal.lock.model.Lock;
 import com.onlyoffice.liferay.docs.model.EditingMeta;
 import com.onlyoffice.liferay.docs.sdk.service.CallbackServiceImpl;
 import com.onlyoffice.liferay.docs.ui.EditMenuContext;
-import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
+import com.onlyoffice.liferay.docs.utils.EditorLockManager;
 import com.onlyoffice.model.commandservice.CommandRequest;
 import com.onlyoffice.model.commandservice.CommandResponse;
 import com.onlyoffice.model.commandservice.commandrequest.Command;
@@ -45,7 +45,7 @@ public class LockModelListener extends BaseModelListener<Lock> {
     @Reference
     private CommandService commandService;
     @Reference
-    private FileEntryUtils fileEntryUtils;
+    private EditorLockManager editorLockManager;
 
     @Override
     public void onAfterRemove(final Lock lock) throws ModelListenerException {
@@ -60,7 +60,8 @@ public class LockModelListener extends BaseModelListener<Lock> {
             return;
         }
 
-        EditingMeta editingMeta = fileEntryUtils.getEditingMeta(lock.getOwner());
+        String editingMetaAsString = lock.getOwner();
+        EditingMeta editingMeta = editorLockManager.parserEditingMeta(editingMetaAsString);
 
         if (editingMeta == null) {
             return;
