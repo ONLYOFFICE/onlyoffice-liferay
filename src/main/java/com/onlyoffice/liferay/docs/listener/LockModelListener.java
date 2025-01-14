@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.lock.model.Lock;
 import com.onlyoffice.liferay.docs.model.EditingMeta;
 import com.onlyoffice.liferay.docs.sdk.service.CallbackServiceImpl;
-import com.onlyoffice.liferay.docs.ui.EditMenuContext;
 import com.onlyoffice.liferay.docs.utils.EditorLockManager;
 import com.onlyoffice.model.commandservice.CommandRequest;
 import com.onlyoffice.model.commandservice.CommandResponse;
