@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2024
+ * (c) Copyright Ascensio System SIA 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,7 @@ import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.lock.model.Lock;
 import com.onlyoffice.liferay.docs.model.EditingMeta;
 import com.onlyoffice.liferay.docs.sdk.service.CallbackServiceImpl;
-import com.onlyoffice.liferay.docs.ui.EditMenuContext;
-import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
+import com.onlyoffice.liferay.docs.utils.EditorLockManager;
 import com.onlyoffice.model.commandservice.CommandRequest;
 import com.onlyoffice.model.commandservice.CommandResponse;
 import com.onlyoffice.model.commandservice.commandrequest.Command;
@@ -40,12 +39,12 @@ import java.util.List;
 
 @Component(service = ModelListener.class)
 public class LockModelListener extends BaseModelListener<Lock> {
-    private static final Log log = LogFactoryUtil.getLog(EditMenuContext.class);
+    private static final Log log = LogFactoryUtil.getLog(LockModelListener.class);
 
     @Reference
     private CommandService commandService;
     @Reference
-    private FileEntryUtils fileEntryUtils;
+    private EditorLockManager editorLockManager;
 
     @Override
     public void onAfterRemove(final Lock lock) throws ModelListenerException {
@@ -60,7 +59,8 @@ public class LockModelListener extends BaseModelListener<Lock> {
             return;
         }
 
-        EditingMeta editingMeta = fileEntryUtils.getEditingMeta(lock.getOwner());
+        String editingMetaAsString = lock.getOwner();
+        EditingMeta editingMeta = editorLockManager.parserEditingMeta(editingMetaAsString);
 
         if (editingMeta == null) {
             return;

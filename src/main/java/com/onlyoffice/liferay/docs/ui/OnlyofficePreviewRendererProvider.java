@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2024
+ * (c) Copyright Ascensio System SIA 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ import javax.servlet.ServletContext;
         service = DLPreviewRendererProvider.class
 )
 public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvider {
-    @Reference(target = "(osgi.web.symbolicname=onlyoffice.integration.web)")
+    @Reference(target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)")
     private ServletContext servletContext;
     @Reference
     private ConfigService configService;
@@ -57,14 +57,6 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
     private UrlManager urlManager;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    public OnlyofficePreviewRendererProvider(final ServletContext servletContext, final ConfigService configService,
-                                             final SettingsManager settingsManager, final UrlManager urlManager) {
-        this.servletContext = servletContext;
-        this.configService = configService;
-        this.settingsManager = settingsManager;
-        this.urlManager = urlManager;
-    }
 
     @Override
     public Set<String> getMimeTypes() {

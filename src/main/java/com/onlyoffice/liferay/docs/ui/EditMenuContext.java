@@ -1,6 +1,6 @@
 /**
  *
- * (c) Copyright Ascensio System SIA 2024
+ * (c) Copyright Ascensio System SIA 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
+import com.onlyoffice.liferay.docs.utils.EditorLockManager;
 import com.onlyoffice.liferay.docs.utils.PermissionUtils;
 import com.onlyoffice.manager.document.DocumentManager;
 
@@ -72,7 +72,8 @@ public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
     public EditMenuContext(final UUID uuid, final DLViewFileVersionDisplayContext parentDLDisplayContext,
                            final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse,
                            final FileVersion fileVersion, final DocumentManager documentManager,
-                           final FileEntryUtils fileEntryUtils, final PermissionCheckerFactory permissionFactory) {
+                           final EditorLockManager editorLockManager,
+                           final PermissionCheckerFactory permissionFactory) {
 
         super(
             uuid, parentDLDisplayContext, httpServletRequest,
@@ -96,7 +97,7 @@ public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
             Folder folder = fileEntry.getFolder();
 
             editPerm = fileEntry.containsPermission(checker, ActionKeys.UPDATE)
-                    && !fileEntryUtils.isLockedNotInEditor(fileEntry);
+                    && !editorLockManager.isLockedNotInEditor(fileEntry);
             viewPerm = fileEntry.containsPermission(checker, ActionKeys.VIEW);
             convPerm = PermissionUtils.checkFolderPermission(
                     themeDisplay.getScopeGroupId(),
