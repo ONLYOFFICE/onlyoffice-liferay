@@ -67,7 +67,8 @@ import javax.portlet.RenderResponse;
                 "javax.portlet.init-param.view-template=/edit.jsp",
                 "javax.portlet.name=" + PortletKeys.EDITOR,
                 "javax.portlet.security-role-ref=power-user,user",
-                "javax.portlet.resource-bundle=content.Language"
+                "javax.portlet.resource-bundle=content.Language",
+                "javax.portlet.version=3.0"
         },
         service = Portlet.class
 )
@@ -105,7 +106,7 @@ public class EditorPortlet extends AbstractDefaultPortlet {
             Folder folder = fileEntry.getFolder();
 
             if (documentManager.getDocumentType(fileName) == null) {
-                throw new FileExtensionException(fileName);
+                throw new FileExtensionException.InvalidExtension(fileName);
             }
 
             User user = userService.getCurrentUser();

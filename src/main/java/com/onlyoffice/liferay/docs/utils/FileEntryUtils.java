@@ -54,15 +54,20 @@ public final class FileEntryUtils {
                 InputStream inputStream = new ByteArrayInputStream(bytes);
 
                 return dlAppService.addFileEntry(
+                        null,
                         repositoryId,
                         folderId,
                         fileName,
                         MimeTypesUtil.getContentType(fileName),
                         fileName,
+                        fileName,
                         "",
                         "ONLYOFFICE Convert",
                         inputStream,
                         bytes.length,
+                        null,
+                        null,
+                        null,
                         ServiceContextThreadLocal.getServiceContext()
                 );
             }
@@ -82,11 +87,15 @@ public final class FileEntryUtils {
                         fileEntry.getFileName(),
                         fileEntry.getMimeType(),
                         fileEntry.getTitle(),
+                        fileEntry.getTitle(),
                         fileEntry.getDescription(),
                         "",
                         dlVersionNumberIncrease,
                         inputStream,
                         bytes.length,
+                        null,
+                        null,
+                        null,
                         ServiceContextThreadLocal.getServiceContext()
                 );
             }

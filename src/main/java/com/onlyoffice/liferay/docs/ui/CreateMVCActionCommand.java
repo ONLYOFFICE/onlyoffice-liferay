@@ -46,6 +46,7 @@ import java.io.InputStream;
 import java.util.Locale;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.MutableRenderParameters;
 
 
 @Component(
@@ -77,8 +78,9 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
         InputStream streamSourceFile = null;
 
         try {
-            actionResponse.setRenderParameter("folderId", String.valueOf(folderId));
-            actionResponse.setRenderParameter("redirect", redirect);
+            MutableRenderParameters params = actionResponse.getRenderParameters();
+            params.setValue("folderId", String.valueOf(folderId));
+            params.setValue("redirect", redirect);
 
             ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
             Long repositoryId = themeDisplay.getScopeGroupId();
@@ -90,7 +92,12 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
             File sourceFile = FileUtil.createTempFile(streamSourceFile);
             String mimeType = MimeTypesUtil.getContentType(sourceFile);
 
-            String uniqueFileName = DLUtil.getUniqueFileName(repositoryId, folderId, title + "." + type);
+            String uniqueFileName = DLUtil.getUniqueFileName(
+                    repositoryId,
+                    folderId,
+                    title + "." + type,
+                    false
+            );
 
             ServiceContext serviceContext = ServiceContextFactory.getInstance(
                     DLFileEntry.class.getName(),
@@ -109,7 +116,7 @@ public class CreateMVCActionCommand extends BaseMVCActionCommand {
                     serviceContext
             );
 
-            actionResponse.setRenderParameter("fileEntryId", String.valueOf(newFile.getFileEntryId()));
+            params.setValue("fileEntryId", String.valueOf(newFile.getFileEntryId()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             if (e instanceof FileNameException || e instanceof PrincipalException.MustHavePermission) {

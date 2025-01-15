@@ -17,7 +17,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <liferay.bom.version>7.3.10.3</liferay.bom.version>
+                <liferay.bom.version>7.4.3.129</liferay.bom.version>
                 <checkstyle.header.file>${basedir}/onlyoffice.header</checkstyle.header.file>
             </properties>
             <dependencyManagement>
@@ -74,11 +74,6 @@
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
