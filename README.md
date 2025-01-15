@@ -10,10 +10,28 @@ The connector allows to:
 * Share documents with other users.
 * Co-edit documents in real-time: use two co-editing modes (Fast and Strict), Track Changes, comments, and built-in chat.
 
-Supported formats: 
+## Supported formats: 
 
-* For opening and editing: DOCX, XLSX, PPTX, DOCXF, OFORM.
-* For viewing only: ODT, ODS, ODP, DOC, XLS, PPT, PDF.
+**For viewing:**
+
+* **WORD**: DOC, DOCM, DOCX, DOT, DOTM, DOTX, EPUB, FB2, FODT, HTM, HTML, MHT, MHTML, ODT, OTT, RTF, STW, SXW, TXT, WPS, WPT, XML
+* **CELL**: CSV, ET, ETT, FODS, ODS, OTS, SXC, XLS, XLSB, XLSM, XLSX, XLT, XLTM, XLTX
+* **SLIDE**: DPS, DPT, FODP, ODP, OTP, POT, POTM, POTX, PPS, PPSM, PPSX, PPT, PPTM, PPTX, SXI
+* **PDF**: DJVU, DOCXF, OFORM, OXPS, PDF, XPS
+
+**For editing:**
+
+* **WORD**: DOCM, DOCX, DOTM, DOTX
+* **CELL**: XLSM, XLSX, XLTM, XLTX
+* **SLIDE**: POTM, POTX, PPSM, PPSX, PPTM, PPTX
+* **PDF**: PDF
+
+**For converting to Office Open XML formats:**
+
+* **WORD:** DOC, DOCM, DOT, DOTM, DOTX, EPUB, FB2, FODT, HTM, HTML, MHT, MHTML, ODT, OTT, RTF, STW, SXW, WPS, WPT, XML
+* **CELL:** ET, ETT, FODS, ODS, OTS, SXC, XLS, XLSB, XLSM, XLT, XLTM, XLTX
+* **SLIDE:** DPS, DPT, FODP, ODP, OTP, POT, POTM, POTX, PPS, PPSM, PPSX, PPT, PPTM, SXI
+* **PDF**: DOCXF, OXPS, PDF, XPS
 
 ## Installing ONLYOFFICE Docs
 
