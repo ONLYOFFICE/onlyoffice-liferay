@@ -25,8 +25,10 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.manager.url.UrlManager;
+import com.onlyoffice.model.common.Format;
 import com.onlyoffice.model.documenteditor.Config;
 import com.onlyoffice.model.documenteditor.config.document.Type;
 import com.onlyoffice.model.documenteditor.config.editorconfig.Mode;
@@ -35,7 +37,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -55,27 +56,22 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
     private SettingsManager settingsManager;
     @Reference
     private UrlManager urlManager;
+    @Reference
+    private DocumentManager documentManager;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public Set<String> getMimeTypes() {
-        return new HashSet<>(Arrays.asList(
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                "application/vnd.oasis.opendocument.text",
-                "application/vnd.oasis.opendocument.spreadsheet",
-                "application/vnd.oasis.opendocument.presentation",
-                "application/msword",
-                "application/vnd.ms-excel",
-                "application/vnd.ms-powerpoint",
-                "text/csv",
-                "text/rtf",
-                "application/rtf",
-                "text/plain",
-                "application/pdf"
-        ));
+        Set<String> mimeTypes = new HashSet<>();
+
+        for (Format format : documentManager.getFormats()) {
+            if (format.getActions().contains("view")) {
+                mimeTypes.addAll(format.getMime());
+            }
+        }
+
+        return mimeTypes;
     }
 
     @Override
