@@ -132,12 +132,15 @@ public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
 
     private DropdownItem createViewDropdownItem() {
         String labelKey = "onlyoffice-context-action-view";
+        String iconKey = "view";
 
         if (canEdit) {
             labelKey = "onlyoffice-context-action-edit";
+            iconKey = "pencil";
         }
 
         return DropdownItemBuilder.setHref(getDocUrl())
+                .setIcon(iconKey)
                 .setLabel(LanguageUtil.get(request, resourceBundle, labelKey))
                 .setTarget("_blank")
                 .build();
@@ -155,6 +158,7 @@ public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
         sb.append(getConvertUrl() + "'});");
 
         return DropdownItemBuilder.setHref("javascript:" + sb)
+                .setIcon("change")
                 .setLabel(label)
                 .build();
     }
