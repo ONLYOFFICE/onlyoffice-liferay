@@ -25,41 +25,62 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.onlyoffice.manager.document.DocumentManager;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.manager.url.UrlManager;
+import com.onlyoffice.model.common.Format;
 import com.onlyoffice.model.documenteditor.Config;
 import com.onlyoffice.model.documenteditor.config.document.Type;
 import com.onlyoffice.model.documenteditor.config.editorconfig.Mode;
 import com.onlyoffice.service.documenteditor.config.ConfigService;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.text.MessageFormat;
+import java.util.HashSet;
 import java.util.Locale;
-import java.util.Optional;
+import java.util.Set;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 
+@Component(
+        property = "service.ranking:Integer=100",
+        service = DLPreviewRendererProvider.class
+)
 public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvider {
-    private final ServletContext servletContext;
-    private final ConfigService configService;
-    private final SettingsManager settingsManager;
-    private final UrlManager urlManager;
+    @Reference(target = "(osgi.web.symbolicname=com.onlyoffice.liferay-docs)")
+    private ServletContext servletContext;
+    @Reference
+    private ConfigService configService;
+    @Reference
+    private SettingsManager settingsManager;
+    @Reference
+    private UrlManager urlManager;
+    @Reference
+    private DocumentManager documentManager;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public OnlyofficePreviewRendererProvider(final ServletContext servletContext, final ConfigService configService,
-                                             final SettingsManager settingsManager, final UrlManager urlManager) {
-        this.servletContext = servletContext;
-        this.configService = configService;
-        this.settingsManager = settingsManager;
-        this.urlManager = urlManager;
+    @Override
+    public Set<String> getMimeTypes() {
+        Set<String> mimeTypes = new HashSet<>();
+
+        for (Format format : documentManager.getFormats()) {
+            if (format.getActions().contains("view")) {
+                mimeTypes.addAll(format.getMime());
+            }
+        }
+
+        return mimeTypes;
     }
 
     @Override
-    public Optional<DLPreviewRenderer> getPreviewDLPreviewRendererOptional(final FileVersion fileVersion) {
+    public DLPreviewRenderer getPreviewDLPreviewRenderer(final FileVersion fileVersion) {
         if (!settingsManager.getSettingBoolean("preview", false)) {
-            return Optional.empty();
+            return null;
         }
 
-        return Optional.of((request, response) -> {
+        return (request, response) -> {
             String languageId = LanguageUtil.getLanguageId(request);
             Locale locale = LocaleUtil.fromLanguageId(languageId);
             boolean version = request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_VERSION) != null;
@@ -73,13 +94,13 @@ public class OnlyofficePreviewRendererProvider implements DLPreviewRendererProvi
             RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher("/preview.jsp");
 
             requestDispatcher.include(request, response);
-        });
+        };
     }
 
     @Override
-    public Optional<DLPreviewRenderer> getThumbnailDLPreviewRendererOptional(final FileVersion fileVersion) {
+    public DLPreviewRenderer getThumbnailDLPreviewRenderer(final FileVersion fileVersion) {
         // TODO Auto-generated method stub
-        return Optional.empty();
+        return null;
     }
 
     private Config getPreviewConfig(final FileVersion fileVersion, final Locale locale, final boolean version) {
