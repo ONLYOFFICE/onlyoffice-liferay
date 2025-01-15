@@ -2,7 +2,7 @@ version: '3'
 
 services:
     liferay:
-        image: liferay/portal:7.2.1-ga2
+        image: liferay/dxp:7.2.10-dxp-20
         ports:
             - "8080:8080"
         volumes:
