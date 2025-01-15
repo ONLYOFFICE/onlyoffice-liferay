@@ -45,6 +45,10 @@ org.projectlombok.lombok - Lombok is a Java library that provides annotations to
 License:               MIT
 License File:          org.projectlombok.lombok.license
 
-com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider - unctionality to handle JSON input/output for JAX-RS implementations (like Jersey and RESTeasy) using standard Jackson data binding ()
+com.fasterxml.jackson.core.jackson-databind - General data-binding functionality for Jackson: works on core streaming API (https://www.apache.org/licenses/LICENSE-2.0.txt)
+License:               Apache 2.0
+License File:          com.fasterxml.jackson.core.jackson-databind.license
+
+com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider - unctionality to handle JSON input/output for JAX-RS implementations (like Jersey and RESTeasy) using standard Jackson data binding (https://www.apache.org/licenses/LICENSE-2.0.txt)
 License:               Apache 2.0
 License File:          com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider.license
