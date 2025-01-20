@@ -1,10 +1,10 @@
-# Liferay ONLYOFFICE Connector
+# ONLYOFFICE app for Liferay
 
-This connector enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Docs packaged as Document Server - [Community or Enterprise Edition](#onlyoffice-docs-editions).
+This app enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Docs packaged as Document Server - [Community or Enterprise Edition](#onlyoffice-docs-editions).
 
 ## Features
 
-The connector allows to:
+The app allows to:
 
 * Create and edit text documents, spreadsheets, and presentations.
 * Share documents with other users.
@@ -45,11 +45,11 @@ To install Enterprise Edition, follow instructions [here](https://helpcenter.onl
 
 Community Edition vs Enterprise Edition comparison can be found [here](#onlyoffice-docs-editions).
 
-## Installing Liferay ONLYOFFICE connector
+## Installing ONLYOFFICE app for Liferay
 
-Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace/-/mp/application/171169174) or if you're building the connector by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install it automatically.
+Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace/-/mp/application/171169174) or if you're building the app by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install it automatically.
 
-## Configuring Liferay ONLYOFFICE connector
+## Configuring ONLYOFFICE app for Liferay
 
 In order to configure it you must navigate to *System Settings* `(Control Panel -> Configuration -> System Settings)`. In *Platform* section click on *Connectors* category and select ONLYOFFICE.
 
@@ -57,7 +57,7 @@ Starting from version 7.2, JWT is enabled by default and the secret key is gener
 Specify your own **Secret key** on the Liferay **System Settings** page. 
 In the ONLYOFFICE Docs [config file](https://api.onlyoffice.com/editors/signature/), specify the same secret key and enable the validation.
 
-## Compiling Liferay ONLYOFFICE connector
+## Compiling ONLYOFFICE app for Liferay
 
 Simply run `gradle build`. Output .jar will be placed inside `build/libs` directory.
 

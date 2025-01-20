@@ -1,4 +1,4 @@
-Liferay ONLYOFFICE Connector uses code from the following 3rd party projects:
+ONLYOFFICE app for Liferay uses code from the following 3rd party projects:
 
 
 com.liferay.portal.release.portal.bom - Release Portal BOM (http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)
