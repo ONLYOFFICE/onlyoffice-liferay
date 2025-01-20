@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -340,19 +341,35 @@ public class CallbackServiceImpl extends DefaultCallbackService {
     }
 
     private void saveFileEntry(final FileEntry fileEntry, final String fileUrl,
-                               final DLVersionNumberIncrease numberIncrease, final boolean keepLock) {
+                               final DLVersionNumberIncrease numberIncrease, final boolean keepLock)
+            throws PortalException {
         Lock lock = fileEntry.getLock();
         long lockOwnerUserId = lock.getUserId();
         String editingMetaAsString = lock.getOwner();
+        long currentUserId = PrincipalThreadLocal.getUserId();
 
         EditingMeta editingMeta = editorLockManager.parserEditingMeta(editingMetaAsString);
+
+        boolean hasUpdatePermissions = PermissionUtils.checkFileEntryPermissionsForUser(
+                fileEntry,
+                ActionKeys.UPDATE,
+                currentUserId
+        );
+
+        if (!hasUpdatePermissions) {
+            throw new PrincipalException.MustHavePermission(
+                    currentUserId,
+                    FileEntry.class.getName(),
+                    fileEntry.getFileEntryId(),
+                    ActionKeys.UPDATE.toString()
+            );
+        }
 
         try {
             TransactionInvokerUtil.invoke(
                     TransactionConfig.Factory.create(
                             Propagation.REQUIRED, new Class<?>[] {Exception.class}),
                     () -> {
-                        long currentUserId = PrincipalThreadLocal.getUserId();
 
                         if (currentUserId != lockOwnerUserId) {
                             editorLockManager.changeLockOwner(fileEntry, currentUserId);
