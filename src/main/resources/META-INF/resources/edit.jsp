@@ -1,6 +1,6 @@
 <%--
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,41 +20,21 @@
 <%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
 
 <%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
-<%@ page import="com.liferay.document.library.kernel.service.DLAppLocalServiceUtil" %>
-<%@ page import="com.liferay.portal.kernel.repository.model.FileEntry" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
-<%@ page import="com.liferay.portal.kernel.util.ResourceBundleUtil" %>
 <%@ page import="com.liferay.portal.kernel.servlet.HttpHeaders" %>
 <%@ page import="com.liferay.portal.kernel.util.PortalUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %>
-
-<%@ page import="java.util.ResourceBundle" %>
-
-<%@ page import="org.osgi.framework.BundleContext" %>
-<%@ page import="org.osgi.framework.FrameworkUtil" %>
-
-<%@ page import="onlyoffice.integration.OnlyOfficeUtils" %>
-<%@ page import="onlyoffice.integration.permission.OnlyOfficePermissionUtils" %>
 
 <liferay-theme:defineObjects />
 
 <portlet:defineObjects />
 
-<%
-    BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeUtils.class).getBundleContext();
-    ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(locale, getClass());
-
-    Long fileEntryId = ParamUtil.getLong(renderRequest, "fileId");
-    FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
-    OnlyOfficeUtils utils = bc.getService(bc.getServiceReference(OnlyOfficeUtils.class));
-%>
-
 <html>
 <head>
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-    <title><%= fileEntry.getFileName() %> - <%= LanguageUtil.get(resourceBundle, "onlyoffice-edit-title") %></title>
+    <title><%= request.getAttribute("title") %> - <%= LanguageUtil.get(request, "onlyoffice-edit-title") %></title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css" />
-    <script id="scriptApi" type="text/javascript" src="<%= utils.getDocServerUrl() %>web-apps/apps/api/documents/api.js"></script>
+    <script id="scriptApi" type="text/javascript" src='<%= request.getAttribute("documentServerApiUrl") %>"'></script>
 
     <% if (request.getHeader(HttpHeaders.USER_AGENT).contains("AscDesktopEditor")) { %>
         <script type="text/javascript">
@@ -87,18 +67,19 @@
         <div id="placeholder"></div>
     </div>
     <script>
-    var config = JSON.parse('<%= utils.getDocumentConfig(fileEntryId, null, false, renderRequest) %>');
+    var config = JSON.parse('<%= request.getAttribute("config") %>');
 
         var onRequestSaveAs = function (event) {
-            var url = event.data.url;
+            var fileUrl = event.data.url;
             var fileType = event.data.fileType ? event.data.fileType : event.data.title.split(".").pop();
 
             var request = new XMLHttpRequest();
-            request.open("POST", '<%= utils.getSaveAsUrl(request) %>', true);
+            request.open("POST", '<%= PortalUtil.getPortalURL(request) + "/o/onlyoffice-docs/feature/save-as" %>', true);
+            request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             request.send(JSON.stringify({
-                url: url,
+                fileUrl: fileUrl,
                 fileType: fileType,
-                fileEntryId: "<%= fileEntryId %>"
+                fileEntryId: '<%= ParamUtil.getLong(renderRequest, "fileEntryId") %>'
             }));
 
             request.onreadystatechange = function() {
@@ -116,7 +97,7 @@
 
         config.events = {};
 
-        <% if (OnlyOfficePermissionUtils.saveAs(fileEntry, themeDisplay.getUser())) { %>
+        <% if ((Boolean)request.getAttribute("canCreateDocument")) { %>
             config.events.onRequestSaveAs = onRequestSaveAs;
         <% } %>
 

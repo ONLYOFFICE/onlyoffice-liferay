@@ -1,5 +1,21 @@
 # Change Log
 
+## 3.0.0
+## Added
+- editing pdf
+- shardkey parameter
+- drop users from editor on unlock document
+- preview for all types supported for viewing
+
+## Changed
+- migrate to maven build
+- create pdf instead docxf
+- delete create oform from docxf
+- core of the plugin has been moved to com.onlyoffice.docs-integration-sdk (https://github.com/ONLYOFFICE/docs-integration-sdk-java)
+- address of the convert service, /converter instead /ConvertService.ashx
+- default token lifetime is 5 minutes
+- default empty file templates
+
 ## 2.4.0
 ## Added
 - compatible with Liferay CE 7.4 GA44 - GA73

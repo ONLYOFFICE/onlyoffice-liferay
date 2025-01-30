@@ -1,6 +1,6 @@
 <%--
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,7 @@
 <%@ page import="com.liferay.document.library.kernel.exception.FileNameException" %>
 <%@ page import="com.liferay.portal.kernel.security.auth.PrincipalException" %>
 <%@ page import="com.liferay.portal.kernel.portlet.LiferayWindowState"%>
-<%@ page import="com.liferay.portal.kernel.util.ResourceBundleUtil" %>
-
-<%@ page import="java.util.ResourceBundle" %>
+<%@ page import="com.onlyoffice.liferay.docs.constants.PortletKeys" %>
 
 <liferay-theme:defineObjects />
 
@@ -43,8 +41,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 long folderId = ParamUtil.getLong(request, "folderId");
 long fileEntryId = ParamUtil.getLong(request, "fileEntryId");
 
-ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(locale, getClass());
-String headerTitle = LanguageUtil.get(resourceBundle, "onlyoffice-context-create-name");
+String headerTitle = LanguageUtil.get(request, "onlyoffice-context-create-name");
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
@@ -76,7 +73,7 @@ renderResponse.setTitle(headerTitle);
 						<aui:option label="onlyoffice-context-create-type-docx" value="docx" />
 						<aui:option label="onlyoffice-context-create-type-xlsx" value="xlsx" />
 						<aui:option label="onlyoffice-context-create-type-pptx" value="pptx" />
-						<aui:option label="onlyoffice-context-create-type-docxf" value="docxf" />
+						<aui:option label="onlyoffice-context-create-type-pdf" value="pdf" />
 					</aui:select>
 					<aui:input name="title" type="text"  required="true" showRequiredLabel="true" />
 					<aui:input name="description" type="textarea" />
@@ -92,8 +89,8 @@ renderResponse.setTitle(headerTitle);
 </div>
 
 <c:if test="<%= (fileEntryId != 0) %>">	
-	<liferay-portlet:renderURL portletName="onlyoffice_integration_ui_EditActionPortlet" var="editURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
-		<portlet:param name="fileId" value="<%= String.valueOf(fileEntryId) %>" />
+	<liferay-portlet:renderURL portletName="<%= PortletKeys.EDITOR %>" var="editURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
+		<portlet:param name="fileEntryId" value="<%= String.valueOf(fileEntryId) %>" />
 	</liferay-portlet:renderURL>
 	<aui:script>
 		document.location.href = "<%= editURL %>";

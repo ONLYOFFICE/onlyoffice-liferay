@@ -1,6 +1,6 @@
 <%--
  *
- * (c) Copyright Ascensio System SIA 2023
+ * (c) Copyright Ascensio System SIA 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,28 +21,9 @@
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
-
-<%@ page import="com.liferay.document.library.kernel.service.DLAppLocalServiceUtil" %>
-<%@ page import="com.liferay.portal.kernel.repository.model.FileEntry" %>
-
-<%@ page import="org.osgi.framework.BundleContext" %>
-<%@ page import="org.osgi.framework.FrameworkUtil" %>
-
-<%@ page import="onlyoffice.integration.OnlyOfficeUtils" %>
-
 <liferay-theme:defineObjects />
 
 <portlet:defineObjects />
-
-
-<%
-    BundleContext bc = FrameworkUtil.getBundle(OnlyOfficeUtils.class).getBundleContext();
-
-    Long fileEntryId = (Long)request.getAttribute("fileEntryId");
-    String version = (String)request.getAttribute("version");
-    FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
-    OnlyOfficeUtils utils = bc.getService(bc.getServiceReference(OnlyOfficeUtils.class));
-%>
 
 <div id="onlyoffice-preview">
     <div class="preview-file-error-container" style="display: none">
@@ -61,7 +42,7 @@
             var scriptApi = document.createElement("script");
 
             scriptApi.setAttribute("type", "text/javascript");
-            scriptApi.setAttribute("src", "<%= utils.getDocServerUrl() %>web-apps/apps/api/documents/api.js");
+            scriptApi.setAttribute("src", '<%= request.getAttribute("documentServerApiUrl") %>"');
 
             scriptApi.onload = scriptApi.onerror = function() {
                 if (typeof DocsAPI === "undefined") {
@@ -69,7 +50,7 @@
                     divOnlyofficePreview.querySelector("div.preview-file-error-container").style.display = "block";
                     divOnlyofficePreview.querySelector("div.preview-file").style.display = "none";
                 } else {
-                    var config = JSON.parse('<%= utils.getDocumentConfig(fileEntryId, version, true, renderRequest) %>');
+                    var config = JSON.parse('<%= request.getAttribute("config") %>');
                     docEditor = new DocsAPI.DocEditor("placeholder", config);
                 }
             };

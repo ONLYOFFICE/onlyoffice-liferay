@@ -1,19 +1,37 @@
-# Liferay ONLYOFFICE Connector
+# ONLYOFFICE app for Liferay
 
-This connector enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Docs packaged as Document Server - [Community or Enterprise Edition](#onlyoffice-docs-editions).
+This app enables users to edit office documents from [Liferay](https://www.liferay.com/) using ONLYOFFICE Docs packaged as Document Server - [Community or Enterprise Edition](#onlyoffice-docs-editions).
 
 ## Features
 
-The connector allows to:
+The app allows to:
 
 * Create and edit text documents, spreadsheets, and presentations.
 * Share documents with other users.
 * Co-edit documents in real-time: use two co-editing modes (Fast and Strict), Track Changes, comments, and built-in chat.
 
-Supported formats: 
+## Supported formats: 
 
-* For opening and editing: DOCX, XLSX, PPTX, DOCXF, OFORM.
-* For viewing only: ODT, ODS, ODP, DOC, XLS, PPT, PDF.
+**For viewing:**
+
+* **WORD**: DOC, DOCM, DOCX, DOT, DOTM, DOTX, EPUB, FB2, FODT, HTM, HTML, MHT, MHTML, ODT, OTT, RTF, STW, SXW, TXT, WPS, WPT, XML
+* **CELL**: CSV, ET, ETT, FODS, ODS, OTS, SXC, XLS, XLSB, XLSM, XLSX, XLT, XLTM, XLTX
+* **SLIDE**: DPS, DPT, FODP, ODP, OTP, POT, POTM, POTX, PPS, PPSM, PPSX, PPT, PPTM, PPTX, SXI
+* **PDF**: DJVU, DOCXF, OFORM, OXPS, PDF, XPS
+
+**For editing:**
+
+* **WORD**: DOCM, DOCX, DOTM, DOTX
+* **CELL**: XLSM, XLSX, XLTM, XLTX
+* **SLIDE**: POTM, POTX, PPSM, PPSX, PPTM, PPTX
+* **PDF**: PDF
+
+**For converting to Office Open XML formats:**
+
+* **WORD:** DOC, DOCM, DOT, DOTM, DOTX, EPUB, FB2, FODT, HTM, HTML, MHT, MHTML, ODT, OTT, RTF, STW, SXW, WPS, WPT, XML
+* **CELL:** ET, ETT, FODS, ODS, OTS, SXC, XLS, XLSB, XLSM, XLT, XLTM, XLTX
+* **SLIDE:** DPS, DPT, FODP, ODP, OTP, POT, POTM, POTX, PPS, PPSM, PPSX, PPT, PPTM, SXI
+* **PDF**: DOCXF, OXPS, PDF, XPS
 
 ## Installing ONLYOFFICE Docs
 
@@ -27,11 +45,11 @@ To install Enterprise Edition, follow instructions [here](https://helpcenter.onl
 
 Community Edition vs Enterprise Edition comparison can be found [here](#onlyoffice-docs-editions).
 
-## Installing Liferay ONLYOFFICE connector
+## Installing ONLYOFFICE app for Liferay
 
-Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace/-/mp/application/171169174) or if you're building the connector by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install it automatically.
+Either install it from [Liferay Marketplace](https://web.liferay.com/marketplace/-/mp/application/171169174) or if you're building the app by yourself simply put compiled .jar file from `build\libs` folder to `/opt/liferay/deploy`. Liferay will install it automatically.
 
-## Configuring Liferay ONLYOFFICE connector
+## Configuring ONLYOFFICE app for Liferay
 
 In order to configure it you must navigate to *System Settings* `(Control Panel -> Configuration -> System Settings)`. In *Platform* section click on *Connectors* category and select ONLYOFFICE.
 
@@ -39,7 +57,7 @@ Starting from version 7.2, JWT is enabled by default and the secret key is gener
 Specify your own **Secret key** on the Liferay **System Settings** page. 
 In the ONLYOFFICE Docs [config file](https://api.onlyoffice.com/editors/signature/), specify the same secret key and enable the validation.
 
-## Compiling Liferay ONLYOFFICE connector
+## Compiling ONLYOFFICE app for Liferay
 
 Simply run `gradle build`. Output .jar will be placed inside `build/libs` directory.
 
@@ -125,12 +143,18 @@ The table below will help you make the right choice.
 | Font and paragraph formatting   | + | + |
 | Object insertion                | + | + |
 | Transitions                     | + | + |
+| Animations                      | + | + |
 | Presenter mode                  | + | + |
 | Notes                           | + | + |
 | **Form creator features** | **Community Edition** | **Enterprise Edition** |
 | Adding form fields           | + | + |
 | Form preview                    | + | + |
 | Saving as PDF                   | + | + |
+| **Working with PDF**      | **Community Edition** | **Enterprise Edition** |
+| Text annotations (highlight, underline, cross out) | + | + |
+| Comments                        | + | + |
+| Freehand drawings               | + | + |
+| Form filling                    | + | + |
 | | [Get it now](https://www.onlyoffice.com/download-docs.aspx?utm_source=github&utm_medium=cpc&utm_campaign=GitHubLiferay#docs-community)  | [Start Free Trial](https://www.onlyoffice.com/download-docs.aspx?utm_source=github&utm_medium=cpc&utm_campaign=GitHubLiferay#docs-enterprise)  |
 
 \* If supported by DMS.

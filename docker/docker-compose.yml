@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+    liferay:
+        image: liferay/portal:7.2.1-ga2
+        ports:
+            - "8080:8080"
+        volumes:
+            - ../bundles/osgi/modules:/opt/liferay/deploy
