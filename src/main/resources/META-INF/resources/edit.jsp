@@ -34,7 +34,7 @@
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
     <title><%= request.getAttribute("title") %> - <%= LanguageUtil.get(request, "onlyoffice-edit-title") %></title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css" />
-    <script id="scriptApi" type="text/javascript" src='<%= request.getAttribute("documentServerApiUrl") %>"'></script>
+    <script id="scriptApi" type="text/javascript" src='<%= request.getAttribute("documentServerApiUrl") %>'></script>
 
     <% if (request.getHeader(HttpHeaders.USER_AGENT).contains("AscDesktopEditor")) { %>
         <script type="text/javascript">
