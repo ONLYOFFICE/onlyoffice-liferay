@@ -24,16 +24,15 @@ import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.onlyoffice.manager.request.RequestManager;
-import org.apache.commons.io.IOUtils;
-import org.apache.hc.core5.http.HttpEntity;
+import com.onlyoffice.client.DocumentServerClient;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.File;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -43,17 +42,16 @@ public final class FileEntryUtils {
     @Reference
     private DLAppService dlAppService;
     @Reference
-    private RequestManager requestManager;
+    private DocumentServerClient documentServerClient;
 
     public FileEntry createFileEntryFromUrl(final String fileName, final long repositoryId, final long folderId,
-                                            final String fileUrl) throws Exception {
-        return requestManager.executeGetRequest(fileUrl, new RequestManager.Callback<FileEntry>() {
-            @Override
-            public FileEntry doWork(final Object response) throws Exception {
-                byte[] bytes = IOUtils.toByteArray(((HttpEntity) response).getContent());
-                InputStream inputStream = new ByteArrayInputStream(bytes);
+                                            final String changeLog, final String fileUrl) throws Exception {
+        File tempFile = FileUtil.createTempFile();
 
-                return dlAppService.addFileEntry(
+        try {
+            documentServerClient.getFile(fileUrl, Files.newOutputStream(tempFile.toPath()));
+
+            return dlAppService.addFileEntry(
                         null,
                         repositoryId,
                         folderId,
@@ -62,27 +60,27 @@ public final class FileEntryUtils {
                         fileName,
                         fileName,
                         "",
-                        "ONLYOFFICE Convert",
-                        inputStream,
-                        bytes.length,
+                        changeLog,
+                        tempFile,
                         null,
                         null,
                         null,
                         ServiceContextThreadLocal.getServiceContext()
                 );
-            }
-        });
+
+        } finally {
+            FileUtil.delete(tempFile);
+        }
     }
 
     public FileEntry updateFileEntryFromUrl(final FileEntry fileEntry, final String fileUrl,
                                        final DLVersionNumberIncrease dlVersionNumberIncrease) throws Exception {
-        return requestManager.executeGetRequest(fileUrl, new RequestManager.Callback<FileEntry>() {
-            @Override
-            public FileEntry doWork(final Object response) throws Exception {
-                byte[] bytes = IOUtils.toByteArray(((HttpEntity) response).getContent());
-                InputStream inputStream = new ByteArrayInputStream(bytes);
+        File tempFile = FileUtil.createTempFile();
 
-                return dlAppService.updateFileEntry(
+        try {
+            documentServerClient.getFile(fileUrl, Files.newOutputStream(tempFile.toPath()));
+
+            return dlAppService.updateFileEntry(
                         fileEntry.getFileEntryId(),
                         fileEntry.getFileName(),
                         fileEntry.getMimeType(),
@@ -91,15 +89,16 @@ public final class FileEntryUtils {
                         fileEntry.getDescription(),
                         "",
                         dlVersionNumberIncrease,
-                        inputStream,
-                        bytes.length,
+                        tempFile,
                         null,
                         null,
                         null,
                         ServiceContextThreadLocal.getServiceContext()
                 );
-            }
-        });
+
+        } finally {
+            FileUtil.delete(tempFile);
+        }
     }
 
     public FileVersion getFileVersion(final FileEntry fileEntry, final String version)
