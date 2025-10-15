@@ -42,7 +42,7 @@
             var scriptApi = document.createElement("script");
 
             scriptApi.setAttribute("type", "text/javascript");
-            scriptApi.setAttribute("src", '<%= request.getAttribute("documentServerApiUrl") %>"');
+            scriptApi.setAttribute("src", '<%= request.getAttribute("documentServerApiUrl") %>');
 
             scriptApi.onload = scriptApi.onerror = function() {
                 if (typeof DocsAPI === "undefined") {
