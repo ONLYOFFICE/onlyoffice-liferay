@@ -17,7 +17,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <liferay.bom.version>7.4.3.129</liferay.bom.version>
+                <liferay.bom.version>7.4.3.132</liferay.bom.version>
                 <checkstyle.header.file>${basedir}/onlyoffice.header</checkstyle.header.file>
             </properties>
             <dependencyManagement>
