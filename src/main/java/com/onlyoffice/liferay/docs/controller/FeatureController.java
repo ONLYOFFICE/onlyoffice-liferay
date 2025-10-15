@@ -23,19 +23,13 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.onlyoffice.liferay.docs.controller.dto.SaveAsRequest;
+import com.onlyoffice.liferay.docs.utils.FileEntryUtils;
 import com.onlyoffice.liferay.docs.utils.SecurityUtils;
-import com.onlyoffice.manager.request.RequestManager;
 import com.onlyoffice.manager.url.UrlManager;
-import org.apache.hc.core5.http.HttpEntity;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.io.File;
-import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -56,7 +50,7 @@ public class FeatureController {
     @Reference
     private UrlManager urlManager;
     @Reference
-    private RequestManager requestManager;
+    private FileEntryUtils fileEntryUtils;
 
     @POST
     @Path("/save-as")
@@ -87,28 +81,15 @@ public class FeatureController {
                 fileName.substring(0, fileName.lastIndexOf(".") + 1) + request.getFileType()
         );
 
-        File sourceFile = null;
         try {
-            sourceFile = requestManager.executeGetRequest(fileUrl, new RequestManager.Callback<File>() {
-                @Override
-                public File doWork(final Object response) throws Exception {
-                    InputStream inputStream = ((HttpEntity) response).getContent();
-
-                    return FileUtil.createTempFile(inputStream);
-                }
-            });
-
-            dlAppService.addFileEntry(
+            fileEntryUtils.createFileEntryFromUrl(
+                    uniqueFileName,
                     fileEntry.getRepositoryId(),
                     fileEntry.getFolderId(),
-                    uniqueFileName,
-                    MimeTypesUtil.getContentType(sourceFile),
-                    uniqueFileName,
-                    null,
-                    null,
-                    sourceFile,
-                    ServiceContextThreadLocal.getServiceContext()
+                    "",
+                    fileUrl
             );
+
         } catch (PortalException e) {
             log.error(e, e);
 
