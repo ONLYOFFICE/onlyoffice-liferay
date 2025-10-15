@@ -1,6 +1,6 @@
 Bundle-Name: ONLYOFFICE Liferay Docs
 Bundle-SymbolicName: com.onlyoffice.liferay-docs
-Bundle-Version: 3.0.0
+Bundle-Version: 3.1.0
 
 Import-Package: \
     !jdk.net,\
