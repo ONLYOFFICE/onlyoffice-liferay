@@ -148,6 +148,7 @@ public class ConvertController {
                         newFileName,
                         fileEntry.getRepositoryId(),
                         folder.getFolderId(),
+                        "ONLYOFFICE Convert",
                         convertResponse.getFileUrl()
                 );
             } catch (Exception e) {
