@@ -16,37 +16,46 @@
  *
  */
 
-package com.onlyoffice.liferay.docs.sdk.managers;
+package com.onlyoffice.liferay.docs.sdk.client;
 
-import com.onlyoffice.manager.request.DefaultRequestManager;
-import com.onlyoffice.manager.request.RequestManager;
-import com.onlyoffice.manager.security.JwtManager;
+import com.onlyoffice.client.ApacheHttpclientDocumentServerClient;
+import com.onlyoffice.client.DocumentServerClient;
+import com.onlyoffice.client.DocumentServerClientSettings;
 import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.manager.url.UrlManager;
+import com.onlyoffice.model.settings.security.Security;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 @Component(
-        service = RequestManager.class
+        service = DocumentServerClient.class
 )
-public class RequestManagerImpl extends DefaultRequestManager {
+public class DocumentServerClientImpl extends ApacheHttpclientDocumentServerClient {
 
-    public RequestManagerImpl() {
-        super(null, null, null);
+    public DocumentServerClientImpl() {
+        super(DocumentServerClientSettings.builder()
+                .baseUrl("base")
+                .security(Security.builder()
+                        .build())
+                .ignoreSSLCertificate(false)
+                .build());
     }
 
     @Reference(service = SettingsManager.class, unbind = "-")
     public void setSettingsManager(final SettingsManager settingsManager) {
-        super.setSettingsManager(settingsManager);
-    }
-
-    @Reference(service = JwtManager.class, unbind = "-")
-    public void setJwtManager(final JwtManager jwtManager) {
-        super.setJwtManager(jwtManager);
+        this.settingsManager = settingsManager;
     }
 
     @Reference(service = UrlManager.class, unbind = "-")
     public void setUrlManager(final UrlManager urlManager) {
-        super.setUrlManager(urlManager);
+        this.urlManager = urlManager;
+    }
+
+    @Activate
+    protected void activate() {
+        this.applySettings(DocumentServerClientSettings.builder().build());
+
+        init();
     }
 }

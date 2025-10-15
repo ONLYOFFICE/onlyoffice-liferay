@@ -4,6 +4,12 @@
 ## Added
 - support ONLYOFFICE Docs v9.1.0
 
+## Changed
+- updated version of com.onlyoffice:docs-integration-sdk
+    - extended supported formats
+    - added type documents DIAGRAM
+    - extended empty file templates
+
 ## 3.0.0
 ## Added
 - editing pdf
