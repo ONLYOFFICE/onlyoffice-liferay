@@ -1,5 +1,9 @@
 # Change Log
 
+##
+## Added
+- support ONLYOFFICE Docs v9.1.0
+
 ## 3.0.0
 ## Added
 - editing pdf
