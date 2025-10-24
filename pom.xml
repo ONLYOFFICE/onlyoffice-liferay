@@ -17,7 +17,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <liferay.bom.version>2025.q1.2</liferay.bom.version>
+                <liferay.bom.version>2025.q2.6</liferay.bom.version>
                 <checkstyle.header.file>${basedir}/onlyoffice.header</checkstyle.header.file>
             </properties>
             <dependencyManagement>
