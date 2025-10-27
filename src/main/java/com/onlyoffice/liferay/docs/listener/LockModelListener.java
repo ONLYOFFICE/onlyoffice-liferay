@@ -24,13 +24,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.lock.model.Lock;
+import com.onlyoffice.client.DocumentServerClient;
 import com.onlyoffice.liferay.docs.model.EditingMeta;
 import com.onlyoffice.liferay.docs.sdk.service.CallbackServiceImpl;
 import com.onlyoffice.liferay.docs.utils.EditorLockManager;
 import com.onlyoffice.model.commandservice.CommandRequest;
 import com.onlyoffice.model.commandservice.CommandResponse;
 import com.onlyoffice.model.commandservice.commandrequest.Command;
-import com.onlyoffice.service.command.CommandService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -42,7 +42,7 @@ public class LockModelListener extends BaseModelListener<Lock> {
     private static final Log log = LogFactoryUtil.getLog(LockModelListener.class);
 
     @Reference
-    private CommandService commandService;
+    private DocumentServerClient documentServerClient;
     @Reference
     private EditorLockManager editorLockManager;
 
@@ -74,7 +74,7 @@ public class LockModelListener extends BaseModelListener<Lock> {
                     .key(editingMeta.getEditingKey())
                     .build();
 
-            infoResponse = commandService.processCommand(infoRequest, null);
+            infoResponse = documentServerClient.command(infoRequest);
             users = infoResponse.getUsers();
         } catch (Exception e) {
             log.error(e, e);
@@ -89,7 +89,7 @@ public class LockModelListener extends BaseModelListener<Lock> {
                     .users(users)
                     .build();
 
-            commandService.processCommand(dropRequest, null);
+            documentServerClient.command(dropRequest);
         } catch (Exception e) {
             log.error(e, e);
         }

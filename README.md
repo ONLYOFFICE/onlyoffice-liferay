@@ -14,23 +14,24 @@ The app allows to:
 
 **For viewing:**
 
-* **WORD**: DOC, DOCM, DOCX, DOT, DOTM, DOTX, EPUB, FB2, FODT, HTM, HTML, MHT, MHTML, ODT, OTT, RTF, STW, SXW, TXT, WPS, WPT, XML
-* **CELL**: CSV, ET, ETT, FODS, ODS, OTS, SXC, XLS, XLSB, XLSM, XLSX, XLT, XLTM, XLTX
-* **SLIDE**: DPS, DPT, FODP, ODP, OTP, POT, POTM, POTX, PPS, PPSM, PPSX, PPT, PPTM, PPTX, SXI
+* **WORD**: DOC, DOCM, DOCX, DOT, DOTM, DOTX, EPUB, FB2, FODT, HTM, HTML, HWP, HWPX, MD, MHT, MHTML, ODT, OTT, PAGES, RTF, STW, SXW, TXT, WPS, WPT, XML
+* **CELL**: CSV, ET, ETT, FODS, NUMBERS, ODS, OTS, SXC, XLS, XLSM, XLSX, XLT, XLTM, XLTX
+* **SLIDE**: DPS, DPT, FODP, KEY, ODG, ODP, OTP, POT, POTM, POTX, PPS, PPSM, PPSX, PPT, PPTM, PPTX, SXI
 * **PDF**: DJVU, DOCXF, OFORM, OXPS, PDF, XPS
+* **DIAGRAM**: VSDM, VSDX, VSSM, VSSX, VSTM, VSTX
 
 **For editing:**
 
 * **WORD**: DOCM, DOCX, DOTM, DOTX
-* **CELL**: XLSM, XLSX, XLTM, XLTX
+* **CELL**: XLSB, XLSM, XLSX, XLTM, XLTX
 * **SLIDE**: POTM, POTX, PPSM, PPSX, PPTM, PPTX
 * **PDF**: PDF
 
 **For converting to Office Open XML formats:**
 
-* **WORD:** DOC, DOCM, DOT, DOTM, DOTX, EPUB, FB2, FODT, HTM, HTML, MHT, MHTML, ODT, OTT, RTF, STW, SXW, WPS, WPT, XML
-* **CELL:** ET, ETT, FODS, ODS, OTS, SXC, XLS, XLSB, XLSM, XLT, XLTM, XLTX
-* **SLIDE:** DPS, DPT, FODP, ODP, OTP, POT, POTM, POTX, PPS, PPSM, PPSX, PPT, PPTM, SXI
+* **WORD**: DOC, DOCM, DOCX, DOT, DOTM, DOTX, EPUB, FB2, FODT, HTM, HTML, HWP, HWPX, MD, MHT, MHT, MHTML, ODT, OTT, PAGES, RTF, STW, SXW, TXT, WPS, WPT, XML
+* **CELL**: CSV, ET, ETT, FODS, NUMBERS, ODS, OTS, SXC, XLS, XLSB, XLSM, XLSX, XLT, XLTM, XLTX
+* **SLIDE**: DPS, DPT, FODP, KEY, ODG, ODP, OTP, POT, POTM, POTX, PPS, PPSM, PPSX, PPT, PPTM, PPTX, SXI
 * **PDF**: DOCXF, OXPS, PDF, XPS
 
 ## Installing ONLYOFFICE Docs
@@ -55,7 +56,7 @@ In order to configure it you must navigate to *System Settings* `(Control Panel 
 
 Starting from version 7.2, JWT is enabled by default and the secret key is generated automatically to restrict the access to ONLYOFFICE Docs and for security reasons and data integrity. 
 Specify your own **Secret key** on the Liferay **System Settings** page. 
-In the ONLYOFFICE Docs [config file](https://api.onlyoffice.com/editors/signature/), specify the same secret key and enable the validation.
+In the ONLYOFFICE Docs [config file](https://api.onlyoffice.com/docs/docs-api/additional-api/signature/), specify the same secret key and enable the validation.
 
 ## Compiling ONLYOFFICE app for Liferay
 
@@ -63,7 +64,7 @@ Simply run `gradle build`. Output .jar will be placed inside `build/libs` direct
 
 ## How it works
 
-The ONLYOFFICE integration follows the API documented [here](https://api.onlyoffice.com/editors/basic):
+The ONLYOFFICE integration follows the API documented [here](https://api.onlyoffice.com/docs/docs-api/get-started/basic-concepts/):
 
 * User navigates to a *Documents and Media* section within Liferay and selects the `Edit in ONLYOFFICE` action.
 * Liferay prepares a JSON object for the Document Server with the following properties:
