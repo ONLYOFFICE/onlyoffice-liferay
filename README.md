@@ -1,6 +1,6 @@
 # ONLYOFFICE app for Liferay
 
-This app enables users to open, edit and collaborate on office documents directly inside Liferay using [ONLYOFFICE Docs](https://www.onlyoffice.com/docs). 
+This app enables users to open, edit and collaborate on office documents directly inside Liferay using [ONLYOFFICE Docs](https://www.onlyoffice.com/docs).
 
 <p align="center">
   <a href="https://www.onlyoffice.com/office-for-liferay">
@@ -42,7 +42,7 @@ The app allows to:
 
 ## Installing ONLYOFFICE Docs
 
-Ensure ONLYOFFICE Docs is running and accessible to both Liferay instance and users’ browsers. The server must also be able to POST updates back to Liferay.
+Ensure ONLYOFFICE Docs is running and accessible to both Liferay instance and users' browsers. The server must also be able to POST updates back to Liferay.
 
 ### 🖥️ Self-hosted version
 
@@ -53,7 +53,7 @@ Community Edition vs Enterprise Edition comparison can be found [here](#onlyoffi
 
 ### ☁️ Cloud
 
-Use **ONLYOFFICE Docs Cloud** if you prefer not to maintain your own server — no installation or configuration required.  
+Use **ONLYOFFICE Docs Cloud** if you prefer not to maintain your own server — no installation or configuration required.
 
 👉 [Get started here](https://www.onlyoffice.com/docs-registration)
 
@@ -91,7 +91,7 @@ The ONLYOFFICE integration follows the API documented [here](https://api.onlyoff
 * After 10 seconds of inactivity, ONLYOFFICE Document Server sends a POST to the `callback` URL letting Liferay know that the clients have finished editing the document and closed it.
 * Liferay downloads the new version of the document, replacing the old one.
 
-## ONLYOFFICE Docs editions 
+## ONLYOFFICE Docs editions
 
 ONLYOFFICE offers different versions of its online document editors that can be deployed on your own servers.
 
