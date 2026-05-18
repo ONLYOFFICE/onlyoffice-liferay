@@ -1,5 +1,9 @@
 # Change Log
 
+##
+## Added
+- support Liferay DXP 2026.*
+
 ## 3.1.0
 ## Added
 - support ONLYOFFICE Docs v9.1.0

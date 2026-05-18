@@ -2,7 +2,7 @@ version: '3'
 
 services:
     liferay:
-        image: liferay/dxp:2025.q4.9
+        image: liferay/dxp:2026.q2.0
         ports:
             - "8080:8080"
         volumes:
