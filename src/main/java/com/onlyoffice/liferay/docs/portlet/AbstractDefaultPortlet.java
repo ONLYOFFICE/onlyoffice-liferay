@@ -23,10 +23,10 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.JavaConstants;
 
 import java.io.IOException;
-import javax.portlet.PortletConfig;
-import javax.portlet.PortletException;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
+import jakarta.portlet.PortletConfig;
+import jakarta.portlet.PortletException;
+import jakarta.portlet.RenderRequest;
+import jakarta.portlet.RenderResponse;
 
 
 public abstract class AbstractDefaultPortlet extends MVCPortlet {
@@ -34,10 +34,10 @@ public abstract class AbstractDefaultPortlet extends MVCPortlet {
     public void doView(final RenderRequest renderRequest, final RenderResponse renderResponse)
             throws IOException, PortletException {
         LiferayPortletConfig liferayPortletConfig = (LiferayPortletConfig) renderRequest.getAttribute(
-                JavaConstants.JAVAX_PORTLET_CONFIG);
+                JavaConstants.JAKARTA_PORTLET_CONFIG);
         PortletConfig customPortletConfig = new ResourceBundlePortletConfigWrapper(liferayPortletConfig);
 
-        renderRequest.setAttribute(JavaConstants.JAVAX_PORTLET_CONFIG, customPortletConfig);
+        renderRequest.setAttribute(JavaConstants.JAKARTA_PORTLET_CONFIG, customPortletConfig);
 
         super.doView(renderRequest, renderResponse);
     }

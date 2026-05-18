@@ -41,9 +41,9 @@ import org.osgi.service.component.annotations.Reference;
 
 import java.util.List;
 import java.util.ResourceBundle;
-import javax.portlet.MutableRenderParameters;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
+import jakarta.portlet.MutableRenderParameters;
+import jakarta.portlet.PortletRequest;
+import jakarta.portlet.PortletResponse;
 
 @Component(
         immediate = true,

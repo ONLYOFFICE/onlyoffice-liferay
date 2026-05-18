@@ -40,8 +40,8 @@ import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
 
 @Component(
         property = "service.ranking:Integer=100",

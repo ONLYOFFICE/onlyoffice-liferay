@@ -53,12 +53,12 @@ import com.onlyoffice.manager.document.DocumentManager;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
-import javax.portlet.MutableRenderParameters;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
-import javax.portlet.WindowStateException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.portlet.MutableRenderParameters;
+import jakarta.portlet.PortletRequest;
+import jakarta.portlet.PortletURL;
+import jakarta.portlet.WindowStateException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class EditMenuContext extends BaseDLViewFileVersionDisplayContext {
     private static final Log log = LogFactoryUtil.getLog(EditMenuContext.class);

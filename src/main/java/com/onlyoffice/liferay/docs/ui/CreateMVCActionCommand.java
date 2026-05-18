@@ -44,16 +44,16 @@ import org.osgi.service.component.annotations.Reference;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Locale;
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
-import javax.portlet.MutableRenderParameters;
+import jakarta.portlet.ActionRequest;
+import jakarta.portlet.ActionResponse;
+import jakarta.portlet.MutableRenderParameters;
 
 
 @Component(
         immediate = true,
         property = {
-                "javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY,
-                "javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
+                "jakarta.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY,
+                "jakarta.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
                 "mvc.command.name=/document_library/create_onlyoffice"
         },
         service = MVCActionCommand.class

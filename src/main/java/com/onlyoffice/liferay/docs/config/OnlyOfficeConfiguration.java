@@ -18,11 +18,10 @@
 
 package com.onlyoffice.liferay.docs.config;
 
+import aQute.bnd.annotation.metatype.Meta;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
-import org.osgi.service.metatype.annotations.AttributeDefinition;
-import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
-@ObjectClassDefinition(
+@Meta.OCD(
         id = "com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration",
         localization = "content/Language",
         name = "onlyoffice-config-name", description = "onlyoffice-config-desc"
@@ -33,49 +32,56 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 )
 public @interface OnlyOfficeConfiguration {
 
-    @AttributeDefinition(
+    @Meta.AD(
+            deflt = "http://127.0.0.1/",
             required = true,
             name = "onlyoffice-config-docserv-url-name",
             description = "onlyoffice-config-docserv-url-desc"
     )
     String docServUrl() default "http://127.0.0.1/";
 
-    @AttributeDefinition(
+    @Meta.AD(
+            deflt = "",
             required = false,
             name = "onlyoffice-config-docserv-inner-url-name",
             description = "onlyoffice-config-docserv-inner-url-desc"
     )
     String docServInnerUrl() default "";
 
-    @AttributeDefinition(
+    @Meta.AD(
+            deflt = "",
             required = false,
             name = "onlyoffice-config-liferay-url-name",
             description = "onlyoffice-config-liferay-url-desc"
     )
     String liferayUrl() default "";
 
-    @AttributeDefinition(
+    @Meta.AD(
+            deflt = "",
             required = false,
             name = "onlyoffice-config-secret-name",
             description = "onlyoffice-config-secret-desc"
     )
     String secret() default "";
 
-    @AttributeDefinition(
+    @Meta.AD(
+            deflt = "",
             required = false,
             name = "onlyoffice-config-jwt-header",
             description = "onlyoffice-config-jwt-header-desc"
     )
     String jwtHeader() default "";
 
-    @AttributeDefinition(
+    @Meta.AD(
+            deflt = "false",
             required = false,
             name = "onlyoffice-config-force-save-name",
             description = "onlyoffice-config-force-save-desc"
     )
     boolean forceSave() default false;
 
-    @AttributeDefinition(
+    @Meta.AD(
+            deflt = "false",
             required = false,
             name = "onlyoffice-config-webpreview"
     )

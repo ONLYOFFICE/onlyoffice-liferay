@@ -21,9 +21,7 @@ package com.onlyoffice.liferay.docs.config;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
-import org.osgi.service.metatype.annotations.Designate;
 
-@Designate(ocd = OnlyOfficeConfiguration.class)
 @Component(
         configurationPid = "com.onlyoffice.liferay.docs.config.OnlyOfficeConfiguration",
         immediate = true,

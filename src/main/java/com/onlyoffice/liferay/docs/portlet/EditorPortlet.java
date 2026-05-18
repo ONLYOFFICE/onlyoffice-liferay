@@ -49,10 +49,10 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
-import javax.portlet.Portlet;
-import javax.portlet.PortletException;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
+import jakarta.portlet.Portlet;
+import jakarta.portlet.PortletException;
+import jakarta.portlet.RenderRequest;
+import jakarta.portlet.RenderResponse;
 
 
 @Component(
@@ -62,13 +62,13 @@ import javax.portlet.RenderResponse;
                 "com.liferay.portlet.display-category=category.hidden",
                 "com.liferay.portlet.header-portlet-css=/css/main.css",
                 "com.liferay.portlet.instanceable=true",
-                "javax.portlet.display-name=OnlyOffice Edit",
-                "javax.portlet.init-param.template-path=/",
-                "javax.portlet.init-param.view-template=/edit.jsp",
-                "javax.portlet.name=" + PortletKeys.EDITOR,
-                "javax.portlet.security-role-ref=power-user,user",
-                "javax.portlet.resource-bundle=content.Language",
-                "javax.portlet.version=3.0"
+                "jakarta.portlet.display-name=OnlyOffice Edit",
+                "jakarta.portlet.init-param.template-path=/",
+                "jakarta.portlet.init-param.view-template=/edit.jsp",
+                "jakarta.portlet.name=" + PortletKeys.EDITOR,
+                "jakarta.portlet.security-role-ref=power-user,user",
+                "jakarta.portlet.resource-bundle=content.Language",
+                "jakarta.portlet.version=3.0"
         },
         service = Portlet.class
 )

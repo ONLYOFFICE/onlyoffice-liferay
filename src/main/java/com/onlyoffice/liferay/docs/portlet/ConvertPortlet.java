@@ -38,10 +38,10 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
-import javax.portlet.Portlet;
-import javax.portlet.PortletException;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
+import jakarta.portlet.Portlet;
+import jakarta.portlet.PortletException;
+import jakarta.portlet.RenderRequest;
+import jakarta.portlet.RenderResponse;
 
 @Component(
         immediate = true,
@@ -50,12 +50,12 @@ import javax.portlet.RenderResponse;
                 "com.liferay.portlet.display-category=category.hidden",
                 "com.liferay.portlet.header-portlet-css=/css/main.css",
                 "com.liferay.portlet.instanceable=true",
-                "javax.portlet.init-param.template-path=/",
-                "javax.portlet.init-param.view-template=/convert.jsp",
-                "javax.portlet.name=" + PortletKeys.CONVERT,
-                "javax.portlet.security-role-ref=power-user,user",
-                "javax.portlet.resource-bundle=content.Language",
-                "javax.portlet.version=3.0"
+                "jakarta.portlet.init-param.template-path=/",
+                "jakarta.portlet.init-param.view-template=/convert.jsp",
+                "jakarta.portlet.name=" + PortletKeys.CONVERT,
+                "jakarta.portlet.security-role-ref=power-user,user",
+                "jakarta.portlet.resource-bundle=content.Language",
+                "jakarta.portlet.version=3.0"
         },
         service = Portlet.class
 )
