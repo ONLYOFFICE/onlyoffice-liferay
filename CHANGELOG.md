@@ -4,6 +4,9 @@
 ## Added
 - support Liferay DXP 2026.*
 
+## Changed
+- updated com.onlyoffice:docs-integration-sdk to v1.9.0, see [ONLYOFFICE/docs-integration-sdk-java v1.9.0](https://github.com/ONLYOFFICE/docs-integration-sdk-java/releases/tag/v1.9.0)
+
 ## 3.1.0
 ## Added
 - support ONLYOFFICE Docs v9.1.0
