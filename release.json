@@ -16,6 +16,10 @@
         "branch": "feature/dxp-2025"
     },
     {
+        "name": "DXP-2026",
+        "branch": "feature/dxp-2026"
+    },
+    {
         "name": "CE-7.2"
     },
     {
