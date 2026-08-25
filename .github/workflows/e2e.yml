@@ -1,0 +1,96 @@
+name: E2E
+
+on:
+  workflow_dispatch:
+    inputs:
+      liferay_image:
+        description: 'Liferay image (empty — the image pinned in docker/docker-compose.yml)'
+        default: ''
+      documentserver_image:
+        description: 'Document Server image'
+        default: 'onlyoffice/documentserver:latest'
+  push:
+    branches: [master]
+    paths-ignore:
+      - '**/*.md'
+      - 'LICENSE'
+      - '.idea/**'
+      - '.gitignore'
+      - '.github/**'
+  pull_request:
+    branches: [master, develop]
+    paths-ignore:
+      - '**/*.md'
+      - 'LICENSE'
+      - '.idea/**'
+      - '.gitignore'
+      - '.github/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Tests the ref this run was triggered on, and only that one: the plugin is built from it and
+# tested on the Liferay image it pins in docker/docker-compose.yml. Every supported platform
+# lives on its own branch (see release.json), so each is covered when the workflow runs on that
+# branch — a PR from feature/dxp-* into master builds exactly that platform.
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      liferay_image: ${{ steps.image.outputs.value }}
+    steps:
+      - name: Checkout plugin
+        uses: actions/checkout@v7
+
+      - name: Resolve Liferay image
+        id: image
+        env:
+          IMAGE_INPUT: ${{ inputs.liferay_image }}
+        run: |
+          image="$IMAGE_INPUT"
+          if [ -z "$image" ]; then
+            image=$(sed -n 's|^[[:space:]]*image:[[:space:]]*\(liferay/[^[:space:]]*\).*|\1|p' \
+              docker/docker-compose.yml | head -n 1)
+          fi
+          if [ -z "$image" ]; then
+            echo '::error file=docker/docker-compose.yml::Could not read the Liferay image'
+            exit 1
+          fi
+          echo "value=$image" >> "$GITHUB_OUTPUT"
+          echo "Liferay image: $image"
+
+      - name: Install Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Build Artifact
+        run: mvn --batch-mode clean package
+
+      - name: Upload plugin
+        uses: christopherHX/gitea-upload-artifact@v4
+        with:
+          name: plugin
+          path: target/liferay-docs-*.jar
+          retention-days: 1
+          if-no-files-found: error
+
+  e2e:
+    needs: build
+    uses: ONLYOFFICE/integration-tests/.github/workflows/e2e.yml@develop
+    with:
+      system: liferay
+      artifact_name: plugin
+      documentserver_image: ${{ inputs.documentserver_image || 'onlyoffice/documentserver:latest' }}
+      env_overrides: LIFERAY_IMAGE=${{ needs.build.outputs.liferay_image }}
+    secrets:
+      # Only consumed when the resolved image is a liferay/dxp one — the DXP branches enforce
+      # a license, the free liferay/portal image does not.
+      liferay_license: ${{ secrets.LIFERAY_LICENSE }}
